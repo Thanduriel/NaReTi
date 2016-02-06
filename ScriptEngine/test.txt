@@ -1,0 +1,31 @@
+/*
+//some vec class    
+type Vec2
+{
+	float x
+	float y
+}
+/*a comment of var len /*a comment in a comment!!!*/
+and this is still a comment*/ 
+
+Vec2 g_vector
+
+// a function definition
+Vec2 len(Vec2 _vec)
+{
+	float x
+	float y
+	
+	x = x - ((y + 1.3) / 42.0)
+}
+
+// a function without return value
+print(string _msg)
+{
+	
+}
+*/
+int sum(int arg0, int arg1)
+{
+	return arg0 + arg1
+}
