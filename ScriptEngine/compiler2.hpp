@@ -27,5 +27,6 @@ namespace codeGen
 
 		par::Function* m_function; // currently compiled function
 		asmjit::X86GpVar m_accumulator; //asmjit temp var of the currently compiled function
+		std::vector<asmjit::X86GpVar> m_anonymousVars; //additional temp vars for function inlining
 	};
 }

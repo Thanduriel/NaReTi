@@ -198,6 +198,9 @@
     <ClInclude Include="compiler2.hpp">
       <Filter>compiler</Filter>
     </ClInclude>
+    <ClInclude Include="ast.hpp">
+      <Filter>par</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

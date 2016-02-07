@@ -1,0 +1,132 @@
+//general language features
+
+//-------------------------------
+// 1. TYPES
+//-------------------------------
+
+// 1.1 atomic types
+// These are always keywords.
+<type> := {int, float, string, bool, uint,}
+//Mind that the last element is void, meaning that a function declaration can be declared 
+//without naming a return type.
+Vec2? // not really because those probably should be bound to native code structures
+
+// 1.2 custom types
+// Can be defined and afterwards used just like atomic types.
+struct <name> { <symbol declaration>,... }
+// keyword
+
+// 1.3 typecasts
+// 1.3.1 implicit typecasts
+// not supported?
+// 1.3.2 explicit typecasts
+(<type>) <symbol>
+// This syntax works like a unary operator and can be implemented for custom types.
+// It returns a handle of the given type.
+<type>& <symbol>
+// very unsafe and should not exist?
+// Some special cases could require them: inheritance, float magic
+
+//Reference types are types aswell.
+//-------------------------------
+// 2. Variables
+//-------------------------------
+// 2.1 handles
+<handle declaration> := <type> <name>
+// A handle has complete ownership and has a scope based lifespan.
+// With this syntax new objects are created.
+
+// 2.1.1 assignment
+// Assignment to a handle will always be by copy without invaliding any references to this obj.
+
+// 2.2. references
+<reference declaration> := <type>& <name>
+// Ownership depends on the binding. It can generally be seen as shared ownership.
+// Thus a handle is always valid.
+// A reference can be rebound, working as if it would go out of scope.
+/// Optimization should take care of references that lay within the scope of another.
+
+<var declaration> := <handle declaration> | <reference declaration> = <rvalue>
+
+// 2.2.1 assignment and rebinding
+// See operators.
+
+// 2.2.4 natives
+// When used as an script language within another system, handles can be defined outside
+// and still be referenced to. A native reference is declared when the used type is
+// extern.
+
+// 2.3 const - keyword
+// Variables can be declared as const preventing any write access in compile time.
+// Native bindings should generally be const.
+
+//-------------------------------
+// 3. Control structures
+//-------------------------------
+// 3.1 flow
+// if, else, while can be used as usual in imperative languages.
+
+// 3.2 range based loop
+for(opt<type> : <symbol name>){}
+// The following code block is executed for all elements of the list that qualify for the given type.
+// If none is given the base type of the container is used.
+
+//-------------------------------
+// 4. Operators
+//-------------------------------
+<binary operator> := <value> <operator> <value>
+//Operators can be used in mathematical style.
+// Precedence is given by a table and can be changed using brackets.
+// Redundant brackets can not be used.
+
+// 4.1 Operator overloading
+<operator>(<reference declaration>,<reference declaration>)
+{
+}
+//Any operator can be overloaded a single time per type combination.
+//Like with any function declaration default arguments can be provided.
+// A default argument will only be used when only one argument is supplied
+// or when no overload can be found for the given arguments.
+
+// 4.1.1 default Operators
+// All atomic types have already implemented operations which are consistent in their
+// semantic with c++.
+numerals : +,-,*,/
+int, bool(bitwise): <<, >>, ^, |, &
+bool: &&, || //overloads for int etc could be provided as implicit casts
+string: +
+struct(member access): .
+/// ? what sense does it make to differentiate, allowing implicit typecasts to bool?
+/// not that useful since there are no nullptrs.
+/// Precedence could be annoying when we have only one. )&(
+
+//-------------------------------
+// 5. functions
+//-------------------------------
+<type><name>(<var declaration>...)
+{
+	<term>
+}
+// 5.1 return
+// Any variable may be returned. If no type is given nothing is returned.
+
+//-------------------------------
+// 6. includes
+//-------------------------------
+:= use <filename>
+// A use clausal will make all symbols known declared in the specified package.
+// It does not work recursive.
+
+//-------------------------------
+// 7. standard library ?or some way for dynamic arrays...
+//-------------------------------
+<array declaration>:= <var declaration>[]
+// An array supports index based access, is cash efficient and can be changed in size.
+/// If an array size is not changed after its initialisation it may be intern reduced to a c-array.
+
+// 5.1 Array operations
+// These member functions are provided operating with iterators on single elements or ranges.
+// insert
+// clear
+// size
+// remove

@@ -102,7 +102,7 @@ namespace par
 				popParam();
 				m_currentScope->m_instructions.emplace_back(InstructionType::RetA, Parameter());
 			}
-			else m_currentScope->m_instructions.emplace_back(InstructionType::RetA, m_paramStack.back());
+			else m_currentScope->m_instructions.emplace_back(InstructionType::Ret, m_paramStack.back());
 		}
 	}
 

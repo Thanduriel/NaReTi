@@ -78,9 +78,15 @@ namespace codeGen
 		case par::InstructionType::Add:
 			m_compiler.add(m_accumulator, _instruction.param.ptr->binVar);
 			break;
+		case par::InstructionType::Mul:
+			m_compiler.imul(m_accumulator, _instruction.param.ptr->binVar);
+			break;
 		case par::InstructionType::Ret:
 			if (_instruction.param.type == par::ParamType::Ptr)
 				m_compiler.ret(_instruction.param.ptr->binVar);
+			break;
+		case par::InstructionType::Push:
+			m_compiler.push(_instruction.param.ptr->binVar);
 	//		else if (_instruction.param.type == par::ParamType::Int)
 	//			m_compiler.ret(_instruction.param.val);
 		}
