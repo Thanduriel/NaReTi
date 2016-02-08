@@ -6,6 +6,7 @@
 #include "module.hpp"
 #include "symbols.hpp"
 #include "modulelib.hpp"
+#include "ast.hpp"
 
 namespace par
 {
@@ -46,12 +47,14 @@ namespace par
 	private:
 		//pops a element from the param stack and translates it into an instruction
 		void popParam();
-		std::vector < Parameter > m_paramStack;
+		ASTNode* popNode() { ASTNode* ptr = m_stack.back(); m_stack.pop_back(); };
+		std::vector < ASTNode* > m_stack;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to
 		par::Function* m_currentFunction; // currently parsed function
 		par::ModuleLibrary m_moduleLib;
 		CodeScope* m_currentScope;
+		ASTCode* m_currentCode;
 		VarSymbol m_accumulator; // a local var that does not have a name
 		Parameter m_accParam; // parameter for the accumulator
 

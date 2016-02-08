@@ -1,6 +1,7 @@
 #pragma once
 
 #include "symbols.hpp"
+#include "ast.hpp"
 #include <vector>
 #include <string>
 
@@ -18,8 +19,8 @@ namespace NaReTi{
 		 * _begin, _end range on a param stack with the given arguments
 		 */
 		par::Function* getFunction(const std::string& _name, 
-			const std::vector<par::Parameter>::iterator& _begin, 
-			const std::vector<par::Parameter>::iterator& _end);
+			const std::vector<par::ASTNode*>::iterator& _begin,
+			const std::vector<par::ASTNode*>::iterator& _end);
 
 		std::vector < par::ComplexType > m_types;
 		std::vector < par::Function > m_functions;

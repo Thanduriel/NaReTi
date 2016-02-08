@@ -43,13 +43,13 @@ namespace par
 	 */
 	struct Parameter
 	{
-		Parameter() : type(ParamType::None){};
-		Parameter(int _val) : val(_val), type(ParamType::Int){};
-		Parameter(float _val) : valFloat(_val), type(ParamType::Float){};
-		Parameter(VarSymbol* _val) : ptr(_val), type(ParamType::Ptr){};
-		Parameter(par::Function* _val) : ptrFunc(_val), type(ParamType::PtrFunc){};
+		Parameter() : parType(ParamType::None){};
+		Parameter(int _val) : val(_val), parType(ParamType::Int){};
+		Parameter(float _val) : valFloat(_val), parType(ParamType::Float){};
+		Parameter(VarSymbol* _val) : ptr(_val), parType(ParamType::Ptr){};
+		Parameter(par::Function* _val) : ptrFunc(_val), parType(ParamType::PtrFunc){};
 
-		ParamType type;
+		ParamType parType;
 		union
 		{
 			int val;

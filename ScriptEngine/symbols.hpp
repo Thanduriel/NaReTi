@@ -67,7 +67,7 @@ namespace par{
 		CodeScope() : m_parent(nullptr) {};
 
 		std::vector< VarSymbol > m_variables;
-		std::vector < Instruction > m_instructions;
+//		std::vector < Instruction > m_instructions;
 
 		VarSymbol* getVar(std::string& _name)
 		{

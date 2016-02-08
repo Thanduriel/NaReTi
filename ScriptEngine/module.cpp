@@ -11,8 +11,8 @@ namespace NaReTi
 	}
 
 	par::Function* Module::getFunction(const std::string& _name,
-		const std::vector<par::Parameter>::iterator& _begin,
-		const std::vector<par::Parameter>::iterator& _end)
+		const std::vector<par::ASTNode*>::iterator& _begin,
+		const std::vector<par::ASTNode*>::iterator& _end)
 	{
 		for (auto& func : m_functions)
 		{
@@ -29,9 +29,9 @@ namespace NaReTi
 			{
 				par::Type* foundType;
 
-				auto& found = *(_begin + i);
-				if (found.type == par::ParamType::Ptr) foundType = &found.ptr->type;
-				else if (found.type == par::ParamType::PtrFunc) foundType = &found.ptrFunc->returnType;
+				par::ASTNode* found = *(_begin + i);
+				if (found->type == par::ASTType::Leaf) foundType = &((par::ASTLeaf*)found)->ptr->type;
+				else if (found->type == par::ASTType::Call) foundType = &((par::ASTCall*)found)->function->returnType;
 				//todo atomic types can be valid aswell
 				else
 				{

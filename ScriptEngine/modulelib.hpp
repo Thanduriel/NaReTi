@@ -23,8 +23,8 @@ namespace par
 
 		Type* getType(const std::string& _str);
 		par::Function* getFunction(const std::string& _name,
-			const std::vector<par::Parameter>::iterator& _begin,
-			const std::vector<par::Parameter>::iterator& _end);
+			const std::vector<par::ASTNode*>::iterator& _begin,
+			const std::vector<par::ASTNode*>::iterator& _end);
 
 	private:
 		std::vector < NaReTi::Module* > m_modules;

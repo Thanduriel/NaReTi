@@ -93,16 +93,12 @@ namespace par
 
 	void SemanticParser::returnStatement()
 	{
-		if (m_currentFunction->returnType.basic == BasicType::Void)
-			m_currentScope->m_instructions.emplace_back(InstructionType::Ret, Parameter());
-		else if (m_currentFunction->returnType.basic == BasicType::Int)
+		m_currentCode->emplace_back(new ASTReturn());
+		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back().get();
+
+		if (m_currentFunction->returnType.basic != BasicType::Void)
 		{
-			if (m_paramStack.back().type == ParamType::PtrFunc)
-			{
-				popParam();
-				m_currentScope->m_instructions.emplace_back(InstructionType::RetA, Parameter());
-			}
-			else m_currentScope->m_instructions.emplace_back(InstructionType::Ret, m_paramStack.back());
+			retNode.body = popNode();
 		}
 	}
 
@@ -114,14 +110,16 @@ namespace par
 		// -find the matching function using them
 		// -add a call instruction
 		// -push m_accumulator with the updated type on the stack
-		Function* func = m_moduleLib.getFunction(_operator, m_paramStack.begin() + (m_paramStack.size() - 2), m_paramStack.end());
+		Function* func = m_moduleLib.getFunction(_operator, m_stack.begin() + (m_stack.size() - 2), m_stack.end());
 		if (!func) throw ParsingError("No function with the given signiture found.");
 
+		ASTCall* astNode = new ASTCall();
+		astNode->function = func;
 		//pop the used params
-		popParam();
-		popParam();
+		astNode->args.push_back(popNode());
+		astNode->args.push_back(popNode());
 		//add result
-		m_paramStack.push_back(func);
+		m_stack.push_back(astNode);
 	//	cout << _operator << endl;
 	}
 
@@ -132,19 +130,19 @@ namespace par
 		VarSymbol* var = m_currentScope->getVar(_name);
 		if (!var) throw ParsingError("Unkown symbol");
 
-		m_paramStack.emplace_back(m_currentScope->getVar(_name));
+		m_stack.push_back(new ASTLeaf(var));
 		cout << _name << endl;
 	}
 
 	void SemanticParser::pushFloat(double _val)
 	{
-		m_paramStack.emplace_back((float)_val);
+//		m_paramStack.emplace_back((float)_val);
 		cout << _val << endl;
 	}
 
 	void SemanticParser::pushInt(int _val)
 	{
-		m_paramStack.emplace_back(_val);
+//		m_paramStack.emplace_back(_val);
 		cout << _val << endl;
 	}
 
