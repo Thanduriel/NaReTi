@@ -127,6 +127,7 @@
     <ClInclude Include="scriptengine.h" />
     <ClInclude Include="semanticparser.hpp" />
     <ClInclude Include="skipper.hpp" />
+    <ClInclude Include="stackalloc.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="symbols.hpp" />
     <ClInclude Include="targetver.h" />
@@ -169,6 +170,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="symbols.cpp" />
     <ClCompile Include="token.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

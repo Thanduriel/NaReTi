@@ -201,6 +201,9 @@
     <ClInclude Include="ast.hpp">
       <Filter>par</Filter>
     </ClInclude>
+    <ClInclude Include="stackalloc.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="compiler2.cpp">
       <Filter>compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="symbols.cpp">
+      <Filter>par</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

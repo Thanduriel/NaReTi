@@ -7,6 +7,7 @@
 #include "symbols.hpp"
 #include "modulelib.hpp"
 #include "ast.hpp"
+#include "stackalloc.hpp"
 
 namespace par
 {
@@ -30,7 +31,7 @@ namespace par
 		void setModule(NaReTi::Module& _module);
 
 		//set the scope back to the default scope of the module
-		void resetScope() { m_currentScope = &m_currentModule->m_text; };
+		void resetScope() { m_currentCode = &m_currentModule->m_text; };
 
 		void makeReference() { m_isReference = true; };
 		void varDeclaration(boost::fusion::vector2< std::string, std::string >& _attr);
@@ -47,7 +48,7 @@ namespace par
 	private:
 		//pops a element from the param stack and translates it into an instruction
 		void popParam();
-		ASTNode* popNode() { ASTNode* ptr = m_stack.back(); m_stack.pop_back(); };
+		ASTNode* popNode() { ASTNode* ptr = m_stack.back(); m_stack.pop_back(); return ptr; };
 		std::vector < ASTNode* > m_stack;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to
@@ -57,6 +58,8 @@ namespace par
 		ASTCode* m_currentCode;
 		VarSymbol m_accumulator; // a local var that does not have a name
 		Parameter m_accParam; // parameter for the accumulator
+
+		utils::StackAllocator<1024> m_allocator; // allocator for the ast
 
 		//flags
 		bool m_isReference;

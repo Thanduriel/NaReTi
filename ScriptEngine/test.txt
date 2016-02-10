@@ -27,5 +27,5 @@ print(string _msg)
 */
 int sum(int arg0, int arg1)
 {
-	return arg0 + arg1
+	return (arg0 + arg1) * (arg0 - arg1)
 }

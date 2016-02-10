@@ -14,12 +14,11 @@ namespace codeGen
 
 	private:
 		void compileFuction(par::Function& _function);
-		void translateInstruction(par::Instruction& _instruction);
-
-		// inlines the given call instr(found at instructions[id]) in the current function context
-		// expanding the original code scope
-		// returns the id to the first instruction after the inlined call
-		size_t inlineFunction(size_t _id);
+		void compileCode(par::ASTCode& _node);
+		void compileCall(par::ASTCall& _node, size_t _anonUsed = 0);
+		void compileBinOp(par::ASTBinOp& _node);
+		void compileRet(par::ASTReturn& _node);
+	//	void translateNode(par::ASTNode& _node);
 
 		asmjit::JitRuntime m_runtime;
 		asmjit::X86Assembler m_assembler;

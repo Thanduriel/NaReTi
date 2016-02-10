@@ -99,31 +99,6 @@ namespace par{
 		}
 	};
 
-	struct Function : public Symbol
-	{
-		// a binary function of the structure T x T -> T
-		Function(const std::string& _name, Type& _type, InstructionType _instr) : Function(_name, _type)
-		{
-			bInline = true;
-			paramCount = 2;
-
-			scope.m_variables.emplace_back("0", _type);
-			scope.m_variables.emplace_back("1", _type);
-
-			scope.m_instructions.emplace_back(InstructionType::SetA, &scope.m_variables[0]);
-			scope.m_instructions.emplace_back(_instr, &scope.m_variables[1]);
-		};
-
-		Function(const std::string& _name, Type& _type) : Symbol(_name), returnType(_type){};
-
-		Type& returnType;
-		CodeScope scope;
-		int paramCount; //< amount of params this function expects
-		//flags
-		bool bInline;
-
-		//the compiled version (the callee should know its signiture)
-		void* binary;
-	};
+	// Function symbol got moved to ast.hpp
 
 }

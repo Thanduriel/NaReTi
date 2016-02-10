@@ -24,7 +24,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//a script func!!!
 	cout << "module loaded: " << scriptEngine.loadMdoule("test.txt") << endl;
 	NaReTi::FunctionHandle scriptHndl = scriptEngine.getFuncHndl("sum");
-	cout << scriptEngine.call<int, int, int>(scriptHndl, 5, 4);
+	cout << scriptEngine.call<int, int, int>(scriptHndl, 1, 3);
 
 	char tmp;
 	std::cin >> tmp;

@@ -21,7 +21,7 @@ namespace par
 	void SemanticParser::setModule(NaReTi::Module& _module)
 	{ 
 		m_currentModule = &_module; 
-		m_currentScope = &_module.m_text; 
+		m_currentCode = &_module.m_text; 
 		m_moduleLib.reset(); 
 
 		//the current module is a valid resource aswell
@@ -79,8 +79,13 @@ namespace par
 		{
 			m_currentModule->m_functions.emplace_back(_attr.m0, *m_moduleLib.getType("void"));
 		}
-		m_currentScope = &m_currentModule->m_functions.back().scope;
+
+		//init envoirement
 		m_currentFunction = &m_currentModule->m_functions.back();
+		m_currentCode = &m_currentModule->m_functions.back().scope;
+		m_currentScope = &m_currentModule->m_functions.back().scope;
+		//destruct previous tree
+		m_allocator.reset();
 	}
 
 	void SemanticParser::finishParamList()
@@ -93,8 +98,8 @@ namespace par
 
 	void SemanticParser::returnStatement()
 	{
-		m_currentCode->emplace_back(new ASTReturn());
-		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back().get();
+		m_currentCode->emplace_back(m_allocator.construct<ASTReturn>());
+		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back();
 
 		if (m_currentFunction->returnType.basic != BasicType::Void)
 		{
@@ -113,13 +118,22 @@ namespace par
 		Function* func = m_moduleLib.getFunction(_operator, m_stack.begin() + (m_stack.size() - 2), m_stack.end());
 		if (!func) throw ParsingError("No function with the given signiture found.");
 
-		ASTCall* astNode = new ASTCall();
+		ASTNode* node;
+		/*			ASTBinOp* astNode = new ASTBinOp(((ASTBinOp*)func->scope[0])->instruction);
+					astNode->lOperand = popNode();
+					astNode->rOperand = popNode();
+					astNode->returnType = &func->returnType;
+					node = astNode;*/
+
+		ASTCall* astNode = m_allocator.construct<ASTCall>();
 		astNode->function = func;
 		//pop the used params
 		astNode->args.push_back(popNode());
 		astNode->args.push_back(popNode());
+		node = astNode;
+
 		//add result
-		m_stack.push_back(astNode);
+		m_stack.push_back(node);
 	//	cout << _operator << endl;
 	}
 
@@ -127,10 +141,10 @@ namespace par
 
 	void SemanticParser::pushSymbol(string& _name)
 	{
-		VarSymbol* var = m_currentScope->getVar(_name);
+		VarSymbol* var = m_currentCode->getVar(_name);
 		if (!var) throw ParsingError("Unkown symbol");
 
-		m_stack.push_back(new ASTLeaf(var));
+		m_stack.push_back(m_allocator.construct<ASTLeaf>(var));
 		cout << _name << endl;
 	}
 
@@ -150,7 +164,7 @@ namespace par
 
 	void SemanticParser::popParam()
 	{
-		par::InstructionType instrT;
+/*		par::InstructionType instrT;
 		switch (m_paramStack.back().type)
 		{
 		case ParamType::PtrFunc: instrT = InstructionType::Call;
@@ -161,8 +175,8 @@ namespace par
 			break;
 		}
 
-		m_currentScope->m_instructions.emplace_back(instrT, m_paramStack.back());
-		m_paramStack.pop_back();
+		m_currentCode->m_instructions.emplace_back(instrT, m_paramStack.back());
+		m_paramStack.pop_back();*/
 	}
 
 	// ************************************************** //

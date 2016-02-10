@@ -3,6 +3,7 @@
 namespace codeGen
 {
 	using namespace asmjit;
+	using namespace par;
 
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
@@ -31,6 +32,9 @@ namespace codeGen
 	{
 		m_function = &_function;
 
+		m_anonymousVars.clear();
+		m_anonymousVars.reserve(32); // make shure that no move will occure
+		
 		m_accumulator = m_compiler.newInt32("accumulator");
 		//setup signature
 		FuncBuilderX funcBuilder;
@@ -48,19 +52,7 @@ namespace codeGen
 		}
 
 		//code
-//		m_compiler.add(m_vars[0], m_vars[1]);
-//		m_compiler.ret(m_vars[0]);
-		size_t i = 0;
-		while (i < _function.scope.m_instructions.size())
-		{
-			if (_function.scope.m_instructions[i].type == par::InstructionType::Call && _function.scope.m_instructions[i].param.ptrFunc->bInline)
-				i = inlineFunction(i);
-			else i++;
-		}
-		for (auto& instr : _function.scope.m_instructions)
-		{
-			translateInstruction(instr);
-		}
+		compileCode(_function.scope);
 		//a final return
 //		m_compiler.ret();
 
@@ -68,60 +60,102 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::translateInstruction(par::Instruction& _instruction)
+	void Compiler::compileCode(ASTCode& _node)
 	{
-		switch (_instruction.type)
+		for (auto& subNode : _node)
 		{
-		case par::InstructionType::SetA:
-			m_compiler.mov(m_accumulator, _instruction.param.ptr->binVar);
-			break;
-		case par::InstructionType::Add:
-			m_compiler.add(m_accumulator, _instruction.param.ptr->binVar);
-			break;
-		case par::InstructionType::Mul:
-			m_compiler.imul(m_accumulator, _instruction.param.ptr->binVar);
-			break;
-		case par::InstructionType::Ret:
-			if (_instruction.param.type == par::ParamType::Ptr)
-				m_compiler.ret(_instruction.param.ptr->binVar);
-			break;
-		case par::InstructionType::Push:
-			m_compiler.push(_instruction.param.ptr->binVar);
-	//		else if (_instruction.param.type == par::ParamType::Int)
-	//			m_compiler.ret(_instruction.param.val);
+			switch (subNode->type)
+			{
+			case ASTType::BinOp:
+				compileBinOp(*(ASTBinOp*)subNode);
+				break;
+			case ASTType::Call:
+				compileCall(*(ASTCall*)subNode);
+				break;
+			case ASTType::Ret:
+				compileRet(*(ASTReturn*)subNode);
+				break;
+			}
 		}
 	}
 
 	// *************************************************** //
 
-	size_t Compiler::inlineFunction(size_t _id)
+	void Compiler::compileCall(ASTCall& _node, size_t _anonUsed)
 	{
-		auto& instructions = m_function->scope.m_instructions;
-		auto& calledFunc = *instructions[_id].param.ptrFunc;
-		
-		size_t firstInstr = _id - calledFunc.paramCount;
-		//save the used arguments
-		std::vector<par::Parameter> args; args.reserve(calledFunc.paramCount);
-		for (size_t i = firstInstr; i < firstInstr + calledFunc.paramCount; ++i)
+		std::vector< X86GpVar* > args; args.resize(_node.args.size());
+		size_t argPtr = _anonUsed;
+		if (_node.function->bInline)
 		{
-			args.push_back(instructions[i].param);
+			int i = 0;
+			//args
+			for (auto& arg : _node.args)
+			{
+				switch (arg->type)
+				{
+				case ASTType::Leaf:
+					// copy arg[0] to not change its value
+					if (i == 0)
+					{
+						m_compiler.mov(m_accumulator, ((ASTLeaf*)arg)->ptr->binVar);
+						args[i] = &m_accumulator;
+					}
+					else args[i] = &((ASTLeaf*)arg)->ptr->binVar;
+					
+					break;
+				case ASTType::Call: 
+					if (m_anonymousVars.size() == argPtr) m_anonymousVars.emplace_back(m_compiler.newInt32());
+					args[i] = &m_anonymousVars[argPtr];
+					compileCall(*(ASTCall*)arg, argPtr);
+					m_compiler.mov(m_anonymousVars[argPtr], m_accumulator);
+					argPtr++;
+					break;
+				}
+				i++;
+			}
+			//code
+			ASTBinOp& binOp = *(ASTBinOp*)_node.function->scope[0];
+
+			switch (binOp.instruction)
+			{
+			case InstructionType::Add:
+				m_compiler.add(*args[0], *args[1]);
+				break;
+			case InstructionType::Sub:
+				m_compiler.sub(*args[0], *args[1]);
+				break;
+			case InstructionType::Mul:
+				m_compiler.imul(*args[0], *args[1]);
+				break;
+			}
+			m_compiler.mov(m_accumulator, *args[0]);
 		}
-
-		//resize
-		//the functions instructions minus the call and the pushes
-		int extraSpace = calledFunc.scope.m_instructions.size() - 1 - calledFunc.paramCount;
-		if (extraSpace < 0) instructions.erase(instructions.begin() + firstInstr, instructions.begin() + firstInstr - extraSpace);
-		else if (extraSpace > 0) instructions.insert(instructions.begin() + firstInstr, extraSpace, instructions[0]);
-
-		//insert the actual instructions from the called function
-		for (auto& instr : calledFunc.scope.m_instructions)
-		{
-			instructions[firstInstr].type = instr.type;
-			instructions[firstInstr].param = args[instr.param.ptr->name[0] - '0'];
-			firstInstr++;
-		}
-
-		return firstInstr;
 	}
 
+	// *************************************************** //
+
+	void Compiler::compileBinOp(ASTBinOp& _node)
+	{
+		
+		m_compiler.mov(m_accumulator, ((ASTLeaf*)_node.lOperand)->ptr->binVar);
+
+		switch (_node.instruction)
+		{
+		case InstructionType::Add:
+			m_compiler.add(m_accumulator, ((ASTLeaf*)_node.rOperand)->ptr->binVar);
+			break;
+		case InstructionType::Mul:
+			m_compiler.imul(m_accumulator, ((ASTLeaf*)_node.rOperand)->ptr->binVar);
+		}
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileRet(ASTReturn& _node)
+	{
+		if (_node.body->type == ASTType::Call) compileCall(*(ASTCall*)_node.body);
+		else if (_node.body->type == ASTType::BinOp) compileBinOp(*(ASTBinOp*)_node.body);
+
+		m_compiler.ret(m_accumulator);
+	}
 }

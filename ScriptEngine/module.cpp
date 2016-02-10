@@ -32,6 +32,7 @@ namespace NaReTi
 				par::ASTNode* found = *(_begin + i);
 				if (found->type == par::ASTType::Leaf) foundType = &((par::ASTLeaf*)found)->ptr->type;
 				else if (found->type == par::ASTType::Call) foundType = &((par::ASTCall*)found)->function->returnType;
+				else if (found->type == par::ASTType::BinOp) foundType = ((par::ASTBinOp*)found)->returnType;
 				//todo atomic types can be valid aswell
 				else
 				{

@@ -24,7 +24,7 @@ namespace NaReTi{
 
 		std::vector < par::ComplexType > m_types;
 		std::vector < par::Function > m_functions;
-		par::CodeScope m_text;
+		par::ASTCode m_text;
 
 	private:
 		std::string m_name;

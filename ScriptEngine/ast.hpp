@@ -20,7 +20,8 @@ namespace par{
 		Call,
 		Leaf,
 		Loop,
-		Ret
+		Ret,
+		BinOp
 	};
 
 	struct ASTNode
@@ -40,6 +41,23 @@ namespace par{
 		public std::vector< ASTNode* >
 	{
 		ASTCode() { type = ASTType::Code; }
+	};
+
+	//function symbol; just here because of crosslinks between ast and symbols
+	struct Function : public Symbol
+	{
+		// a binary function of the structure T x T -> T
+		Function(const std::string& _name, Type& _type, InstructionType _instr);
+		Function(const std::string& _name, Type& _type) : Symbol(_name), returnType(_type){};
+
+		Type& returnType;
+		ASTCode scope;
+		int paramCount; //< amount of params this function expects, coresponds to the first elements in scope.locals
+		//flags
+		bool bInline;
+
+		//the compiled version (the callee should know its signiture)
+		void* binary;
 	};
 
 	struct ASTBranch : public ASTNode
@@ -70,5 +88,16 @@ namespace par{
 	{
 		ASTLeaf() { type = ASTType::Leaf; }
 		ASTLeaf(VarSymbol* _val) : Parameter(_val){ type = ASTType::Leaf; }
+	};
+
+	struct ASTBinOp : public ASTNode
+	{
+		ASTBinOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
+		InstructionType instruction;
+
+		Type* returnType; //setting the type is not mandentory in inlined functions
+		//left and right operand
+		ASTLeaf* lOperand;
+		ASTLeaf* rOperand;
 	};
 }
