@@ -8,6 +8,8 @@ namespace lang
 	struct BasicModule: public NaReTi::Module
 	{
 		BasicModule();
+
+		par::ComplexType& getBasicType(par::BasicType _basicType);
 	};
 	extern BasicModule g_module;
 }

@@ -119,11 +119,6 @@ namespace par
 		if (!func) throw ParsingError("No function with the given signiture found.");
 
 		ASTNode* node;
-		/*			ASTBinOp* astNode = new ASTBinOp(((ASTBinOp*)func->scope[0])->instruction);
-					astNode->lOperand = popNode();
-					astNode->rOperand = popNode();
-					astNode->returnType = &func->returnType;
-					node = astNode;*/
 
 		ASTCall* astNode = m_allocator.construct<ASTCall>();
 		astNode->function = func;
@@ -156,7 +151,7 @@ namespace par
 
 	void SemanticParser::pushInt(int _val)
 	{
-//		m_paramStack.emplace_back(_val);
+		m_stack.push_back(m_allocator.construct<ASTLeaf>(_val));
 		cout << _val << endl;
 	}
 

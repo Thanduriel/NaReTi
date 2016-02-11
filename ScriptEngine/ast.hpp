@@ -88,6 +88,7 @@ namespace par{
 	{
 		ASTLeaf() { type = ASTType::Leaf; }
 		ASTLeaf(VarSymbol* _val) : Parameter(_val){ type = ASTType::Leaf; }
+		ASTLeaf(int _val) : Parameter(_val){ type = ASTType::Leaf; }
 	};
 
 	struct ASTBinOp : public ASTNode

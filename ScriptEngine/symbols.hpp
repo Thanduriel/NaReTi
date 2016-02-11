@@ -30,6 +30,7 @@ namespace par{
 
 	struct Type : public Symbol
 	{
+		Type(){};
 		Type(const std::string& _name, BasicType _basic) : Symbol(_name), basic(_basic){};
 		BasicType basic;
 
@@ -55,6 +56,16 @@ namespace par{
 			Symbol(_name),
 			type(_type)
 		{};
+
+		VarSymbol& operator= (VarSymbol& oth)
+		{
+			name = oth.name;
+			type = oth.type;
+			isReference = oth.isReference;
+
+			return *this;
+		}
+
 		Type& type;
 
 		bool isReference;
@@ -84,6 +95,7 @@ namespace par{
 
 	struct ComplexType : public Type
 	{
+		ComplexType(){};
 		ComplexType(const std::string& _name, BasicType _basicType = Complex) : Type(_name, _basicType)
 		{}
 		CodeScope scope;

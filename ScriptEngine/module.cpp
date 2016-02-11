@@ -1,4 +1,5 @@
 #include "module.hpp"
+#include "atomics.hpp"
 
 namespace NaReTi
 {
@@ -30,7 +31,15 @@ namespace NaReTi
 				par::Type* foundType;
 
 				par::ASTNode* found = *(_begin + i);
-				if (found->type == par::ASTType::Leaf) foundType = &((par::ASTLeaf*)found)->ptr->type;
+				if (found->type == par::ASTType::Leaf)
+				{
+					par::ASTLeaf& leaf = *(par::ASTLeaf*)found;
+					switch (leaf.parType)
+					{
+					case par::ParamType::Ptr: foundType = &leaf.ptr->type; break;
+					case par::ParamType::Int: foundType = &lang::g_module.getBasicType(par::BasicType::Int);
+					}
+				}
 				else if (found->type == par::ASTType::Call) foundType = &((par::ASTCall*)found)->function->returnType;
 				else if (found->type == par::ASTType::BinOp) foundType = ((par::ASTBinOp*)found)->returnType;
 				//todo atomic types can be valid aswell

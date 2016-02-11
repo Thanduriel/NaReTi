@@ -18,7 +18,6 @@ namespace codeGen
 		void compileCall(par::ASTCall& _node, size_t _anonUsed = 0);
 		void compileBinOp(par::ASTBinOp& _node);
 		void compileRet(par::ASTReturn& _node);
-	//	void translateNode(par::ASTNode& _node);
 
 		asmjit::JitRuntime m_runtime;
 		asmjit::X86Assembler m_assembler;

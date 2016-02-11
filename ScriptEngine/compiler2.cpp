@@ -94,14 +94,25 @@ namespace codeGen
 				switch (arg->type)
 				{
 				case ASTType::Leaf:
-					// copy arg[0] to not change its value
-					if (i == 0)
+					ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
+					//immediate val
+					if (leaf->parType == ParamType::Int)
 					{
-						m_compiler.mov(m_accumulator, ((ASTLeaf*)arg)->ptr->binVar);
-						args[i] = &m_accumulator;
+						if (m_anonymousVars.size() == argPtr) m_anonymousVars.emplace_back(m_compiler.newInt32());
+						args[i] = &m_anonymousVars[argPtr];
+						m_compiler.mov(m_anonymousVars[argPtr], Imm(leaf->val));
+						argPtr++;
 					}
-					else args[i] = &((ASTLeaf*)arg)->ptr->binVar;
-					
+					else
+					{
+						// copy arg[0] to not change its value
+						if (i == 0)
+						{
+							m_compiler.mov(m_accumulator, ((ASTLeaf*)arg)->ptr->binVar);
+							args[i] = &m_accumulator;
+						}
+						else args[i] = &((ASTLeaf*)arg)->ptr->binVar;
+					}
 					break;
 				case ASTType::Call: 
 					if (m_anonymousVars.size() == argPtr) m_anonymousVars.emplace_back(m_compiler.newInt32());
