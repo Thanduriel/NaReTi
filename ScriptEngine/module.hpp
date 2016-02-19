@@ -4,6 +4,7 @@
 #include "ast.hpp"
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace NaReTi{
 
@@ -22,8 +23,9 @@ namespace NaReTi{
 			const std::vector<par::ASTNode*>::iterator& _begin,
 			const std::vector<par::ASTNode*>::iterator& _end);
 
-		std::vector < par::ComplexType > m_types;
-		std::vector < par::Function > m_functions;
+		//their lifetime equals 
+		std::vector < std::unique_ptr<par::ComplexType> > m_types;
+		std::vector < std::unique_ptr<par::Function> > m_functions;
 		par::ASTCode m_text;
 
 	private:

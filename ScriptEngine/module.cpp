@@ -6,7 +6,7 @@ namespace NaReTi
 	par::Type* Module::getType(const std::string& _name)
 	{
 		for (auto& type : m_types)
-			if (type.name == _name) return &type;
+			if (type->name == _name) return type.get();
 
 		return nullptr;
 	}
@@ -17,11 +17,11 @@ namespace NaReTi
 	{
 		for (auto& func : m_functions)
 		{
-			if (func.name != _name) continue;
+			if (func->name != _name) continue;
 	//		if (&func.returnType != &_ret) continue;
 
 			auto dist = std::distance(_begin, _end);
-			if (dist != func.paramCount) continue;
+			if (dist != func->paramCount) continue;
 
 			//make a copy
 			auto begin = _begin;
@@ -48,13 +48,13 @@ namespace NaReTi
 					paramsMatch = false;
 					break;
 				}
-				if (foundType != &func.scope.m_variables[i].type)
+				if (foundType != &func->scope.m_variables[i].type)
 				{
 					paramsMatch = false;
 					break;
 				}
 			}
-			if (paramsMatch) return &func;
+			if (paramsMatch) return func.get();
 		}
 		return nullptr;
 	}

@@ -12,6 +12,12 @@ namespace par
 		Mul,
 		Div,
 		Mod,
+		//float arithmetic
+		fAdd,
+		fSub,
+		fMul,
+		fDiv,
+		fMod,
 		//logical operations
 		Not,
 		ShL,

@@ -13,7 +13,7 @@ namespace NaReTi{
 		ScriptEngine();
 
 		//compiles a given source file and adds the module
-		bool loadMdoule(const std::string& _fileName);
+		bool loadModule(const std::string& _fileName);
 
 
 		//
@@ -36,7 +36,7 @@ namespace NaReTi{
 		codeGen::Compiler m_compiler;
 
 		std::vector< FunctionHandle > m_nativeFunctions;
-		std::vector< Module > m_modules;
+		std::vector< std::unique_ptr<Module> > m_modules;
 	};
 
 }

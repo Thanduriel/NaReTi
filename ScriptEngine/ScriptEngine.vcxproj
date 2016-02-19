@@ -116,6 +116,7 @@
     <ClInclude Include="atomics.hpp" />
     <ClInclude Include="attributecasts.hpp" />
     <ClInclude Include="boostparser.hpp" />
+    <ClInclude Include="compiledsymbols.hpp" />
     <ClInclude Include="compiler2.hpp" />
     <ClInclude Include="enginetypes.hpp" />
     <ClInclude Include="instruction.hpp" />

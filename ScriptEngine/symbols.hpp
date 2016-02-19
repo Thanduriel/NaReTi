@@ -1,9 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "instruction.hpp"
 
-#include <asmjit.h> // for x86grpvar
+#include "compiledsymbols.hpp"// for x86grpvar
 
 namespace par{
 	
@@ -70,7 +71,7 @@ namespace par{
 
 		bool isReference;
 
-		asmjit::X86GpVar binVar;
+		asmjit::Var* compiledVar;
 	};
 
 	struct CodeScope

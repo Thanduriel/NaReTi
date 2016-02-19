@@ -59,8 +59,8 @@ namespace par
 
 	void SemanticParser::typeDeclaration(std::string& _attr)
 	{
-		m_currentModule->m_types.emplace_back(_attr);
-		m_currentScope = &m_currentModule->m_types.back().scope;
+		m_currentModule->m_types.emplace_back(new ComplexType(_attr));
+		m_currentScope = &m_currentModule->m_types.back()->scope;
 	}
 
 	// ************************************************** //
@@ -72,25 +72,25 @@ namespace par
 		{
 			Type* type = m_moduleLib.getType(_attr.m0);
 			if (!type) throw ParsingError("Unkown type");
-			m_currentModule->m_functions.emplace_back(_attr.m1.get(), *type);
+			m_currentModule->m_functions.emplace_back(new Function(_attr.m1.get(), *type));
 		}
 		//assume void
 		else
 		{
-			m_currentModule->m_functions.emplace_back(_attr.m0, *m_moduleLib.getType("void"));
+			m_currentModule->m_functions.emplace_back(new Function(_attr.m0, *m_moduleLib.getType("void")));
 		}
 
 		//init envoirement
-		m_currentFunction = &m_currentModule->m_functions.back();
-		m_currentCode = &m_currentModule->m_functions.back().scope;
-		m_currentScope = &m_currentModule->m_functions.back().scope;
+		m_currentFunction = m_currentModule->m_functions.back().get();
+		m_currentCode = &m_currentModule->m_functions.back()->scope;
+		m_currentScope = &m_currentModule->m_functions.back()->scope;
 		//destruct previous tree
 		m_allocator.reset();
 	}
 
 	void SemanticParser::finishParamList()
 	{
-		Function& function = m_currentModule->m_functions.back();
+		Function& function = *m_currentModule->m_functions.back();
 		function.paramCount = (int)function.scope.m_variables.size();
 	}
 

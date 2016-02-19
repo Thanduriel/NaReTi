@@ -22,9 +22,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	cout << scriptEngine.call<int, int>(hndl, 5) << endl;
 
 	//a script func!!!
-	cout << "module loaded: " << scriptEngine.loadMdoule("test.txt") << endl;
-	NaReTi::FunctionHandle scriptHndl = scriptEngine.getFuncHndl("sum");
-	cout << scriptEngine.call<int, int, int>(scriptHndl, 1, 3);
+	cout << "module loaded: " << scriptEngine.loadModule("test.txt") << endl;
+	NaReTi::FunctionHandle hndlI = scriptEngine.getFuncHndl("sum");
+	NaReTi::FunctionHandle hndlF = scriptEngine.getFuncHndl("fsum");
+	cout << scriptEngine.call<int, int, int>(hndlI, 40, 2) << endl;
+	cout << scriptEngine.call<float, float, float>(hndlF, 2.14, 1.0015) << endl;
 
 	char tmp;
 	std::cin >> tmp;

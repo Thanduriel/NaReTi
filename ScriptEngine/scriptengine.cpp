@@ -13,7 +13,7 @@ namespace NaReTi
 
 	// ******************************************************* //
 
-	bool ScriptEngine::loadMdoule(const string& _fileName)
+	bool ScriptEngine::loadModule(const string& _fileName)
 	{
 		std::ifstream in(_fileName.c_str(), std::ios::in | std::ios::binary);
 
@@ -49,14 +49,18 @@ namespace NaReTi
 		}
 		//use it witout the file ending as name for the module
 		string packageName = _fileName.substr(beginInd, endInd);
-		NaReTi::Module module(packageName);
+		m_modules.emplace_back(new NaReTi::Module(packageName));
+		NaReTi::Module& module = *m_modules.back();
 
 
 		bool ret = m_parser.parse(fileContent, module);
 		if (ret)
 		{
 			m_compiler.compile(module);
-			m_modules.push_back(std::move(module));
+		}
+		else
+		{
+			m_modules.pop_back();
 		}
 
 		return ret;
@@ -67,8 +71,8 @@ namespace NaReTi
 	FunctionHandle ScriptEngine::getFuncHndl(const std::string& _name)
 	{
 		for (auto& module : m_modules)
-			for (auto& func : module.m_functions)
-				if (func.name == _name) return FunctionHandle(func.binary);
+			for (auto& func : module->m_functions)
+				if (func->name == _name) return FunctionHandle(func->binary);
 	}
 
 	// ******************************************************* //

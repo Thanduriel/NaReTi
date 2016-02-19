@@ -21,7 +21,8 @@ namespace par{
 		Leaf,
 		Loop,
 		Ret,
-		BinOp
+		BinOp,
+		UnOp
 	};
 
 	struct ASTNode
@@ -44,7 +45,7 @@ namespace par{
 	};
 
 	//function symbol; just here because of crosslinks between ast and symbols
-	struct Function : public Symbol
+	struct Function : public Symbol, codeGen::CFunction
 	{
 		// a binary function of the structure T x T -> T
 		Function(const std::string& _name, Type& _type, InstructionType _instr);
@@ -55,9 +56,6 @@ namespace par{
 		int paramCount; //< amount of params this function expects, coresponds to the first elements in scope.locals
 		//flags
 		bool bInline;
-
-		//the compiled version (the callee should know its signiture)
-		void* binary;
 	};
 
 	struct ASTBranch : public ASTNode
@@ -100,5 +98,14 @@ namespace par{
 		//left and right operand
 		ASTLeaf* lOperand;
 		ASTLeaf* rOperand;
+	};
+
+	struct ASTUnOp : public ASTNode
+	{
+		ASTUnOp(InstructionType _instr) : instruction(_instr) { type = ASTType::UnOp; }
+		InstructionType instruction;
+
+		Type* returnType; //setting the type is not mandentory in inlined functions
+		ASTLeaf* operand;
 	};
 }

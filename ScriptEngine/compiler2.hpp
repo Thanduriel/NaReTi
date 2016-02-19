@@ -5,6 +5,11 @@
 
 namespace codeGen
 {
+	struct UsageState
+	{
+		size_t varsInUse;
+		size_t floatsInUse;
+	};
 	class Compiler
 	{
 	public:
@@ -13,18 +18,35 @@ namespace codeGen
 		void compile(NaReTi::Module& _module);
 
 	private:
+		//sets up a par::Function's asmjit funcbuilder
+		void convertSignature(par::Function& _function);
+		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
-		void compileCall(par::ASTCall& _node, size_t _anonUsed = 0);
-		void compileBinOp(par::ASTBinOp& _node);
+		void compileCall(par::ASTCall& _node);
+	//	void compileInstr(par::InstructionType _instr);
 		void compileRet(par::ASTReturn& _node);
+
+		UsageState getUsageState() { return m_usageState; }
+		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
+		// returns a virtual register currently not in use
+		asmjit::X86GpVar& getUnusedVar();
+		asmjit::X86XmmVar& getUnusedFloat();
+
+
 
 		asmjit::JitRuntime m_runtime;
 		asmjit::X86Assembler m_assembler;
 		asmjit::X86Compiler m_compiler;
 
 		par::Function* m_function; // currently compiled function
-		asmjit::X86GpVar m_accumulator; //asmjit temp var of the currently compiled function
-		std::vector<asmjit::X86GpVar> m_anonymousVars; //additional temp vars for function inlining
+		asmjit::X86GpVar* m_accumulator; //asmjit temp var of the currently compiled function
+		asmjit::X86XmmVar* m_fp0;
+		//virtual registers used
+		std::vector<asmjit::X86GpVar> m_anonymousVars; 
+		std::vector<asmjit::X86XmmVar> m_anonymousFloats;
+		// registers that have relevant content that should not be overwritten
+		// appart from assignments.
+		UsageState m_usageState;
 	};
 }
