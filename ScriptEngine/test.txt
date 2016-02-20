@@ -34,3 +34,8 @@ float fsum(float f0, float f1)
 {
 	return f0 + f1
 }
+
+float castTest(int arg0, float arg1)
+{
+	return arg0 + arg1
+}

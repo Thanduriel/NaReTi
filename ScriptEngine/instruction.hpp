@@ -2,6 +2,7 @@
 
 namespace par
 {
+	//not all of this are in use or even make sence in the current implementation
 	enum InstructionType
 	{
 		//set accumulator
@@ -27,7 +28,11 @@ namespace par
 		RetA, // return the accumulator; takes no param
 		Call, // call subroutine; is inlined when the flag is set
 		Push, // push anything on the virtual stack
-		Scope // a new scope "{}" inside the current one
+		Scope, // a new scope "{}" inside the current one
+		// type casts and which argument to take
+		iTof0,
+		iTof1,
+		fToi
 	};
 
 	//predeclarations

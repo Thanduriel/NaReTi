@@ -123,8 +123,9 @@ namespace par
 		ASTCall* astNode = m_allocator.construct<ASTCall>();
 		astNode->function = func;
 		//pop the used params
-		astNode->args.push_back(popNode());
-		astNode->args.push_back(popNode());
+		astNode->args.resize(2);
+		astNode->args[1] = popNode();
+		astNode->args[0] = popNode();
 		node = astNode;
 
 		//add result

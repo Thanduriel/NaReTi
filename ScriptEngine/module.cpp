@@ -41,7 +41,7 @@ namespace NaReTi
 					}
 				}
 				else if (found->type == par::ASTType::Call) foundType = &((par::ASTCall*)found)->function->returnType;
-				else if (found->type == par::ASTType::BinOp) foundType = ((par::ASTBinOp*)found)->returnType;
+				else if (found->type == par::ASTType::BinOp) foundType = ((par::ASTOp*)found)->returnType;
 				//todo atomic types can be valid aswell
 				else
 				{

@@ -113,7 +113,7 @@ namespace codeGen
 			switch (subNode->type)
 			{
 	//		case ASTType::BinOp:
-	//			compileBinOp(*(ASTBinOp*)subNode);
+	//			compileBinOp(*(ASTOp*)subNode);
 				break;
 			case ASTType::Call:
 				compileCall(*(ASTCall*)subNode);
@@ -181,34 +181,27 @@ namespace codeGen
 				i++;
 			}
 			//code
-			ASTBinOp& binOp = *(ASTBinOp*)_node.function->scope[0];
 
-			//since the first operand of a binop is overwritten with the result copy the values first
-			if (func.returnType.basic == BasicType::Float)
+			// if types do not match, a typecast will move the data
+			if (func.returnType.basic == func.scope.m_variables[0].type.basic)
 			{
-				m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
-				args[0] = m_fp0;
-			}
-			else
-			{
-				m_compiler.mov(*m_accumulator, *(asmjit::X86GpVar*)args[0]);
-				args[0] = m_accumulator;
+				//since the first operand of a binop is overwritten with the result copy the values first
+				if (func.returnType.basic == BasicType::Float)
+				{
+					m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
+					args[0] = m_fp0;
+				}
+				else
+				{
+					m_compiler.mov(*m_accumulator, *(asmjit::X86GpVar*)args[0]);
+					args[0] = m_accumulator;
+				}
 			}
 
-			switch (binOp.instruction)
+			for (auto& node : _node.function->scope)
 			{
-			case InstructionType::Add:
-				m_compiler.add(*(asmjit::X86GpVar*)args[0], *(asmjit::X86GpVar*)args[1]);
-				break;
-	/*		case InstructionType::Sub:
-				m_compiler.sub(*args[0], *args[1]);
-				break;
-			case InstructionType::Mul:
-				m_compiler.imul(*args[0], *args[1]);
-				break;*/
-			case InstructionType::fAdd:
-				m_compiler.addss(*(X86XmmVar*)args[0], *(X86XmmVar*)args[1]);
-				break;
+				ASTOp& op = *(ASTOp*)node;
+				compileOp(op.instruction, args);
 			}
 
 			//the result is already in ax or fp0
@@ -226,27 +219,37 @@ namespace codeGen
 
 	// *************************************************** //
 
-/*	void Compiler::compileBinOp(ASTBinOp& _node)
+	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args)
 	{
 		
-		m_compiler.mov(m_accumulator, ((ASTLeaf*)_node.lOperand)->ptr->binVar);
-
-		switch (_node.instruction)
+		switch (_instr)
 		{
 		case InstructionType::Add:
-			m_compiler.add(m_accumulator, ((ASTLeaf*)_node.rOperand)->ptr->binVar);
+			m_compiler.add(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Mul:
-			m_compiler.imul(m_accumulator, ((ASTLeaf*)_node.rOperand)->ptr->binVar);
+			/*		case InstructionType::Sub:
+			m_compiler.sub(*args[0], *args[1]);
+			break;
+			case InstructionType::Mul:
+			m_compiler.imul(*args[0], *args[1]);
+			break;*/
+		case InstructionType::fAdd:
+			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			break;
+		case InstructionType::iTof0:
+			X86XmmVar& var = *m_fp0;
+			m_compiler.cvtsi2ss(var, *(X86GpVar*)_args[0]);
+			_args[0] = &var;
+			break;
 		}
-	}*/
+	}
 
 	// *************************************************** //
 
 	void Compiler::compileRet(ASTReturn& _node)
 	{
 		if (_node.body->type == ASTType::Call) compileCall(*(ASTCall*)_node.body);
-	//	else if (_node.body->type == ASTType::BinOp) compileBinOp(*(ASTBinOp*)_node.body);
+	//	else if (_node.body->type == ASTType::BinOp) compileBinOp(*(ASTOp*)_node.body);
 
 		par::Type& returnType = (*(ASTCall*)_node.body).function->returnType;
 		if (returnType.basic == Float)

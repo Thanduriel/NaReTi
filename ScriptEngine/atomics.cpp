@@ -2,6 +2,7 @@
 #include "symbols.hpp"
 
 #define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( X, *m_types[ Y ], Z));
+#define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
 
 namespace lang
 {
@@ -33,6 +34,11 @@ namespace lang
 		BASICOPERATION("-", BasicType::Float, InstructionType::fSub);
 		BASICOPERATION("*", BasicType::Float, InstructionType::fMul);
 		BASICOPERATION("/", BasicType::Float, InstructionType::fDiv);
+
+		//float x int
+		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
+		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof1, InstructionType::fAdd }), BasicType::Float, BasicType::Float, BasicType::Int);
+
 	/*	m_functions.emplace_back("+", m_types[0], InstructionType::Add);
 		m_functions.emplace_back("-", m_types[0], InstructionType::Sub);
 		m_functions.emplace_back("*", m_types[0], InstructionType::Mul);

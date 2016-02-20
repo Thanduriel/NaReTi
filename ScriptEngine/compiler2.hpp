@@ -24,7 +24,7 @@ namespace codeGen
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
 		void compileCall(par::ASTCall& _node);
-	//	void compileInstr(par::InstructionType _instr);
+		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 
 		UsageState getUsageState() { return m_usageState; }

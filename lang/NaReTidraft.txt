@@ -18,7 +18,10 @@ struct <name> { <symbol declaration>,... }
 
 // 1.3 typecasts
 // 1.3.1 implicit typecasts
-// not supported?
+Number types can will be casted if no match for a specific function or operation is found.
+This will first try "upcasting" with less loss of information from int to float and if that does
+not produce a match types is "downcasted".
+Left sides of assignments can not be casted.
 // 1.3.2 explicit typecasts
 (<type>) <symbol>
 // This syntax works like a unary operator and can be implemented for custom types.

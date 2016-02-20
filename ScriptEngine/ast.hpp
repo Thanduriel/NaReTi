@@ -47,8 +47,11 @@ namespace par{
 	//function symbol; just here because of crosslinks between ast and symbols
 	struct Function : public Symbol, codeGen::CFunction
 	{
+		//definitions can be fuond in "symbols.cpp"
 		// a binary function of the structure T x T -> T
 		Function(const std::string& _name, Type& _type, InstructionType _instr);
+		// general purpose T1 x T2 -> T0
+		Function(const std::string& _name, std::initializer_list<InstructionType> _instr, Type& _t0, Type* _t1, Type* _t2);
 		Function(const std::string& _name, Type& _type) : Symbol(_name), returnType(_type){};
 
 		Type& returnType;
@@ -89,15 +92,12 @@ namespace par{
 		ASTLeaf(int _val) : Parameter(_val){ type = ASTType::Leaf; }
 	};
 
-	struct ASTBinOp : public ASTNode
+	struct ASTOp : public ASTNode
 	{
-		ASTBinOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
+		ASTOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
 		InstructionType instruction;
 
 		Type* returnType; //setting the type is not mandentory in inlined functions
-		//left and right operand
-		ASTLeaf* lOperand;
-		ASTLeaf* rOperand;
 	};
 
 	struct ASTUnOp : public ASTNode
