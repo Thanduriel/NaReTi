@@ -9,9 +9,7 @@ using namespace std;
 namespace par
 {
 	SemanticParser::SemanticParser() :
-		m_moduleLib(lang::g_module),
-		m_accumulator("", *lang::g_module.getType("int")),
-		m_accParam(&m_accumulator)
+		m_moduleLib(lang::g_module)
 	{
 
 	}
@@ -22,6 +20,7 @@ namespace par
 	{ 
 		m_currentModule = &_module; 
 		m_currentCode = &_module.m_text; 
+		m_allocator = &_module.getAllocator();
 		m_moduleLib.reset(); 
 
 		//the current module is a valid resource aswell
@@ -85,7 +84,7 @@ namespace par
 		m_currentCode = &m_currentModule->m_functions.back()->scope;
 		m_currentScope = &m_currentModule->m_functions.back()->scope;
 		//destruct previous tree
-		m_allocator.reset();
+		m_allocator->reset();
 	}
 
 	void SemanticParser::finishParamList()
@@ -98,7 +97,7 @@ namespace par
 
 	void SemanticParser::returnStatement()
 	{
-		m_currentCode->emplace_back(m_allocator.construct<ASTReturn>());
+		m_currentCode->emplace_back(m_allocator->construct<ASTReturn>());
 		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back();
 
 		if (m_currentFunction->returnType.basic != BasicType::Void)
@@ -120,7 +119,7 @@ namespace par
 		Function* func = m_moduleLib.getFunction(_operator, m_stack.begin() + (m_stack.size() - 2), m_stack.end());
 		if (!func) throw ParsingError("No function with the given signature found.");
 
-		ASTCall* astNode = m_allocator.construct<ASTCall>();
+		ASTCall* astNode = m_allocator->construct<ASTCall>();
 		astNode->function = func;
 		astNode->expType = (ComplexType*)&func->returnType;
 		//pop the used params
@@ -146,7 +145,7 @@ namespace par
 			{
 				if (member.name == _name)
 				{
-					ASTMember* memberNode = m_allocator.construct<ASTMember>(*popNode(), i);
+					ASTMember* memberNode = m_allocator->construct<ASTMember>(*popNode(), i);
 					memberNode->expType = (ComplexType*)&member.type;
 					m_stack.push_back(memberNode);
 
@@ -159,7 +158,7 @@ namespace par
 
 		}
 		
-		ASTLeaf* leaf = m_allocator.construct<ASTLeaf>(var);
+		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(var);
 		leaf->expType = (ComplexType*)&var->type;
 		m_stack.push_back(leaf);
 		cout << _name << endl;
@@ -173,7 +172,7 @@ namespace par
 
 	void SemanticParser::pushInt(int _val)
 	{
-		ASTLeaf* leaf = m_allocator.construct<ASTLeaf>(_val);
+		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(_val);
 		leaf->expType = &lang::g_module.getBasicType(BasicType::Int);
 		m_stack.push_back(leaf);
 		cout << _val << endl;

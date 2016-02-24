@@ -1,8 +1,8 @@
 #include "atomics.hpp"
 #include "symbols.hpp"
 
-#define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( X, *m_types[ Y ], Z));
-#define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
+#define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
+#define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
 
 namespace lang
 {

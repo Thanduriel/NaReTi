@@ -2,6 +2,7 @@
 
 #include "symbols.hpp"
 #include "ast.hpp"
+#include "stackalloc.hpp"
 #include <vector>
 #include <string>
 #include <memory>
@@ -23,12 +24,18 @@ namespace NaReTi{
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
 			const std::vector<par::ASTExpNode*>::iterator& _end);
 
+		utils::StackAlloc& getAllocator() { return m_allocator; }
+
 		//their lifetime equals 
 		std::vector < std::unique_ptr<par::ComplexType> > m_types;
 		std::vector < std::unique_ptr<par::Function> > m_functions;
 		par::ASTCode m_text;
 
-	private:
 		std::string m_name;
+	protected:
+
+		// allocator for the ast-nodes
+		// todo: types and functions could be allocated by this aswell to make destruction faster
+		utils::StackAlloc m_allocator;
 	};
 }

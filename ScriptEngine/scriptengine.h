@@ -14,7 +14,9 @@ namespace NaReTi{
 
 		//compiles a given source file and adds the module
 		bool loadModule(const std::string& _fileName);
-
+		// Removes a module with the given name and all it's symbols to realease it's memory.
+		// This should only be used if no other module depends on the module.
+		bool unloadModule(const std::string& _moduleName);
 
 		//
 		FunctionHandle getFuncHndl(const std::string& _name);

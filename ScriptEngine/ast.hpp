@@ -4,6 +4,7 @@
 
 #include "symbols.hpp"
 #include "instruction.hpp"
+#include "stackalloc.hpp"
 
 namespace par{
 
@@ -55,9 +56,9 @@ namespace par{
 	{
 		//definitions can be fuond in "symbols.cpp"
 		// a binary function of the structure T x T -> T
-		Function(const std::string& _name, Type& _type, InstructionType _instr);
+		Function(utils::StackAlloc& _alloc, const std::string& _name, Type& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
-		Function(const std::string& _name, std::initializer_list<InstructionType> _instr, Type& _t0, Type* _t1, Type* _t2);
+		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, Type& _t0, Type* _t1, Type* _t2);
 		Function(const std::string& _name, Type& _type) : Symbol(_name), returnType(_type){};
 
 		Type& returnType;

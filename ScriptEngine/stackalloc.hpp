@@ -50,4 +50,6 @@ namespace utils{
 		size_t bp; //block pointer
 		std::vector< void* > memBlocks;
 	};
+
+	typedef utils::StackAllocator<1024> StackAlloc;
 }

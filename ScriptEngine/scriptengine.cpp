@@ -68,6 +68,22 @@ namespace NaReTi
 
 	// ******************************************************* //
 
+	bool ScriptEngine::unloadModule(const std::string& _moduleName)
+	{
+		for (auto i = m_modules.begin(); i != m_modules.end(); ++i)
+		{
+			Module& module = *(*i);
+			if (module.m_name == _moduleName)
+			{
+				m_modules.erase(i);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// ******************************************************* //
+
 	FunctionHandle ScriptEngine::getFuncHndl(const std::string& _name)
 	{
 		for (auto& module : m_modules)

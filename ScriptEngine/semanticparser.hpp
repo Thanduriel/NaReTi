@@ -12,20 +12,15 @@
 namespace par
 {
 	/* SemanticParser *******************************
-	* Does all semantic actions.
-	* Translates matches of the boostparser to Symbol definitions.
+	* Performs all semantic actions evoked by the boost parser.
+	* Generates symbol tables and an abstract syntax tree.
+	* All source code errors are thrown by the SemanticParser
+	* and the finished module should be valid when no error is found.
 	*/
 	class SemanticParser
 	{
 	public:
 		SemanticParser();
-
-		/* parse() *******************************
-		* Translates a tokenizedText into a symbolizedText
-		* and adds the result to the given module
-		* overriting any symbols that are already defined.
-		*/
-		//void parse(tok::TokenizedText&& _tokenizedText, NaReTi::Module& _module);
 
 		//set the module that takes the parsed symbols
 		void setModule(NaReTi::Module& _module);
@@ -41,6 +36,11 @@ namespace par
 		void returnStatement();
 
 		//term parsing
+		/* The general building process works like this:
+		 * * all symbols are pushed onto the stack.
+		 * * expressions(stuff that returns smth) take required operands from the stack and put the assembled node back.
+		 * * statements (e.g. return) take required operands from the stack and output the nodes to the current codescope.
+		 */
 		void pushSymbol(std::string& _name);
 		void pushFloat(double _val);
 		void pushInt(int _val);
@@ -56,10 +56,9 @@ namespace par
 		par::ModuleLibrary m_moduleLib;
 		CodeScope* m_currentScope;
 		ASTCode* m_currentCode;
-		VarSymbol m_accumulator; // a local var that does not have a name
-		Parameter m_accParam; // parameter for the accumulator
 
-		utils::StackAllocator<1024> m_allocator; // allocator for the ast
+		//the current module's allocator
+		utils::StackAlloc* m_allocator;
 
 		//flags
 		bool m_isReference;
