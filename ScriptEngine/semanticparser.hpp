@@ -34,7 +34,7 @@ namespace par
 		void resetScope() { m_currentCode = &m_currentModule->m_text; };
 
 		void makeReference() { m_isReference = true; };
-		void varDeclaration(boost::fusion::vector2< std::string, std::string >& _attr);
+		void varDeclaration(boost::fusion::vector3< std::string, boost::optional<char>, std::string >& _attr);
 		void typeDeclaration(std::string& _attr);
 		void funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string >>& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
@@ -48,8 +48,8 @@ namespace par
 	private:
 		//pops a element from the param stack and translates it into an instruction
 		void popParam();
-		ASTNode* popNode() { ASTNode* ptr = m_stack.back(); m_stack.pop_back(); return ptr; };
-		std::vector < ASTNode* > m_stack;
+		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); return ptr; };
+		std::vector < ASTExpNode* > m_stack;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to
 		par::Function* m_currentFunction; // currently parsed function

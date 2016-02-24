@@ -12,8 +12,8 @@ namespace NaReTi
 	}
 
 	par::Function* Module::getFunction(const std::string& _name,
-		const std::vector<par::ASTNode*>::iterator& _begin,
-		const std::vector<par::ASTNode*>::iterator& _end)
+		const std::vector<par::ASTExpNode*>::iterator& _begin,
+		const std::vector<par::ASTExpNode*>::iterator& _end)
 	{
 		for (auto& func : m_functions)
 		{
@@ -30,24 +30,9 @@ namespace NaReTi
 			{
 				par::Type* foundType;
 
-				par::ASTNode* found = *(_begin + i);
-				if (found->type == par::ASTType::Leaf)
-				{
-					par::ASTLeaf& leaf = *(par::ASTLeaf*)found;
-					switch (leaf.parType)
-					{
-					case par::ParamType::Ptr: foundType = &leaf.ptr->type; break;
-					case par::ParamType::Int: foundType = &lang::g_module.getBasicType(par::BasicType::Int);
-					}
-				}
-				else if (found->type == par::ASTType::Call) foundType = &((par::ASTCall*)found)->function->returnType;
-				else if (found->type == par::ASTType::BinOp) foundType = ((par::ASTOp*)found)->returnType;
-				//todo atomic types can be valid aswell
-				else
-				{
-					paramsMatch = false;
-					break;
-				}
+				par::ASTExpNode* found = *(_begin + i);
+				foundType = found->expType;
+
 				if (foundType != &func->scope.m_variables[i].type)
 				{
 					paramsMatch = false;

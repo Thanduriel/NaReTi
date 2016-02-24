@@ -16,8 +16,8 @@ namespace par
 	}
 
 	par::Function* ModuleLibrary::getFunction(const std::string& _name,
-		const std::vector<par::ASTNode*>::iterator& _begin,
-		const std::vector<par::ASTNode*>::iterator& _end)
+		const std::vector<par::ASTExpNode*>::iterator& _begin,
+		const std::vector<par::ASTExpNode*>::iterator& _end)
 	{
 		for (auto& module : m_modules)
 		{

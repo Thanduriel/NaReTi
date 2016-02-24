@@ -18,6 +18,9 @@ namespace codeGen
 		void compile(NaReTi::Module& _module);
 
 	private:
+		// calculates the member offsets and alignment
+		void compileType(par::ComplexType& _type);
+
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function);
 		//compile a specific structure
@@ -26,6 +29,10 @@ namespace codeGen
 		void compileCall(par::ASTCall& _node);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
+		//load some member var into the given destination register
+		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);
+		//store result in a member var
+		void compileMemberStr(par::ASTMember& _node);
 
 		UsageState getUsageState() { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }

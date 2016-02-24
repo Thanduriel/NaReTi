@@ -53,9 +53,10 @@ namespace par{
 	struct VarSymbol : public Symbol
 	{
 //		VarSymbol(){}; //todo: add better way to acuire atom type; use this here
-		VarSymbol(const std::string& _name, Type& _type) :
+		VarSymbol(const std::string& _name, Type& _type, bool _isRef = false) :
 			Symbol(_name),
-			type(_type)
+			type(_type),
+			isReference(_isRef)
 		{};
 
 		VarSymbol& operator= (VarSymbol& oth)
@@ -100,6 +101,10 @@ namespace par{
 		ComplexType(const std::string& _name, BasicType _basicType = Complex) : Type(_name, _basicType)
 		{}
 		CodeScope scope;
+
+		//offsets of the member vars
+		//is set by the compiler
+		std::vector < int > displacement;
 
 		int sizeOf() override
 		{

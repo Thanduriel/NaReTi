@@ -20,8 +20,8 @@ namespace NaReTi{
 		 * _begin, _end range on a param stack with the given arguments
 		 */
 		par::Function* getFunction(const std::string& _name, 
-			const std::vector<par::ASTNode*>::iterator& _begin,
-			const std::vector<par::ASTNode*>::iterator& _end);
+			const std::vector<par::ASTExpNode*>::iterator& _begin,
+			const std::vector<par::ASTExpNode*>::iterator& _end);
 
 		//their lifetime equals 
 		std::vector < std::unique_ptr<par::ComplexType> > m_types;

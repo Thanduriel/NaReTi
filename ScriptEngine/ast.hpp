@@ -22,7 +22,7 @@ namespace par{
 		Loop,
 		Ret,
 		BinOp,
-		UnOp
+		Member
 	};
 
 	struct ASTNode
@@ -30,7 +30,13 @@ namespace par{
 		ASTType type;
 	};
 
-	struct ASTCall : public ASTNode
+	// node with a type
+	struct ASTExpNode : public ASTNode
+	{
+		ComplexType* expType;
+	};
+
+	struct ASTCall : public ASTExpNode
 	{
 		ASTCall() { type = ASTType::Call; }
 		Function* function;
@@ -82,10 +88,10 @@ namespace par{
 	{
 		ASTReturn() { type = ASTType::Ret; }
 
-		ASTNode* body;
+		ASTExpNode* body;
 	};
 
-	struct ASTLeaf : public ASTNode, public Parameter
+	struct ASTLeaf : public ASTExpNode, public Parameter
 	{
 		ASTLeaf() { type = ASTType::Leaf; }
 		ASTLeaf(VarSymbol* _val) : Parameter(_val){ type = ASTType::Leaf; }
@@ -97,15 +103,14 @@ namespace par{
 		ASTOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
 		InstructionType instruction;
 
-		Type* returnType; //setting the type is not mandentory in inlined functions
+//		Type* returnType; //setting the type is not mandentory in inlined functions
 	};
 
-	struct ASTUnOp : public ASTNode
+	struct ASTMember : public ASTExpNode
 	{
-		ASTUnOp(InstructionType _instr) : instruction(_instr) { type = ASTType::UnOp; }
-		InstructionType instruction;
-
-		Type* returnType; //setting the type is not mandentory in inlined functions
-		ASTLeaf* operand;
+		ASTMember(ASTExpNode& _var, size_t _index) : instance(&_var), index(_index) { type = ASTType::Member; }
+		
+		ASTExpNode* instance;
+		size_t index;
 	};
 }
