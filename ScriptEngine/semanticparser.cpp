@@ -95,6 +95,14 @@ namespace par
 
 	// ************************************************** //
 
+	void SemanticParser::finishGeneralExpression()
+	{
+		while (m_stack.size())
+			m_currentCode->push_back(popNode());
+	}
+
+	// ************************************************** //
+
 	void SemanticParser::returnStatement()
 	{
 		m_currentCode->emplace_back(m_allocator->construct<ASTReturn>());

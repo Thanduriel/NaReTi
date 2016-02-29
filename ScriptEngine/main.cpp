@@ -50,6 +50,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		NaReTi::FunctionHandle hndlPrec = scriptEngine.getFuncHndl("precedence");
 		cout << scriptEngine.call<int, int, int>(hndlPrec, 2, 7) << endl;
 
+		NaReTi::FunctionHandle hndlLocalVar = scriptEngine.getFuncHndl("test_localVar");
+		cout << scriptEngine.call<int, int, int>(hndlLocalVar, 13, 11) << endl;
+
 	}
 
 	char tmp;

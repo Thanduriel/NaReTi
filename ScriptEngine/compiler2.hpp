@@ -27,8 +27,10 @@ namespace codeGen
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
 		void compileCall(par::ASTCall& _node);
+		asmjit::Operand* compileLeaf(par::ASTLeaf& _node);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
+		void compileRetF(par::ASTReturn& _node);
 		//load some member var into the given destination register
 		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);
 		//store result in a member var

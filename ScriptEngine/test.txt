@@ -28,3 +28,11 @@ int precedence(int a, int b)
 {
 	return 3 + a * (b + 3) * a + b
 }
+
+int test_localVar(int a, int b)
+{
+	int x
+	x = a + b
+	
+	return x
+}

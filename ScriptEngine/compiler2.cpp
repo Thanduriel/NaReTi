@@ -115,9 +115,11 @@ namespace codeGen
 					break;
 				}
 			}
-			m_compiler.setArg(i, *varPtr);
+			
 			_function.scope.m_variables[i].compiledVar = varPtr;
 		}
+		for (int i = 0; i < _function.paramCount; ++i)
+			m_compiler.setArg(i, *_function.scope.m_variables[i].compiledVar);
 		//args are relevant through out the function
 		m_usageState.varsInUse = m_anonymousVars.size();
 		m_usageState.floatsInUse = m_anonymousFloats.size();
@@ -144,7 +146,10 @@ namespace codeGen
 				compileCall(*(ASTCall*)subNode);
 				break;
 			case ASTType::Ret:
-				compileRet(*(ASTReturn*)subNode);
+				ASTReturn* retNode = (ASTReturn*)subNode;
+				if (retNode->body->expType->basic == BasicType::Float)
+					compileRetF(*(ASTReturn*)subNode);
+				else compileRet(*(ASTReturn*)subNode);
 				break;
 			}
 		}
@@ -170,21 +175,7 @@ namespace codeGen
 				{
 				case ASTType::Leaf:
 					ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
-					//immediate val
-					if (leaf->parType == ParamType::Int)
-					{
-						X86GpVar& var = getUnusedVar();
-						m_compiler.mov(var, Imm(leaf->val));
-						args.emplace_back(&var);
-					}
-					else if (leaf->parType == ParamType::Float)
-					{
-					//	m_compiler.
-					}
-					else if(leaf->parType == ParamType::Ptr)
-					{
-						args.emplace_back(((ASTLeaf*)arg)->ptr->compiledVar);
-					}
+					args.emplace_back(compileLeaf(*leaf));
 					break;
 				case ASTType::Member:
 //					args.emplace_back(&compileMemberLd(*(ASTMember*)arg));
@@ -212,7 +203,7 @@ namespace codeGen
 			//code
 
 			// if types do not match, a typecast will move the data
-			if (func.returnType.basic == func.scope.m_variables[0].type.basic)
+			if (func.returnType.basic == func.scope.m_variables[0].type.basic && !(func.name[0] == '='))
 			{
 				//since the first operand of a binop is overwritten with the result copy the values first
 				if (func.returnType.basic == BasicType::Float)
@@ -248,6 +239,27 @@ namespace codeGen
 
 	// *************************************************** //
 
+	asmjit::Operand* Compiler::compileLeaf(par::ASTLeaf& _node)
+	{
+		//immediate val
+		if (_node.parType == ParamType::Int)
+		{
+			X86GpVar& var = getUnusedVar();
+			m_compiler.mov(var, Imm(_node.val));
+			return &var;
+		}
+		else if (_node.parType == ParamType::Float)
+		{
+			//	m_compiler.
+		}
+		else if (_node.parType == ParamType::Ptr)
+		{
+			return ((ASTLeaf*)&_node)->ptr->compiledVar;
+		}
+	}
+
+	// *************************************************** //
+
 	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args)
 	{
 		
@@ -259,9 +271,13 @@ namespace codeGen
 		case InstructionType::Sub:
 			m_compiler.sub(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-			case InstructionType::Mul:
-				m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+		case InstructionType::Mul:
+			m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
+		case InstructionType::Set:
+			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		//float instructions
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
@@ -277,19 +293,47 @@ namespace codeGen
 
 	void Compiler::compileRet(ASTReturn& _node)
 	{
-		if (_node.body->type == ASTType::Call) compileCall(*(ASTCall*)_node.body);
+		asmjit::X86GpVar* var;
+		if (_node.body->type == ASTType::Call)
+		{
+			compileCall(*(ASTCall*)_node.body);
+			var = m_accumulator;
+		}
 		else if (_node.body->type == ASTType::Member)
 		{
 			ASTMember& member = *(ASTMember*)_node.body;
-			compileMemberLd(member, member.expType->basic == BasicType::Float ? (asmjit::Operand*)m_fp0 : (asmjit::Operand*)m_accumulator);
+			compileMemberLd(member, m_accumulator);
 		}
-	//	else if (_node.body->type == ASTType::BinOp) compileBinOp(*(ASTOp*)_node.body);
+		else if (_node.body->type == ASTType::Leaf)
+		{
+			var = (X86GpVar*)compileLeaf(*(ASTLeaf*)_node.body);
+		}
 
-		par::Type& returnType = *_node.body->expType;//(*(ASTCall*)_node.body).function->returnType
-		if (returnType.basic == Float)
-			m_compiler.ret(*m_fp0);
-		else
-			m_compiler.ret(*m_accumulator);
+		m_compiler.ret(*var);
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileRetF(ASTReturn& _node)
+	{
+		X86XmmVar* var;
+		if (_node.body->type == ASTType::Call)
+		{
+			compileCall(*(ASTCall*)_node.body);
+			var = m_fp0;
+		}
+		else if (_node.body->type == ASTType::Member)
+		{
+			ASTMember& member = *(ASTMember*)_node.body;
+			compileMemberLd(member, m_fp0);
+			var = m_fp0;
+		}
+		else if (_node.body->type == ASTType::Leaf)
+		{
+			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
+		}
+
+		m_compiler.ret(*var);
 	}
 
 	// *************************************************** //

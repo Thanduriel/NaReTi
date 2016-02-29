@@ -24,6 +24,7 @@ namespace par
 		ShL,
 		ShR,
 		Set, //assign
+		fSet,
 		Ret,
 		RetA, // return the accumulator; takes no param
 		Call, // call subroutine; is inlined when the flag is set

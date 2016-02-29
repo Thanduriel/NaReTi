@@ -18,7 +18,8 @@ namespace lang
 			pair<string, int>("--", 2),
 			pair<string, int>(".", 2),
 			pair<string, int>("*", 5),
-			pair<string, int>("+", 6)
+			pair<string, int>("+", 6),
+			pair<string, int>("=", 15)
 			} }
 		)
 	{
@@ -37,6 +38,7 @@ namespace lang
 		BASICOPERATION("-", BasicType::Int, InstructionType::Sub);
 		BASICOPERATION("*", BasicType::Int, InstructionType::Mul);
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
+		BASICOPERATION("=", BasicType::Int, InstructionType::Set);
 
 		//float -------------------------------------------------------
 		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);

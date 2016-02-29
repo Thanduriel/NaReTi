@@ -62,9 +62,9 @@ namespace par
 				;
 
 			GeneralExpression = 
-				("return" >> Expression)[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
+				(("return" >> Expression)[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
 				| VarDeclaration
-				| Expression
+				| Expression)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
 				;
 
 			//here we have terms...

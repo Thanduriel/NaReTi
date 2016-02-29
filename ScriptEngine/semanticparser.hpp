@@ -33,6 +33,7 @@ namespace par
 		void typeDeclaration(std::string& _attr);
 		void funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string >>& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
+		void finishGeneralExpression();
 		void returnStatement();
 
 		//term parsing
