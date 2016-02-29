@@ -175,6 +175,7 @@ namespace codeGen
 					{
 						X86GpVar& var = getUnusedVar();
 						m_compiler.mov(var, Imm(leaf->val));
+						args.emplace_back(&var);
 					}
 					else if (leaf->parType == ParamType::Float)
 					{
@@ -255,12 +256,12 @@ namespace codeGen
 		case InstructionType::Add:
 			m_compiler.add(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-			/*		case InstructionType::Sub:
-			m_compiler.sub(*args[0], *args[1]);
+		case InstructionType::Sub:
+			m_compiler.sub(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 			case InstructionType::Mul:
-			m_compiler.imul(*args[0], *args[1]);
-			break;*/
+				m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;

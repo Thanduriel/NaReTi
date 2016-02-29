@@ -23,3 +23,8 @@ float memberAccess(Vec2& _vec)
 {
 	return _vec.y
 }
+
+int precedence(int a, int b)
+{
+	return 3 + a * (b + 3) * a + b
+}

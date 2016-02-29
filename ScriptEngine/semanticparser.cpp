@@ -119,17 +119,20 @@ namespace par
 		Function* func = m_moduleLib.getFunction(_operator, m_stack.begin() + (m_stack.size() - 2), m_stack.end());
 		if (!func) throw ParsingError("No function with the given signature found.");
 
+		//build new node
 		ASTCall* astNode = m_allocator->construct<ASTCall>();
 		astNode->function = func;
 		astNode->expType = (ComplexType*)&func->returnType;
+
 		//pop the used params
 		astNode->args.resize(2);
 		astNode->args[1] = popNode();
-		astNode->args[0] = popNode();
-
-		//add result
-		m_stack.push_back(astNode);
-	//	cout << _operator << endl;
+		//traverse the tree to find the right position in regard of precedence
+		ASTExpNode** dest = findPrecPos(&m_stack[m_stack.size() - 1], *astNode);
+		astNode->args[0] = *dest;
+		*dest = astNode; // put this node there
+	//	m_stack.push_back(astNode);
+		cout << _operator << endl;
 	}
 
 	// ************************************************** //
@@ -176,6 +179,35 @@ namespace par
 		leaf->expType = &lang::g_module.getBasicType(BasicType::Int);
 		m_stack.push_back(leaf);
 		cout << _val << endl;
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::lockLatestNode()
+	{
+		((ASTCall*)m_stack.back())->isLocked = true;
+	}
+
+	// ************************************************** //
+
+	ASTExpNode** SemanticParser::findPrecPos(ASTExpNode** _tree, ASTCall& _node)
+	{
+		switch ((*_tree)->type)
+		{
+		case ASTType::Call:
+		{
+			ASTCall& call = *((ASTCall*)(*_tree));
+			if (!call.isLocked && lang::g_module.getPrecedence(call.function->name) > lang::g_module.getPrecedence(_node.function->name))
+			{
+				return (ASTExpNode**)&call.args[1];
+			}
+			break;
+		}
+		case ASTType::Leaf:
+		case ASTType::Member:
+			return _tree;
+		}
+		return _tree;
 	}
 
 	// ************************************************** //

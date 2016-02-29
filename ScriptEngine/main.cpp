@@ -47,6 +47,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		vect.y = 42.5f;
 		cout << scriptEngine.call<float, Vec2*>(hndlMember, &vect) << endl;
 
+		NaReTi::FunctionHandle hndlPrec = scriptEngine.getFuncHndl("precedence");
+		cout << scriptEngine.call<int, int, int>(hndlPrec, 2, 7) << endl;
+
 	}
 
 	char tmp;

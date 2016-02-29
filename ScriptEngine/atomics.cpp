@@ -7,11 +7,20 @@
 namespace lang
 {
 	using namespace par;
+	using namespace std;
 
 	BasicModule g_module;
 
 	BasicModule::BasicModule():
-		Module("")
+		Module(""),
+		m_precedence( { {
+			pair<string, int>("++", 2),
+			pair<string, int>("--", 2),
+			pair<string, int>(".", 2),
+			pair<string, int>("*", 5),
+			pair<string, int>("+", 6)
+			} }
+		)
 	{
 		m_types.resize(5);
 		//basic types
@@ -56,5 +65,13 @@ namespace lang
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)
 	{
 		return *m_types[_basicType];
+	}
+
+	int BasicModule::getPrecedence(const std::string& _op)
+	{
+		for (auto& prec : m_precedence)
+			if (prec.first == _op) return prec.second;
+
+		return 1; // uknown operator or function takes precedence
 	}
 }

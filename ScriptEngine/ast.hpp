@@ -39,9 +39,11 @@ namespace par{
 
 	struct ASTCall : public ASTExpNode
 	{
-		ASTCall() { type = ASTType::Call; }
+		ASTCall(): isLocked(false) { type = ASTType::Call; }
 		Function* function;
-		std::vector< ASTNode* > args;
+		std::vector< ASTExpNode* > args;
+
+		bool isLocked; // a parsing flag, meaning that this subtree may not be changed
 	};
 
 	struct ASTCode : public ASTNode, 

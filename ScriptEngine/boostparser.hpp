@@ -69,16 +69,17 @@ namespace par
 
 			//here we have terms...
 			Expression = 
-				(((('(' >> Expression >> ')') 
+				(((('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand) >>
 				-RExpression)) //match with an operator
-	//			Operator >> 
-	//			(('(' >> Expression >> ')') 
-	//			| Expression 
-	//			| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)])// match it completly
 				;
 
-			RExpression = (Operator >> (('(' >> Expression >> ')') | Operand) >> -RExpression)[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)];
+			RExpression =
+				(Operator >>
+				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
+				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)] >>
+				-RExpression
+				;
 
 			Operand = 
 				Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]

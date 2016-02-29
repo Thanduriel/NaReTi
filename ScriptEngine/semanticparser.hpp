@@ -45,6 +45,10 @@ namespace par
 		void pushFloat(double _val);
 		void pushInt(int _val);
 		void term(std::string& _operator);
+
+		void lockLatestNode();
+		//looks in the tree with the given node as root for the right position of the top level on the stack.
+		ASTExpNode** findPrecPos(ASTExpNode** _tree, ASTCall& _node);
 	private:
 		//pops a element from the param stack and translates it into an instruction
 		void popParam();
