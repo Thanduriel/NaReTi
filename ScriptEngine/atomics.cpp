@@ -45,6 +45,7 @@ namespace lang
 		BASICOPERATION("-", BasicType::Float, InstructionType::fSub);
 		BASICOPERATION("*", BasicType::Float, InstructionType::fMul);
 		BASICOPERATION("/", BasicType::Float, InstructionType::fDiv);
+		BASICOPERATION("=", BasicType::Float, InstructionType::fSet);
 
 		//float x int
 		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);

@@ -3,7 +3,7 @@
 
 namespace NaReTi
 {
-	par::Type* Module::getType(const std::string& _name)
+	par::ComplexType* Module::getType(const std::string& _name)
 	{
 		for (auto& type : m_types)
 			if (type->name == _name) return type.get();
@@ -28,12 +28,9 @@ namespace NaReTi
 			bool paramsMatch = true;
 			for (int i = 0; i < dist; ++i)
 			{
-				par::Type* foundType;
-
 				par::ASTExpNode* found = *(_begin + i);
-				foundType = found->expType;
 
-				if (foundType != &func->scope.m_variables[i].type)
+				if (*found->typeInfo != func->scope.m_variables[i].typeInfo)
 				{
 					paramsMatch = false;
 					break;

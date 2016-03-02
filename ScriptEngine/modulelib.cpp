@@ -5,11 +5,11 @@
 
 namespace par
 {
-	Type* ModuleLibrary::getType(const std::string& _name)
+	ComplexType* ModuleLibrary::getType(const std::string& _name)
 	{
 		for (auto& module : m_modules)
 		{
-			Type* type = module->getType(_name);
+			ComplexType* type = module->getType(_name);
 			if (type) return type;
 		}
 		return nullptr;

@@ -34,7 +34,7 @@ namespace par{
 	// node with a type
 	struct ASTExpNode : public ASTNode
 	{
-		ComplexType* expType;
+		TypeInfo* typeInfo;
 	};
 
 	struct ASTCall : public ASTExpNode
@@ -58,12 +58,12 @@ namespace par{
 	{
 		//definitions can be fuond in "symbols.cpp"
 		// a binary function of the structure T x T -> T
-		Function(utils::StackAlloc& _alloc, const std::string& _name, Type& _type, InstructionType _instr);
+		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
-		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, Type& _t0, Type* _t1, Type* _t2);
-		Function(const std::string& _name, Type& _type) : Symbol(_name), returnType(_type){};
+		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
+		Function(const std::string& _name, ComplexType& _type) : Symbol(_name), returnTypeInfo(_type, false){};
 
-		Type& returnType;
+		TypeInfo returnTypeInfo;
 		ASTCode scope;
 		int paramCount; //< amount of params this function expects, coresponds to the first elements in scope.locals
 		//flags

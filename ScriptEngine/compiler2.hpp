@@ -31,6 +31,7 @@ namespace codeGen
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
+		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register
 		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);
 		//store result in a member var
@@ -57,5 +58,7 @@ namespace codeGen
 		// registers that have relevant content that should not be overwritten
 		// appart from assignments.
 		UsageState m_usageState;
+
+		bool m_isRefSet; //flag: lvalue is a reference 
 	};
 }

@@ -21,7 +21,7 @@ namespace par
 		//resets the library to only contain the first value that was given
 		void reset() { m_modules.resize(1); };
 
-		Type* getType(const std::string& _str);
+		ComplexType* getType(const std::string& _str);
 		par::Function* getFunction(const std::string& _name,
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
 			const std::vector<par::ASTExpNode*>::iterator& _end);

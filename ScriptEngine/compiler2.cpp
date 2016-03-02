@@ -7,7 +7,8 @@ namespace codeGen
 
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
-		m_compiler(&m_assembler)
+		m_compiler(&m_assembler),
+		m_isRefSet(false)
 	{}
 
 	// *************************************************** //
@@ -51,7 +52,7 @@ namespace codeGen
 		FuncBuilderX& funcBuilder = _function.funcBuilder;
 		for (int i = 0; i < _function.paramCount; ++i)
 		{
-			switch (_function.scope.m_variables[i].type.basic)
+			switch (_function.scope.m_variables[i].typeInfo.type.basic)
 			{
 			case BasicType::Int: funcBuilder.addArgT<int>(); break;
 			case BasicType::Float: funcBuilder.addArgT<float>(); break;
@@ -59,7 +60,7 @@ namespace codeGen
 			default: funcBuilder.addArgT<int>();
 			}
 		}
-		switch (_function.returnType.basic)
+		switch (_function.returnTypeInfo.type.basic)
 		{
 		case BasicType::Int: funcBuilder.setRetT<int>(); break;
 		case BasicType::Float: funcBuilder.setRetT<float>(); break;
@@ -96,14 +97,14 @@ namespace codeGen
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
 			asmjit::Var* varPtr;
-			if (_function.scope.m_variables[i].isReference)
+			if (_function.scope.m_variables[i].typeInfo.isReference)
 			{
 				m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
 				varPtr = &m_anonymousVars.back();
 			}
 			else
 			{
-				switch (_function.scope.m_variables[i].type.basic)
+				switch (_function.scope.m_variables[i].typeInfo.type.basic)
 				{
 				case BasicType::Int:
 					m_anonymousVars.push_back(m_compiler.newInt32(("arg" + std::to_string(i)).c_str()));
@@ -147,7 +148,7 @@ namespace codeGen
 				break;
 			case ASTType::Ret:
 				ASTReturn* retNode = (ASTReturn*)subNode;
-				if (retNode->body->expType->basic == BasicType::Float)
+				if (retNode->body->typeInfo->type.basic == BasicType::Float)
 					compileRetF(*(ASTReturn*)subNode);
 				else compileRet(*(ASTReturn*)subNode);
 				break;
@@ -178,18 +179,25 @@ namespace codeGen
 					args.emplace_back(compileLeaf(*leaf));
 					break;
 				case ASTType::Member:
-//					args.emplace_back(&compileMemberLd(*(ASTMember*)arg));
+					if (func.name == "=" && i == 0)
+					{
+						X86GpVar& var = getUnusedVar();
+						args.emplace_back(&var);
+						m_compiler.lea(var, getMemberAdr(*(ASTMember*)arg));
+						m_isRefSet = true;
+					}
+				//	args.emplace_back(&compileMemberLd(*(ASTMember*)arg));
 					break;
 				case ASTType::Call: 
 					ASTCall* astCall = (ASTCall*)arg;
-					if (astCall->function->returnType.basic == BasicType::Int)
+					if (astCall->function->returnTypeInfo.type.basic == BasicType::Int)
 					{
 						X86GpVar& var = getUnusedVar();
 						args.emplace_back(&var);
 						compileCall(*astCall);
 						m_compiler.mov(var, *m_accumulator);
 					}
-					else if (astCall->function->returnType.basic == BasicType::Float)
+					else if (astCall->function->returnTypeInfo.type.basic == BasicType::Float)
 					{
 						X86XmmVar& var = getUnusedFloat();
 						args.emplace_back(&var);
@@ -203,10 +211,10 @@ namespace codeGen
 			//code
 
 			// if types do not match, a typecast will move the data
-			if (func.returnType.basic == func.scope.m_variables[0].type.basic && !(func.name[0] == '='))
+			if (func.returnTypeInfo.type.basic == func.scope.m_variables[0].typeInfo.type.basic && !(func.name[0] == '='))
 			{
 				//since the first operand of a binop is overwritten with the result copy the values first
-				if (func.returnType.basic == BasicType::Float)
+				if (func.returnTypeInfo.type.basic == BasicType::Float)
 				{
 					m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
 					args[0] = m_fp0;
@@ -275,6 +283,9 @@ namespace codeGen
 			m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case InstructionType::Set:
+			if (m_isRefSet) {
+				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
+			}
 			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		//float instructions
@@ -338,7 +349,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::compileMemberLd(ASTMember& _node, asmjit::Operand* _destination)
+	X86Mem Compiler::getMemberAdr(ASTMember& _node)
 	{
 		X86GpVar* gpVar;
 		switch (_node.instance->type)
@@ -347,11 +358,18 @@ namespace codeGen
 			//can only be a pointer
 			ASTLeaf& leaf = *(ASTLeaf*)_node.instance;
 			gpVar = (X86GpVar*)leaf.ptr->compiledVar;
-//			case ASTType::
+			//			case ASTType::
 		}
-		ComplexType& type = *_node.instance->expType;
-		auto adr = x86::dword_ptr(*gpVar, type.displacement[_node.index]);
-		if (type.scope.m_variables[_node.index].type.basic == BasicType::Float)
+
+		ComplexType& type = _node.instance->typeInfo->type;
+		return x86::dword_ptr(*gpVar, type.displacement[_node.index]);
+	}
+
+	void Compiler::compileMemberLd(ASTMember& _node, asmjit::Operand* _destination)
+	{
+		ComplexType& type = _node.instance->typeInfo->type;
+		auto adr = getMemberAdr(_node);
+		if (type.scope.m_variables[_node.index].typeInfo.type.basic == BasicType::Float)
 		{
 			X86XmmVar& var = *(X86XmmVar*)_destination;
 			m_compiler.movss(var, adr);

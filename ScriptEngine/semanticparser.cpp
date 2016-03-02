@@ -47,7 +47,7 @@ namespace par
 	void SemanticParser::varDeclaration(vector3< string, boost::optional<char>, string >& _attr)
 	{
 		//search type
-		Type* type = m_moduleLib.getType(_attr.m0);
+		ComplexType* type = m_moduleLib.getType(_attr.m0);
 		if (!type) throw ParsingError("Unkown type");
 
 		m_currentScope->m_variables.emplace_back(_attr.m2, *type, _attr.m1.is_initialized());
@@ -64,12 +64,20 @@ namespace par
 
 	// ************************************************** //
 
+	void SemanticParser::finishTypeDec()
+	{
+		// generate default assigment
+
+	}
+
+	// ************************************************** //
+
 	void SemanticParser::funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string> >& _attr)
 	{
 		//a type is provided
 		if (_attr.m1.is_initialized())
 		{
-			Type* type = m_moduleLib.getType(_attr.m0);
+			ComplexType* type = m_moduleLib.getType(_attr.m0);
 			if (!type) throw ParsingError("Unkown type");
 			m_currentModule->m_functions.emplace_back(new Function(_attr.m1.get(), *type));
 		}
@@ -108,7 +116,7 @@ namespace par
 		m_currentCode->emplace_back(m_allocator->construct<ASTReturn>());
 		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back();
 
-		if (m_currentFunction->returnType.basic != BasicType::Void)
+		if (m_currentFunction->returnTypeInfo.type.basic != BasicType::Void)
 		{
 			retNode.body = popNode();
 		}
@@ -130,7 +138,7 @@ namespace par
 		//build new node
 		ASTCall* astNode = m_allocator->construct<ASTCall>();
 		astNode->function = func;
-		astNode->expType = (ComplexType*)&func->returnType;
+		astNode->typeInfo = &func->returnTypeInfo;
 
 		//pop the used params
 		astNode->args.resize(2);
@@ -152,12 +160,12 @@ namespace par
 		{
 			size_t i = 0;
 			// check members of the type on top of the stack
-			for (auto& member : m_stack.back()->expType->scope.m_variables)
+			for (auto& member : m_stack.back()->typeInfo->type.scope.m_variables)
 			{
 				if (member.name == _name)
 				{
 					ASTMember* memberNode = m_allocator->construct<ASTMember>(*popNode(), i);
-					memberNode->expType = (ComplexType*)&member.type;
+					memberNode->typeInfo = &member.typeInfo;
 					m_stack.push_back(memberNode);
 
 					return;
@@ -170,7 +178,7 @@ namespace par
 		}
 		
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(var);
-		leaf->expType = (ComplexType*)&var->type;
+		leaf->typeInfo = &var->typeInfo;
 		m_stack.push_back(leaf);
 		cout << _name << endl;
 	}
@@ -184,7 +192,7 @@ namespace par
 	void SemanticParser::pushInt(int _val)
 	{
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(_val);
-		leaf->expType = &lang::g_module.getBasicType(BasicType::Int);
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Int), false);
 		m_stack.push_back(leaf);
 		cout << _val << endl;
 	}

@@ -50,27 +50,43 @@ namespace par{
 
 	// ************************************************* //
 
+	struct ComplexType;
+
+	struct TypeInfo
+	{
+		TypeInfo(ComplexType& _type, bool _isRef) : type(_type), isReference(_isRef){}
+		ComplexType& type;
+		bool isReference;
+
+		bool operator== (TypeInfo& oth)
+		{
+			return (&type == &oth.type && isReference == oth.isReference);
+		}
+
+		bool operator!= (TypeInfo& oth)
+		{
+			return !(&type == &oth.type && isReference == oth.isReference);
+		}
+	};
+
 	struct VarSymbol : public Symbol
 	{
 //		VarSymbol(){}; //todo: add better way to acuire atom type; use this here
-		VarSymbol(const std::string& _name, Type& _type, bool _isRef = false) :
+		VarSymbol(const std::string& _name, ComplexType& _type, bool _isRef = false) :
 			Symbol(_name),
-			type(_type),
-			isReference(_isRef)
+			typeInfo(_type, _isRef)
 		{};
 
 		VarSymbol& operator= (VarSymbol& oth)
 		{
 			name = oth.name;
-			type = oth.type;
-			isReference = oth.isReference;
+//			typeInfo.type = oth.typeInfo.type;
+//			typeInfo.isReference = oth.typeInfo.isReference;
 
 			return *this;
 		}
 
-		Type& type;
-
-		bool isReference;
+		TypeInfo typeInfo;
 
 		asmjit::Var* compiledVar;
 	};
@@ -110,8 +126,8 @@ namespace par{
 		{
 			int size = 0;
 
-			for (auto& member : scope.m_variables)
-				size += member.isReference ? 4 : member.type.sizeOf();
+	//		for (auto& member : scope.m_variables)
+//				size += member.isReference ? 4 : member.type.sizeOf();
 
 			return size;
 		}

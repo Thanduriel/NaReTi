@@ -14,7 +14,7 @@ namespace NaReTi{
 	public:
 		Module(const std::string& _name) : m_name(_name){};
 
-		par::Type* getType(const std::string& _name);
+		par::ComplexType* getType(const std::string& _name);
 		/*search for a function with the given signature
 		 * _name the name of the function 
 		 * _ret the return type

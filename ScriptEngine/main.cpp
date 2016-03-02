@@ -19,6 +19,12 @@ struct Vec2
 	float y;
 };
 
+struct iVec2
+{
+	int x;
+	int y;
+};
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	NaReTi::ScriptEngine scriptEngine;
@@ -53,6 +59,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		NaReTi::FunctionHandle hndlLocalVar = scriptEngine.getFuncHndl("test_localVar");
 		cout << scriptEngine.call<int, int, int>(hndlLocalVar, 13, 11) << endl;
 
+		NaReTi::FunctionHandle hndlMemberAssign = scriptEngine.getFuncHndl("test_memberAssign");
+		iVec2 ivec;
+		ivec.x = 0;
+		ivec.y = 2;
+		scriptEngine.call<void, iVec2*>(hndlMemberAssign, &ivec);
+		cout << ivec.x << endl;
 	}
 
 	char tmp;

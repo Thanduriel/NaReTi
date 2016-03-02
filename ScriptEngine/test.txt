@@ -19,9 +19,20 @@ type Vec2
 	float y
 }
 
+type iVec2
+{
+	int x
+	int y
+}
+
 float memberAccess(Vec2& _vec)
 {
 	return _vec.y
+}
+
+test_memberAssign(iVec2& _vec)
+{
+	_vec.x = 42
 }
 
 int precedence(int a, int b)

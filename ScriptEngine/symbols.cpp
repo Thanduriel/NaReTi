@@ -2,7 +2,7 @@
 #include "symbols.hpp"
 
 namespace par{
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, Type& _type, InstructionType _instr) : Function(_name, _type)
+	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr) : Function(_name, _type)
 	{
 		bInline = true;
 		paramCount = 2;
@@ -15,7 +15,7 @@ namespace par{
 		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
 	};
 
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, Type& _t0, Type* _t1, Type* _t2) : Function(_name, _t0)
+	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2) : Function(_name, _t0)
 	{
 		bInline = true;
 		paramCount = 2;

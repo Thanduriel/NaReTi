@@ -31,6 +31,7 @@ namespace par
 		void makeReference() { m_isReference = true; };
 		void varDeclaration(boost::fusion::vector3< std::string, boost::optional<char>, std::string >& _attr);
 		void typeDeclaration(std::string& _attr);
+		void finishTypeDec();
 		void funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string >>& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
 		void finishGeneralExpression();
