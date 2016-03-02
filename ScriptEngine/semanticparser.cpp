@@ -48,7 +48,7 @@ namespace par
 	{
 		//search type
 		ComplexType* type = m_moduleLib.getType(_attr.m0);
-		if (!type) throw ParsingError("Unkown type");
+		if (!type) throw ParsingError("Unknown type");
 
 		m_currentScope->m_variables.emplace_back(_attr.m2, *type, _attr.m1.is_initialized());
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
@@ -173,7 +173,7 @@ namespace par
 				i++;
 			}
 
-			throw ParsingError("Unkown symbol");
+			throw ParsingError("Unknown symbol");
 
 		}
 		

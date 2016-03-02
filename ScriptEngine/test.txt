@@ -47,3 +47,16 @@ int test_localVar(int a, int b)
 	
 	return x
 }
+
+int test_conditional(int a)
+{
+	if(a = 10)
+	{
+		return 10
+	}
+	else if(a = 11)
+	{
+		return 11
+	}
+	else { return 0}
+}

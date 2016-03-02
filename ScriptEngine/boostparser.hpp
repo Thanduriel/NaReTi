@@ -56,15 +56,15 @@ namespace par
 				-VarDeclaration >> 
 				*(',' >> VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
-				'{' >>
-				*(GeneralExpression) >>
-				'}'
+				CodeScope
 				;
 
 			GeneralExpression = 
 				(("return" >> Expression)[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
+				| Conditional
 				| VarDeclaration
-				| Expression)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
+				| Expression
+				)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
 				;
 
 			//here we have terms...
@@ -79,6 +79,21 @@ namespace par
 				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)] >>
 				-RExpression
+				;
+
+			CodeScope =
+				'{' >>
+				*(GeneralExpression) >>
+				'}'
+				;
+
+			Conditional =
+				lit("if") >> '(' >> Expression >> ')' >>
+				CodeScope >>
+				*(lit("else if") >> '(' >> Expression >> ')' >>
+				CodeScope) >>
+				-("else" >>
+				CodeScope)
 				;
 
 			Operand = 
@@ -118,6 +133,8 @@ namespace par
 		qi::rule<Iterator, Skipper> Expression;
 		qi::rule<Iterator, Skipper> GeneralExpression;
 		qi::rule<Iterator, Skipper> RExpression;
+		qi::rule<Iterator, Skipper> CodeScope;
+		qi::rule<Iterator, Skipper> Conditional;
 		
 		qi::rule<Iterator, std::string()> Symbol;
 		qi::rule<Iterator, std::string()> ConstString;
