@@ -89,10 +89,9 @@ namespace par
 
 		//init envoirement
 		m_currentFunction = m_currentModule->m_functions.back().get();
-		m_currentCode = &m_currentModule->m_functions.back()->scope;
-		m_currentScope = &m_currentModule->m_functions.back()->scope;
-		//destruct previous tree
-		m_allocator->reset();
+		m_targetScope = &m_currentModule->m_functions.back()->scope;
+		m_targetScope->m_parent = m_currentScope;
+		m_currentScope = m_targetScope;
 	}
 
 	void SemanticParser::finishParamList()
@@ -107,6 +106,64 @@ namespace par
 	{
 		while (m_stack.size())
 			m_currentCode->push_back(popNode());
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::beginCodeScope()
+	{
+		ASTCode* codeNode = m_targetScope ? m_targetScope : m_allocator->construct<ASTCode>();
+		m_targetScope = nullptr;
+		codeNode->parent = m_currentCode;
+		codeNode->m_parent = m_currentCode;
+		m_currentCode = codeNode;
+		m_currentScope = codeNode;
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::finishCodeScope()
+	{
+		//return to the previous scope
+		m_currentCode = m_currentCode->parent;
+		m_currentScope = m_currentScope->m_parent;
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::ifConditional()
+	{
+		ASTBranch& branchNode = *m_allocator->construct<ASTBranch>();
+		branchNode.condition = popNode();
+		branchNode.ifBody = m_allocator->construct<ASTCode>();
+		m_targetScope = branchNode.ifBody;
+
+		m_currentCode->push_back(&branchNode);
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::elseifConditional()
+	{
+		ASTBranch& branchNode = *m_allocator->construct<ASTBranch>();
+		branchNode.condition = popNode();
+		branchNode.ifBody = m_allocator->construct<ASTCode>();
+		m_targetScope = branchNode.ifBody;
+
+		// the actual else body will not be a parent nor child
+		// which does not matter because nothing but this branch will be added to it.
+		ASTBranch& parentNode = *(ASTBranch*)m_currentCode->back();
+		parentNode.elseBody = m_allocator->construct<ASTCode>();
+		parentNode.elseBody->push_back(&branchNode);
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::elseConditional()
+	{
+		ASTBranch& parentNode = *(ASTBranch*)m_currentCode->back();
+		parentNode.elseBody = m_allocator->construct<ASTCode>();
+		m_targetScope = parentNode.elseBody;
 	}
 
 	// ************************************************** //

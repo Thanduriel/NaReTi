@@ -82,17 +82,17 @@ namespace par
 				;
 
 			CodeScope =
-				'{' >>
+				lit('{')[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >>
 				*(GeneralExpression) >>
-				'}'
+				lit('}')[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
 				;
 
 			Conditional =
-				lit("if") >> '(' >> Expression >> ')' >>
+				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
 				CodeScope >>
-				*(lit("else if") >> '(' >> Expression >> ')' >>
+				*((lit("else if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::elseifConditional, &m_semanticParser)] >>
 				CodeScope) >>
-				-("else" >>
+				-(lit("else")[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
 				CodeScope)
 				;
 
@@ -102,6 +102,8 @@ namespace par
 				| Float[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
 				| ConstString
 				;
+
+			//lexer definitions
 
 			// match any special char that can be used as an operator
 			//pay attention that '-' needs to be the last char so that it is not interpreted as range

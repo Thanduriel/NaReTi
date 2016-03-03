@@ -51,6 +51,7 @@ namespace par{
 		public std::vector< ASTNode* >
 	{
 		ASTCode() { type = ASTType::Code; }
+		ASTCode* parent;
 	};
 
 	//function symbol; just here because of crosslinks between ast and symbols
@@ -74,7 +75,7 @@ namespace par{
 	{
 		ASTBranch() { type = ASTType::Branch; }
 
-		ASTNode* condition;
+		ASTExpNode* condition;
 		ASTCode* ifBody;
 		ASTCode* elseBody;
 	};

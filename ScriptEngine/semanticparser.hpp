@@ -28,13 +28,17 @@ namespace par
 		//set the scope back to the default scope of the module
 		void resetScope() { m_currentCode = &m_currentModule->m_text; };
 
-		void makeReference() { m_isReference = true; };
 		void varDeclaration(boost::fusion::vector3< std::string, boost::optional<char>, std::string >& _attr);
 		void typeDeclaration(std::string& _attr);
 		void finishTypeDec();
 		void funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string >>& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
 		void finishGeneralExpression();
+		void beginCodeScope();
+		void finishCodeScope();
+		void ifConditional();
+		void elseifConditional();
+		void elseConditional();
 		void returnStatement();
 
 		//term parsing
@@ -62,12 +66,10 @@ namespace par
 		par::ModuleLibrary m_moduleLib;
 		CodeScope* m_currentScope;
 		ASTCode* m_currentCode;
+		ASTCode* m_targetScope; // a scope that is to be entered
 
 		//the current module's allocator
 		utils::StackAlloc* m_allocator;
-
-		//flags
-		bool m_isReference;
 	};
 
 	 // simple print for debugging
