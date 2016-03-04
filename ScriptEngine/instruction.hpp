@@ -27,6 +27,8 @@ namespace par
 		fSet,
 		SetRef,
 		fSetRef,
+		//comparisation
+		Eq,
 		Ret,
 		RetA, // return the accumulator; takes no param
 		Call, // call subroutine; is inlined when the flag is set

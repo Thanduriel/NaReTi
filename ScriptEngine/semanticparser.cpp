@@ -112,7 +112,17 @@ namespace par
 
 	void SemanticParser::beginCodeScope()
 	{
-		ASTCode* codeNode = m_targetScope ? m_targetScope : m_allocator->construct<ASTCode>();
+		ASTCode* codeNode;
+		if (m_targetScope)
+		{
+			codeNode = m_targetScope;
+		}
+		else
+		{
+			codeNode = m_allocator->construct<ASTCode>();
+			//since the node is linked to no other node it is placed into the currently open scope
+			m_currentCode->push_back(codeNode);
+		}
 		m_targetScope = nullptr;
 		codeNode->parent = m_currentCode;
 		codeNode->m_parent = m_currentCode;
@@ -143,27 +153,12 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::elseifConditional()
-	{
-		ASTBranch& branchNode = *m_allocator->construct<ASTBranch>();
-		branchNode.condition = popNode();
-		branchNode.ifBody = m_allocator->construct<ASTCode>();
-		m_targetScope = branchNode.ifBody;
-
-		// the actual else body will not be a parent nor child
-		// which does not matter because nothing but this branch will be added to it.
-		ASTBranch& parentNode = *(ASTBranch*)m_currentCode->back();
-		parentNode.elseBody = m_allocator->construct<ASTCode>();
-		parentNode.elseBody->push_back(&branchNode);
-	}
-
-	// ************************************************** //
-
 	void SemanticParser::elseConditional()
 	{
 		ASTBranch& parentNode = *(ASTBranch*)m_currentCode->back();
 		parentNode.elseBody = m_allocator->construct<ASTCode>();
 		m_targetScope = parentNode.elseBody;
+		beginCodeScope();
 	}
 
 	// ************************************************** //

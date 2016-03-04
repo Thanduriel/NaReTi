@@ -65,6 +65,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		ivec.y = 2;
 		scriptEngine.call<void, iVec2*>(hndlMemberAssign, &ivec);
 		cout << ivec.x << endl;
+
+		NaReTi::FunctionHandle hndlBranch = scriptEngine.getFuncHndl("test_branch");
+		cout << scriptEngine.call<int, int>(hndlBranch, 11) << endl;
 	}
 
 	char tmp;

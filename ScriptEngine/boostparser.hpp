@@ -87,14 +87,23 @@ namespace par
 				lit('}')[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
 				;
 
+			//classic if / if else / else
+			//the "else" scope is created manually because logicly an "else if" is an if inside the outer else
 			Conditional =
+				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
+				CodeScope >>
+				-(lit("else")[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
+				(Conditional | CodeScope)[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)])
+				;
+
+	/*		Conditional =
 				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
 				CodeScope >>
 				*((lit("else if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::elseifConditional, &m_semanticParser)] >>
 				CodeScope) >>
 				-(lit("else")[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
 				CodeScope)
-				;
+				;*/
 
 			Operand = 
 				Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]

@@ -73,7 +73,7 @@ namespace par{
 
 	struct ASTBranch : public ASTNode
 	{
-		ASTBranch() { type = ASTType::Branch; }
+		ASTBranch() : elseBody(nullptr) { type = ASTType::Branch; }
 
 		ASTExpNode* condition;
 		ASTCode* ifBody;

@@ -37,7 +37,6 @@ namespace par
 		void beginCodeScope();
 		void finishCodeScope();
 		void ifConditional();
-		void elseifConditional();
 		void elseConditional();
 		void returnStatement();
 

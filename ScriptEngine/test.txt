@@ -48,15 +48,15 @@ int test_localVar(int a, int b)
 	return x
 }
 
-int test_conditional(int a)
+int test_branch(int a)
 {
-	if(a = 10)
+	if(a == 10)
 	{
 		return 10
 	}
-	else if(a = 11)
+	else if(a == 11)
 	{
 		return 11
 	}
-	else { return 0}
+	else { return 2}
 }

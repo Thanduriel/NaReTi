@@ -36,6 +36,7 @@ namespace codeGen
 		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);
 		//store result in a member var
 		void compileMemberStr(par::ASTMember& _node);
+		void compileBranch(par::ASTBranch& _node);
 
 		UsageState getUsageState() { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }

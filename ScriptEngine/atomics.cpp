@@ -19,6 +19,7 @@ namespace lang
 			pair<string, int>(".", 2),
 			pair<string, int>("*", 5),
 			pair<string, int>("+", 6),
+			pair<string, int>("==", 9),
 			pair<string, int>("=", 15)
 			} }
 		)
@@ -39,6 +40,8 @@ namespace lang
 		BASICOPERATION("*", BasicType::Int, InstructionType::Mul);
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("=", BasicType::Int, InstructionType::Set);
+		//comparisation
+		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Eq }), BasicType::Bool, BasicType::Int, BasicType::Int);
 
 		//float -------------------------------------------------------
 		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);

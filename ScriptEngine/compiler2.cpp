@@ -140,9 +140,12 @@ namespace codeGen
 		{
 			switch (subNode->type)
 			{
-	//		case ASTType::BinOp:
-	//			compileBinOp(*(ASTOp*)subNode);
-	//			break;
+			case ASTType::Code:
+				compileCode(*(ASTCode*)subNode);
+				break;
+			case ASTType::Branch:
+				compileBranch(*(ASTBranch*)subNode);
+				break;
 			case ASTType::Call:
 				compileCall(*(ASTCall*)subNode);
 				break;
@@ -288,6 +291,8 @@ namespace codeGen
 			}
 			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
+		case InstructionType::Eq:
+			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 		//float instructions
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
@@ -379,6 +384,24 @@ namespace codeGen
 			X86GpVar& var = *(X86GpVar*)_destination;
 			m_compiler.mov(var, adr);
 		}
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileBranch(ASTBranch& _node)
+	{
+		Label elseBranch(m_compiler);
+		Label end(m_compiler);
+		
+		compileCall(*(ASTCall*)_node.condition);
+		m_compiler.jnz(elseBranch);
+		compileCode(*_node.ifBody);
+		m_compiler.jmp(end);
+		m_compiler.bind(elseBranch);
+
+		if (_node.elseBody) compileCode(*_node.elseBody);
+
+		m_compiler.bind(end);
 	}
 
 	// *************************************************** //

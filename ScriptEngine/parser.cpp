@@ -35,7 +35,7 @@ namespace par{
 		}
 		catch (ParsingError& _error)
 		{
-			std::cout << _error.message;
+			std::cout << _error.message << endl;
 			return false;
 		}
 		clock_t endClock = clock();
