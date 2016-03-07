@@ -62,6 +62,7 @@ namespace par
 			GeneralExpression = 
 				(("return" >> Expression)[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
 				| Conditional
+				| Loop
 				| VarDeclaration
 				| Expression
 				)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]

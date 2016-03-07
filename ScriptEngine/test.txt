@@ -64,14 +64,9 @@ int test_branch(int a)
 
 int test_loop(int a, int b)
 {
-	if(a < 0 && b < 1)
+	while(0 < a && b < 57)
 	{
-		return 42
+		b = b + a
 	}
-	return 7
-/*	while(0 < a && a < b)
-	{
-		b = b - a
-	}
-	return b*/
+	return b
 }

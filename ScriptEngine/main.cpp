@@ -72,7 +72,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout << scriptEngine.call<int, int>(hndlBranch, 5) << endl;
 
 		NaReTi::FunctionHandle hndlLoop = scriptEngine.getFuncHndl("test_loop");
-		cout << scriptEngine.call<int, int, int>(hndlLoop, -2, 0) << endl;
+		cout << scriptEngine.call<int, int, int>(hndlLoop, 3, 2) << endl;
 	}
 
 	char tmp;

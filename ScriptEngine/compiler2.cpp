@@ -427,12 +427,10 @@ namespace codeGen
 
 		m_compiler.bind(begin);
 		compileCondExp(*(ASTCall*)_node.condition);
-	//	m_compiler.jz(end);
 		compileCode(*_node.body);
 		m_compiler.jmp(begin);
 
 		m_compiler.bind(end);
-	//	m_compiler.cmpss()
 	}
 
 	// *************************************************** //

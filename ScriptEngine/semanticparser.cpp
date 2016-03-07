@@ -200,6 +200,8 @@ namespace par
 		node.condition = popNode();
 		node.body = m_allocator->construct<ASTCode>();
 		m_targetScope = node.body;
+
+		m_currentCode->push_back(&node);
 	}
 
 	// ************************************************** //
