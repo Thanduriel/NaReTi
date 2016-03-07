@@ -146,6 +146,9 @@ namespace codeGen
 			case ASTType::Branch:
 				compileBranch(*(ASTBranch*)subNode);
 				break;
+			case ASTType::Loop:
+				compileLoop(*(ASTLoop*)subNode);
+				break;
 			case ASTType::Call:
 				compileCall(*(ASTCall*)subNode);
 				break;
@@ -291,8 +294,15 @@ namespace codeGen
 			}
 			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Eq:
+		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case JNE:
+			m_compiler.jne(m_labelStack.back());
+			break;
+		case JNL:
+			m_compiler.jnl(m_labelStack.back());
+			break;
 		//float instructions
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
@@ -390,11 +400,12 @@ namespace codeGen
 
 	void Compiler::compileBranch(ASTBranch& _node)
 	{
-		Label elseBranch(m_compiler);
 		Label end(m_compiler);
+		m_labelStack.emplace_back(m_compiler);
+		Label& elseBranch = m_labelStack.back();
 		
-		compileCall(*(ASTCall*)_node.condition);
-		m_compiler.jnz(elseBranch);
+		compileCondExp(*(ASTCall*)_node.condition);
+	//	m_compiler.jnz(elseBranch);
 		compileCode(*_node.ifBody);
 		m_compiler.jmp(end);
 		m_compiler.bind(elseBranch);
@@ -402,6 +413,49 @@ namespace codeGen
 		if (_node.elseBody) compileCode(*_node.elseBody);
 
 		m_compiler.bind(end);
+		m_labelStack.pop_back();
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileLoop(ASTLoop& _node)
+	{
+		Label begin(m_compiler);
+
+		m_labelStack.emplace_back(m_compiler);
+		Label& end = m_labelStack.back();
+
+		m_compiler.bind(begin);
+		compileCondExp(*(ASTCall*)_node.condition);
+	//	m_compiler.jz(end);
+		compileCode(*_node.body);
+		m_compiler.jmp(begin);
+
+		m_compiler.bind(end);
+	//	m_compiler.cmpss()
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileCondExp(ASTCall& _node)
+	{
+		if (_node.function->name == "||")
+		{
+			m_labelStack.emplace_back(m_compiler);
+			Label& end = m_labelStack.back();
+
+			compileCondExp(*(ASTCall*)_node.args[0]);
+			m_compiler.bind(end);
+			m_labelStack.pop_back();
+
+			compileCondExp(*(ASTCall*)_node.args[1]);
+		}
+		else if (_node.function->name == "&&")
+		{
+			compileCondExp(*(ASTCall*)_node.args[0]);
+			compileCondExp(*(ASTCall*)_node.args[1]);
+		}
+		else compileCall(_node);
 	}
 
 	// *************************************************** //

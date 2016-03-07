@@ -19,20 +19,29 @@ namespace lang
 			pair<string, int>(".", 2),
 			pair<string, int>("*", 5),
 			pair<string, int>("+", 6),
+			pair<string, int>("<", 8),
 			pair<string, int>("==", 9),
+			pair<string, int>("!=", 9),
+			pair<string, int>("&&", 13),
+			pair<string, int>("||", 14),
 			pair<string, int>("=", 15)
 			} }
 		)
 	{
-		m_types.resize(5);
+		m_types.resize(6);
 		//basic types
 		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int));
 		m_types[BasicType::Float] = std::unique_ptr<ComplexType>(new ComplexType("float", BasicType::Float));
 		m_types[BasicType::String] = std::unique_ptr<ComplexType>(new ComplexType("string", BasicType::String));
 		m_types[BasicType::Void] = std::unique_ptr<ComplexType>(new ComplexType("void", BasicType::Void));
 		m_types[BasicType::Bool] = std::unique_ptr<ComplexType>(new ComplexType("bool", BasicType::Bool));
+		m_types[BasicType::FlagBool] = std::unique_ptr<ComplexType>(new ComplexType("flagBool", BasicType::FlagBool));
 
 		//operators
+		//logical -----------------------------------------------------
+		BASICOPERATION("&&", BasicType::FlagBool, InstructionType::Nop);
+		BASICOPERATION("||", BasicType::FlagBool, InstructionType::Nop);
+
 		//int ---------------------------------------------------------
 		//basic arithmetic
 		BASICOPERATION("+", BasicType::Int, InstructionType::Add);
@@ -41,7 +50,8 @@ namespace lang
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("=", BasicType::Int, InstructionType::Set);
 		//comparisation
-		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Eq }), BasicType::Bool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 
 		//float -------------------------------------------------------
 		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);

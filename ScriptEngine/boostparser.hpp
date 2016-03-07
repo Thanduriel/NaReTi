@@ -96,6 +96,11 @@ namespace par
 				(Conditional | CodeScope)[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)])
 				;
 
+			Loop =
+				(lit("while") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::loop, &m_semanticParser)] >>
+				CodeScope
+				;
+
 	/*		Conditional =
 				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
 				CodeScope >>
@@ -146,6 +151,7 @@ namespace par
 		qi::rule<Iterator, Skipper> RExpression;
 		qi::rule<Iterator, Skipper> CodeScope;
 		qi::rule<Iterator, Skipper> Conditional;
+		qi::rule<Iterator, Skipper> Loop;
 		
 		qi::rule<Iterator, std::string()> Symbol;
 		qi::rule<Iterator, std::string()> ConstString;

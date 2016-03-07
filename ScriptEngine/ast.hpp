@@ -43,6 +43,7 @@ namespace par{
 		Function* function;
 		std::vector< ASTExpNode* > args;
 
+		std::string name; // signatures can only be checked once a complete expression has been parsed
 		bool isLocked; // a parsing flag, meaning that this subtree may not be changed
 	};
 

@@ -26,6 +26,24 @@ namespace par
 		//the current module is a valid resource aswell
 		m_moduleLib.addModule(_module);
 	}
+
+	// ************************************************** //
+
+	void SemanticParser::linkCall(ASTCall& _node)
+	{
+		for (auto& arg : _node.args)
+		{
+			//only not linked functions have no typeinfo at this point
+			if (arg->typeInfo == nullptr) linkCall(*(ASTCall*)arg);
+		}
+
+		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
+		if (!func) throw ParsingError("No function with the given signature found.");
+
+		_node.function = func;
+		_node.typeInfo = &func->returnTypeInfo;
+	}
+
 	// ************************************************** //
 	// boost parser declarations						  //
 	// ************************************************** //
@@ -176,6 +194,16 @@ namespace par
 
 	// ************************************************** //
 
+	void SemanticParser::loop()
+	{
+		ASTLoop& node = *m_allocator->construct<ASTLoop>();
+		node.condition = popNode();
+		node.body = m_allocator->construct<ASTCode>();
+		m_targetScope = node.body;
+	}
+
+	// ************************************************** //
+
 	void SemanticParser::term(string& _operator)
 	{
 		//the plan: -pop the top 2 stack params
@@ -184,19 +212,17 @@ namespace par
 		// -push m_accumulator with the updated type on the stack
 		if (_operator == ".") return; // member access is currently handled in pushSymbol
 
-		Function* func = m_moduleLib.getFunction(_operator, m_stack.begin() + (m_stack.size() - 2), m_stack.end());
-		if (!func) throw ParsingError("No function with the given signature found.");
-
 		//build new node
 		ASTCall* astNode = m_allocator->construct<ASTCall>();
-		astNode->function = func;
-		astNode->typeInfo = &func->returnTypeInfo;
+		astNode->name = _operator;
+		astNode->typeInfo = nullptr;
 
 		//pop the used params
 		astNode->args.resize(2);
-		astNode->args[1] = popNode();
+		//no popNode since the tree is not final
+		astNode->args[1] = m_stack.back(); m_stack.pop_back();
 		//traverse the tree to find the right position in regard of precedence
-		ASTExpNode** dest = findPrecPos(&m_stack[m_stack.size() - 1], *astNode);
+		ASTExpNode** dest = findPrecPos(&m_stack.back(), *astNode);
 		astNode->args[0] = *dest;
 		*dest = astNode; // put this node there
 	//	m_stack.push_back(astNode);
@@ -265,7 +291,7 @@ namespace par
 		case ASTType::Call:
 		{
 			ASTCall& call = *((ASTCall*)(*_tree));
-			if (!call.isLocked && lang::g_module.getPrecedence(call.function->name) > lang::g_module.getPrecedence(_node.function->name))
+			if (!call.isLocked && lang::g_module.getPrecedence(call.name) > lang::g_module.getPrecedence(_node.name))
 			{
 				return (ASTExpNode**)&call.args[1];
 			}

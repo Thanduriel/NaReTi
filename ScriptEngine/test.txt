@@ -1,3 +1,4 @@
+/**/
 int sum(int arg0, int arg1)
 {
 	return arg0 + arg1
@@ -59,4 +60,18 @@ int test_branch(int a)
 		return 11
 	}
 	else { return 2}
+}
+
+int test_loop(int a, int b)
+{
+	if(a < 0 && b < 1)
+	{
+		return 42
+	}
+	return 7
+/*	while(0 < a && a < b)
+	{
+		b = b - a
+	}
+	return b*/
 }

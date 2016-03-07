@@ -38,6 +38,7 @@ namespace par
 		void finishCodeScope();
 		void ifConditional();
 		void elseConditional();
+		void loop();
 		void returnStatement();
 
 		//term parsing
@@ -57,7 +58,10 @@ namespace par
 	private:
 		//pops a element from the param stack and translates it into an instruction
 		void popParam();
-		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); return ptr; };
+		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call){ linkCall(*(ASTCall*)ptr); } return ptr; };
+
+		void linkCall(ASTCall& _node);
+
 		std::vector < ASTExpNode* > m_stack;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to

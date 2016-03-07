@@ -67,7 +67,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout << ivec.x << endl;
 
 		NaReTi::FunctionHandle hndlBranch = scriptEngine.getFuncHndl("test_branch");
+		cout << scriptEngine.call<int, int>(hndlBranch, 10) << endl;
 		cout << scriptEngine.call<int, int>(hndlBranch, 11) << endl;
+		cout << scriptEngine.call<int, int>(hndlBranch, 5) << endl;
+
+		NaReTi::FunctionHandle hndlLoop = scriptEngine.getFuncHndl("test_loop");
+		cout << scriptEngine.call<int, int, int>(hndlLoop, -2, 0) << endl;
 	}
 
 	char tmp;

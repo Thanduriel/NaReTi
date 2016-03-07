@@ -5,6 +5,7 @@ namespace par
 	//not all of this are in use or even make sence in the current implementation
 	enum InstructionType
 	{
+		Nop,
 		//set accumulator
 		SetA,
 		//arithmetical operations
@@ -28,7 +29,9 @@ namespace par
 		SetRef,
 		fSetRef,
 		//comparisation
-		Eq,
+		Cmp,
+		JNE,
+		JNL,
 		Ret,
 		RetA, // return the accumulator; takes no param
 		Call, // call subroutine; is inlined when the flag is set

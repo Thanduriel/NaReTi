@@ -37,6 +37,9 @@ namespace codeGen
 		//store result in a member var
 		void compileMemberStr(par::ASTMember& _node);
 		void compileBranch(par::ASTBranch& _node);
+		void compileLoop(par::ASTLoop& _node);
+		//compiles an expression that resolves to a branch descicion
+		void compileCondExp(par::ASTCall& _node);
 
 		UsageState getUsageState() { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
@@ -60,6 +63,7 @@ namespace codeGen
 		// appart from assignments.
 		UsageState m_usageState;
 
+		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
 		bool m_isRefSet; //flag: lvalue is a reference 
 	};
 }
