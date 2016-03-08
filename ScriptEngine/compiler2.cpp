@@ -9,7 +9,9 @@ namespace codeGen
 		m_assembler(&m_runtime),
 		m_compiler(&m_assembler),
 		m_isRefSet(false)
-	{}
+	{
+		m_labelStack.reserve(64); // prevent moving
+	}
 
 	// *************************************************** //
 
@@ -472,12 +474,15 @@ namespace codeGen
 		{
 			m_labelStack.emplace_back(m_compiler);
 			Label& end = m_labelStack.back();
+			Label postOr(m_compiler);
 
 			compileCondExp(*(ASTCall*)_node.args[0]);
-			m_compiler.bind(end);
+			m_compiler.jmp(postOr); //on success the Or statement is true
+			m_compiler.bind(end); // the second Or condition
 			m_labelStack.pop_back();
 
 			compileCondExp(*(ASTCall*)_node.args[1]);
+			m_compiler.bind(postOr);
 		}
 		else if (_node.function->name == "&&")
 		{
