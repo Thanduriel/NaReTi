@@ -75,6 +75,22 @@ int _tmain(int argc, _TCHAR* argv[])
 		cout << scriptEngine.call<int, int, int>(hndlLoop, 3, 2) << endl;
 	}
 
+	success = scriptEngine.loadModule("random.nrt");
+	if (success)
+	{
+		NaReTi::FunctionHandle hndlRnd = scriptEngine.getFuncHndl("xorshift");
+		NaReTi::FunctionHandle hndlMod = scriptEngine.getFuncHndl("rand");
+		int num = 3234604;
+		int buf[11];
+		ZeroMemory(&buf, sizeof(int) * 11);
+		for (int i = 0; i < 0xFFFFFF; ++i)
+		{
+			num = scriptEngine.call<int, int>(hndlRnd, num);
+			buf[scriptEngine.call<int, int, int, int>(hndlMod, num, 10, 0)]++;
+		}
+		for (int i = 0; i < 10; ++i) cout << buf[i] << endl;
+	}
+
 	char tmp;
 	std::cin >> tmp;
 	return 0;

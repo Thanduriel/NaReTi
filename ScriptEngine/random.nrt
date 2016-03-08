@@ -1,0 +1,13 @@
+int xorshift(int num)
+{
+	    num = num ^ (num << 13)
+        num = num ^ (num >> 17)
+        num = num ^ (num << 5)
+        
+        return num
+}
+
+int rand(int num, int max, int min)
+{
+	return (num % (max + 1 - min)) + min
+}

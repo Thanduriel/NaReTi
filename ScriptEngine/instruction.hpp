@@ -6,8 +6,6 @@ namespace par
 	enum InstructionType
 	{
 		Nop,
-		//set accumulator
-		SetA,
 		//arithmetical operations
 		Add,
 		Sub,
@@ -24,7 +22,11 @@ namespace par
 		Not,
 		ShL,
 		ShR,
-		Set, //assign
+		Xor,
+		And,
+		Or,
+		//assign
+		Set, 
 		fSet,
 		SetRef,
 		fSetRef,

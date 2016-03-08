@@ -18,10 +18,18 @@ namespace lang
 			pair<string, int>("--", 2),
 			pair<string, int>(".", 2),
 			pair<string, int>("*", 5),
+			pair<string, int>("%", 5),
+			pair<string, int>("/", 5),
 			pair<string, int>("+", 6),
+			pair<string, int>("-", 6),
+			pair<string, int>("<<", 7),
+			pair<string, int>(">>", 7),
 			pair<string, int>("<", 8),
 			pair<string, int>("==", 9),
 			pair<string, int>("!=", 9),
+			pair<string, int>("&", 10),
+			pair<string, int>("^", 11),
+			pair<string, int>("|", 12),
 			pair<string, int>("&&", 13),
 			pair<string, int>("||", 14),
 			pair<string, int>("=", 15)
@@ -48,7 +56,13 @@ namespace lang
 		BASICOPERATION("-", BasicType::Int, InstructionType::Sub);
 		BASICOPERATION("*", BasicType::Int, InstructionType::Mul);
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
+		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
 		BASICOPERATION("=", BasicType::Int, InstructionType::Set);
+		BASICOPERATION("<<", BasicType::Int, InstructionType::ShL);
+		BASICOPERATION(">>", BasicType::Int, InstructionType::ShR);
+		BASICOPERATION("&", BasicType::Int, InstructionType::And);
+		BASICOPERATION("^", BasicType::Int, InstructionType::Xor);
+		BASICOPERATION("|", BasicType::Int, InstructionType::Or);
 		//comparisation
 		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);

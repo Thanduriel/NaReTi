@@ -288,6 +288,36 @@ namespace codeGen
 		case InstructionType::Mul:
 			m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
+		case Mod:
+		{
+			X86GpVar& dummy = getUnusedVar();
+			m_compiler.xor_(dummy, dummy);
+			m_compiler.idiv(dummy, *(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.mov(*(X86GpVar*)_args[0], dummy);
+			break;
+		}
+		case Div:
+		{
+			X86GpVar& dummy = getUnusedVar();
+			m_compiler.xor_(dummy, dummy);
+			m_compiler.idiv(dummy, *(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		}
+		case ShL:
+			m_compiler.shl(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case ShR:
+			m_compiler.shr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case And:
+			m_compiler.and_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case Xor:
+			m_compiler.xor_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case Or:
+			m_compiler.or_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
 		case InstructionType::Set:
 			if (m_isRefSet) {
 				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
@@ -329,6 +359,7 @@ namespace codeGen
 		{
 			ASTMember& member = *(ASTMember*)_node.body;
 			compileMemberLd(member, m_accumulator);
+			var = m_accumulator;
 		}
 		else if (_node.body->type == ASTType::Leaf)
 		{
