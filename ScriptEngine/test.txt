@@ -1,4 +1,3 @@
-/**/
 int sum(int arg0, int arg1)
 {
 	return arg0 + arg1
@@ -76,4 +75,17 @@ int test_loop(int a, int b)
 		b = b + a
 	}
 	return b
+}
+
+iVec2 g_test_vec
+
+test_globalInit()
+{
+	g_test_vec.x = 11
+	g_test_vec.y = 9
+}
+
+int test_global()
+{
+	return g_test_vec.y
 }

@@ -235,7 +235,16 @@ namespace par
 
 	void SemanticParser::pushSymbol(string& _name)
 	{
-		VarSymbol* var = m_currentCode->getVar(_name);
+		VarSymbol* var;
+		//look in global scope
+		var = m_moduleLib.getGlobalVar(_name);
+		if (var)
+		{
+			bool isImported = false;
+			for (auto& impVar : m_currentFunction->m_importedVars) if (impVar == var){ isImported = true; break; }
+			if(!isImported) m_currentFunction->m_importedVars.push_back(var);
+		}
+		else var = m_currentCode->getVar(_name);
 		if (!var)
 		{
 			size_t i = 0;

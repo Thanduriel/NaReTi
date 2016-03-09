@@ -70,13 +70,13 @@ namespace par{
 		}
 	};
 
-	struct VarSymbol : public Symbol
+	struct VarSymbol : public Symbol, public codeGen::CVarSymbol
 	{
 //		VarSymbol(){}; //todo: add better way to acuire atom type; use this here
 		VarSymbol(const std::string& _name, ComplexType& _type, bool _isRef = false) :
 			Symbol(_name),
 			typeInfo(_type, _isRef)
-		{};
+		{}
 
 		VarSymbol& operator= (VarSymbol& oth)
 		{
@@ -88,8 +88,6 @@ namespace par{
 		}
 
 		TypeInfo typeInfo;
-
-		asmjit::Var* compiledVar;
 	};
 
 	struct CodeScope
@@ -97,7 +95,6 @@ namespace par{
 		CodeScope() : m_parent(nullptr) {};
 
 		std::vector< VarSymbol > m_variables;
-//		std::vector < Instruction > m_instructions;
 
 		VarSymbol* getVar(std::string& _name)
 		{
@@ -122,6 +119,7 @@ namespace par{
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;
+		size_t size; // size in bytes
 
 		int sizeOf() override
 		{

@@ -30,6 +30,17 @@ namespace utils{
 			return ptr;
 		}
 
+		//allocate a block with the given amounts of bytes
+		void* alloc(size_t _bytes)
+		{
+			if (sp - (char*)memBlocks[bp] + _bytes > _BlockSize) newBlock();
+			
+			auto ptr = sp;
+			sp += _bytes;
+
+			return ptr;
+		}
+
 		//throws away extra blocks and resets to the default state
 		void reset()
 		{

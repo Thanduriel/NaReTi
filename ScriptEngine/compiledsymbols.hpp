@@ -13,30 +13,23 @@ namespace codeGen{
 		asmjit::FuncBuilderX funcBuilder; //signature needed to compile calls
 	};
 
-	enum class CVarType
+	enum class OwnershipType
 	{
-		Mem, //memory
-		Reg, //register
-		Float // float register
+		Stack,
+		Heap
+	};
+
+	struct Ownership
+	{
+		Ownership(OwnershipType _ownerType = OwnershipType::Stack) : ownerType(_ownerType){};
+		OwnershipType ownerType;
+		void* rawPtr;
 	};
 
 	struct CVarSymbol
 	{
-		CVarType cType;
+		asmjit::Var* compiledVar;
+		Ownership ownership;
+//		X86Mem rawPtr;
 	};
-
-	template < typename _T, CVarType _VarType>
-	struct CompilerVar : public CVarSymbol
-	{
-		CompilerVar(_T&& _var) : asmjitVar(_var){ cType = _VarType; };
-		_T asmjitVar;
-	};
-
-	typedef CompilerVar<asmjit::X86GpVar, CVarType::Reg> IntReg;
-	typedef CompilerVar<asmjit::X86XmmVar, CVarType::Float> FloatReg;
-	typedef CompilerVar<asmjit::X86MmVar, CVarType::Mem> MemPtr;
-
-	typedef CompilerVar<asmjit::X86GpVar*, CVarType::Reg> IntRegPtr;
-	typedef CompilerVar<asmjit::X86XmmVar*, CVarType::Float> FloatRegPtr;
-	typedef CompilerVar<asmjit::X86MmVar*, CVarType::Mem> MemPtrPtr;
 }

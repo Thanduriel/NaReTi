@@ -26,4 +26,14 @@ namespace par
 		}
 		return nullptr;
 	}
+
+	VarSymbol* ModuleLibrary::getGlobalVar(const std::string& _name)
+	{
+		for (auto& module : m_modules)
+		{
+			VarSymbol* var = module->getGlobalVar(_name);
+			if (var) return var;
+		}
+		return nullptr;
+	}
 }

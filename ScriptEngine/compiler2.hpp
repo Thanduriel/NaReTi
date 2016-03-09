@@ -21,6 +21,8 @@ namespace codeGen
 		// calculates the member offsets and alignment
 		void compileType(par::ComplexType& _type);
 
+		void compileHeapVar(par::VarSymbol& _var, utils::StackAlloc& _allocator);
+
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function);
 		//compile a specific structure

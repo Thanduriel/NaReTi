@@ -3,6 +3,8 @@
 
 namespace NaReTi
 {
+	using namespace par;
+
 	par::ComplexType* Module::getType(const std::string& _name)
 	{
 		for (auto& type : m_types)
@@ -37,6 +39,15 @@ namespace NaReTi
 				}
 			}
 			if (paramsMatch) return func.get();
+		}
+		return nullptr;
+	}
+
+	VarSymbol* Module::getGlobalVar(const std::string& _name)
+	{
+		for (auto& var : m_text.m_variables)
+		{
+			if (_name == var.name) return &var;
 		}
 		return nullptr;
 	}

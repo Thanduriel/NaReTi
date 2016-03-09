@@ -24,6 +24,8 @@ namespace NaReTi{
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
 			const std::vector<par::ASTExpNode*>::iterator& _end);
 
+		par::VarSymbol* getGlobalVar(const std::string& _name);
+
 		utils::StackAlloc& getAllocator() { return m_allocator; }
 
 		//their lifetime equals 

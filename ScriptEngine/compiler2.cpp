@@ -21,6 +21,10 @@ namespace codeGen
 		{
 			compileType(*(ComplexType*)type.get());
 		}
+		for (auto& var : _module.m_text.m_variables)
+		{
+			compileHeapVar(var, _module.getAllocator());
+		}
 		for (auto& function : _module.m_functions)
 		{
 			compileFuction(*function);
@@ -45,6 +49,19 @@ namespace codeGen
 			_type.displacement.push_back(currentOffset);
 			currentOffset += 4;
 		}
+		_type.size = currentOffset;
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileHeapVar(VarSymbol& _var, utils::StackAlloc& _allocator)
+	{
+		_var.ownership.rawPtr = _allocator.alloc(_var.typeInfo.type.size);
+	//	auto memMgr = m_runtime.getMemMgr();
+	//	_var.ownership.rawPtr = memMgr->alloc(_var.typeInfo.type.size);
+	//	ZeroMemory(_var.ownership.rawPtr, _var.typeInfo.type.size);
+		_var.ownership.ownerType = OwnershipType::Heap;
+		_var.typeInfo.isReference = true;
 	}
 
 	// *************************************************** //
@@ -123,6 +140,17 @@ namespace codeGen
 		}
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i].compiledVar);
+
+		//imported heap vars
+		for (auto& var : _function.m_importedVars)
+		{
+			m_anonymousVars.push_back(m_compiler.newIntPtr());
+			X86GpVar& gpVar = m_anonymousVars.back();
+			var->compiledVar = &gpVar;
+			int test = *(int*)(var->ownership.rawPtr);
+			m_compiler.mov(gpVar, asmjit::imm((int)var->ownership.rawPtr));
+		}
+
 		//args are relevant through out the function
 		m_usageState.varsInUse = m_anonymousVars.size();
 		m_usageState.floatsInUse = m_anonymousFloats.size();
@@ -323,8 +351,8 @@ namespace codeGen
 		case InstructionType::Set:
 			if (m_isRefSet) {
 				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
-			}
-			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			} else
+				m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
@@ -412,6 +440,8 @@ namespace codeGen
 		ComplexType& type = _node.instance->typeInfo->type;
 		return x86::dword_ptr(*gpVar, type.displacement[_node.index]);
 	}
+
+	// *************************************************** //
 
 	void Compiler::compileMemberLd(ASTMember& _node, asmjit::Operand* _destination)
 	{

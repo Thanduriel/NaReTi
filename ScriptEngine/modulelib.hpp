@@ -25,6 +25,7 @@ namespace par
 		par::Function* getFunction(const std::string& _name,
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
 			const std::vector<par::ASTExpNode*>::iterator& _end);
+		VarSymbol* getGlobalVar(const std::string& _name);
 
 	private:
 		std::vector < NaReTi::Module* > m_modules;

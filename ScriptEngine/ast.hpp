@@ -67,6 +67,7 @@ namespace par{
 
 		TypeInfo returnTypeInfo;
 		ASTCode scope;
+		std::vector< VarSymbol* > m_importedVars; //< variables from a global scope
 		int paramCount; //< amount of params this function expects, coresponds to the first elements in scope.locals
 		//flags
 		bool bInline;

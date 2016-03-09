@@ -26,7 +26,7 @@ namespace par
 		void setModule(NaReTi::Module& _module);
 
 		//set the scope back to the default scope of the module
-		void resetScope() { m_currentCode = &m_currentModule->m_text; };
+		void resetScope() { m_currentCode = &m_currentModule->m_text; m_currentScope = &m_currentModule->m_text; };
 
 		void varDeclaration(boost::fusion::vector3< std::string, boost::optional<char>, std::string >& _attr);
 		void typeDeclaration(std::string& _attr);
