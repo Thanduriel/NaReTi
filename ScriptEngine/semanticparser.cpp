@@ -98,7 +98,7 @@ namespace par
 		if (_attr.m1.is_initialized())
 		{
 			ComplexType* type = m_moduleLib.getType(_attr.m0);
-			if (!type) throw ParsingError("Unkown type");
+			if (!type) throw ParsingError("Unkown type: " + _attr.m0);
 			m_currentModule->m_functions.emplace_back(new Function(_attr.m1.get(), *type));
 		}
 		//assume void
@@ -109,6 +109,7 @@ namespace par
 
 		//init envoirement
 		m_currentFunction = m_currentModule->m_functions.back().get();
+		m_currentFunction->bInline = false;
 		m_targetScope = &m_currentModule->m_functions.back()->scope;
 		m_targetScope->m_parent = m_currentScope;
 		//param dec is outside of the following code scope
@@ -211,10 +212,6 @@ namespace par
 
 	void SemanticParser::term(string& _operator)
 	{
-		//the plan: -pop the top 2 stack params
-		// -find the matching function using them
-		// -add a call instruction
-		// -push m_accumulator with the updated type on the stack
 		if (_operator == ".") return; // member access is currently handled in pushSymbol
 
 		//build new node
@@ -232,6 +229,23 @@ namespace par
 		*dest = astNode; // put this node there
 	//	m_stack.push_back(astNode);
 		cout << _operator << endl;
+	}
+
+	void SemanticParser::call(string& _name)
+	{
+		//build new node
+		ASTCall* node = m_allocator->construct<ASTCall>();
+		node->name = _name;
+		node->typeInfo = nullptr;
+
+		m_stack.push_back(node);
+	}
+
+	void SemanticParser::argSeperator()
+	{
+		ASTExpNode* expNode = popNode();
+		ASTCall* callNode = (ASTCall*)m_stack.back();
+		callNode->args.push_back(expNode);
 	}
 
 	// ************************************************** //

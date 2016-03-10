@@ -52,6 +52,8 @@ namespace par
 		void pushFloat(double _val);
 		void pushInt(int _val);
 		void term(std::string& _operator);
+		void call(std::string& _name);
+		void argSeperator();
 
 		void lockLatestNode();
 		//looks in the tree with the given node as root for the right position of the top level on the stack.

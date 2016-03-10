@@ -92,7 +92,7 @@ namespace par
 				;
 
 			//classic if / if else / else
-			//the "else" scope is created manually because logicly an "else if" is an if inside the outer else
+			//the "else" scope is created manually because logically an "else if" is an if inside the outer else
 			Conditional =
 				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
 				CodeScope >>
@@ -114,8 +114,16 @@ namespace par
 				CodeScope)
 				;*/
 
+			Call =
+				(Symbol >>
+				'(')[boost::bind(&SemanticParser::call, &m_semanticParser, ::_1)] >>
+				-(Expression[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)] >> *(',' >> Expression[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)])) >>
+				')'
+				;
+
 			Operand = 
-				Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
+				Call
+				| Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
 				| Integer[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
 				| Float[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
 				| ConstString
@@ -127,22 +135,12 @@ namespace par
 			//pay attention that '-' needs to be the last char so that it is not interpreted as range
 			Operator = lexeme[+char_("?+*/<>=|^%~!&.-")];
 			
-		//	Number = Integer;
 
 			Integer = 
 				int_ >>
 				!char_('.') //cannot be followed by an . as that would indicate a float
 				;
 			Float = double_;
-			/*
-			Float = ;
-
-			number = flt | integer;
-			Operand = number |
-				Var |
-				('-' >> Operand) |
-				('+' >> Operand)
-				;*/
 		}
 	private:
 		qi::rule<Iterator, Skipper> BaseExpression;
@@ -157,6 +155,8 @@ namespace par
 		qi::rule<Iterator, Skipper> CodeScope;
 		qi::rule<Iterator, Skipper> Conditional;
 		qi::rule<Iterator, Skipper> Loop;
+		qi::rule<Iterator, Skipper> Call;
+
 		
 		qi::rule<Iterator, std::string()> Symbol;
 		qi::rule<Iterator, std::string()> ConstString;

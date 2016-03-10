@@ -58,7 +58,7 @@ namespace par{
 	//function symbol; just here because of crosslinks between ast and symbols
 	struct Function : public Symbol, codeGen::CFunction
 	{
-		//definitions can be fuond in "symbols.cpp"
+		//definitions can be found in "symbols.cpp"
 		// a binary function of the structure T x T -> T
 		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0

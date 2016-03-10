@@ -199,53 +199,54 @@ namespace codeGen
 
 		UsageState preCallState = getUsageState();
 
+		int i = 0;
+		//manage args and put make sure that all are located in virtual registers
+		for (auto& arg : _node.args)
+		{
+			switch (arg->type)
+			{
+			case ASTType::Leaf:
+				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
+				args.emplace_back(compileLeaf(*leaf));
+				break;
+			case ASTType::Member:
+				if (func.name == "=" && i == 0)
+				{
+					X86GpVar& var = getUnusedVar();
+					args.emplace_back(&var);
+					m_compiler.lea(var, getMemberAdr(*(ASTMember*)arg));
+					m_isRefSet = true;
+				}
+				else
+				{
+					X86GpVar& var = getUnusedVar();
+					args.emplace_back(&var);
+					compileMemberLd(*(ASTMember*)arg, &var);
+				}
+				break;
+			case ASTType::Call:
+				ASTCall* astCall = (ASTCall*)arg;
+				if (astCall->function->returnTypeInfo.type.basic == BasicType::Int)
+				{
+					X86GpVar& var = getUnusedVar();
+					args.emplace_back(&var);
+					compileCall(*astCall);
+					m_compiler.mov(var, *m_accumulator);
+				}
+				else if (astCall->function->returnTypeInfo.type.basic == BasicType::Float)
+				{
+					X86XmmVar& var = getUnusedFloat();
+					args.emplace_back(&var);
+					compileCall(*astCall);
+					m_compiler.movss(var, *m_fp0);
+				}
+				break;
+			}
+			i++;
+		}
+
 		if (_node.function->bInline)
 		{
-			int i = 0;
-			//manage args and put make shure that all are located in virtual registers
-			for (auto& arg : _node.args)
-			{
-				switch (arg->type)
-				{
-				case ASTType::Leaf:
-					ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
-					args.emplace_back(compileLeaf(*leaf));
-					break;
-				case ASTType::Member:
-					if (func.name == "=" && i == 0)
-					{
-						X86GpVar& var = getUnusedVar();
-						args.emplace_back(&var);
-						m_compiler.lea(var, getMemberAdr(*(ASTMember*)arg));
-						m_isRefSet = true;
-					}
-					else
-					{
-						X86GpVar& var = getUnusedVar();
-						args.emplace_back(&var);
-						compileMemberLd(*(ASTMember*)arg, &var);
-					}
-					break;
-				case ASTType::Call: 
-					ASTCall* astCall = (ASTCall*)arg;
-					if (astCall->function->returnTypeInfo.type.basic == BasicType::Int)
-					{
-						X86GpVar& var = getUnusedVar();
-						args.emplace_back(&var);
-						compileCall(*astCall);
-						m_compiler.mov(var, *m_accumulator);
-					}
-					else if (astCall->function->returnTypeInfo.type.basic == BasicType::Float)
-					{
-						X86XmmVar& var = getUnusedFloat();
-						args.emplace_back(&var);
-						compileCall(*astCall);
-						m_compiler.movss(var, *m_fp0);
-					}
-					break;
-				}
-				i++;
-			}
 			//code
 
 			// if types do not match, a typecast will move the data
@@ -278,6 +279,11 @@ namespace codeGen
 			X86CallNode* call = m_compiler.call(*m_accumulator, func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[0]);
+
+			if (func.returnTypeInfo.type.basic == BasicType::Float)
+				call->setRet(0, *m_fp0);
+			else 
+				call->setRet(0, *m_accumulator);
 		}
 
 		setUsageState(preCallState);

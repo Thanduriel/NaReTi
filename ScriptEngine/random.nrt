@@ -22,7 +22,7 @@ int xorshift(int num)
 // returns a evenly distributed number in [min, max]
 int rand(int max, int min)
 {
-//	xsNumber = xorshift(xsNumber)
+	xsNumber.val = xorshift(xsNumber.val)
 	
 	return (xsNumber.val % (max + 1 - min)) + min
 }
