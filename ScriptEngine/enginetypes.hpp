@@ -7,9 +7,13 @@ namespace NaReTi{
 
 	typedef void basicFunc(void);
 
-	//some kind of param and retval information for safety?
+	/* A function handle that can be used to let the script engine
+	 * call the associated function.
+	 */
 	struct FunctionHandle
 	{
+		friend class ScriptEngine;
+
 		FunctionHandle() = default;
 
 		FunctionHandle(basicFunc* _ptr)
@@ -23,6 +27,12 @@ namespace NaReTi{
 			ptr = (void*)_ptr;
 		}
 
+		operator bool() const
+		{
+			return ptr != nullptr;
+		}
+
+	private:
 		void* ptr;
 	};
 

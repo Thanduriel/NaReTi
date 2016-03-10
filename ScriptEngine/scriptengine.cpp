@@ -13,6 +13,18 @@ namespace NaReTi
 
 	// ******************************************************* //
 
+	Module* ScriptEngine::getModule(const string& _name)
+	{
+		string name = extractName(_name);
+		for (auto& mod : m_modules)
+		{
+			if (mod->m_name == name) return mod.get();
+		}
+		return loadModule(_name) ? getModule(name) : nullptr;
+	}
+
+	// ******************************************************* //
+
 	bool ScriptEngine::loadModule(const string& _fileName)
 	{
 		std::ifstream in(_fileName.c_str(), std::ios::in | std::ios::binary);
@@ -33,26 +45,24 @@ namespace NaReTi
 
 		fileContent.assign((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 
-		//extract file name
-		size_t endInd = _fileName.size()-1;
-		size_t beginInd = 0;
-		size_t i = _fileName.size();
-		while (i != 0)
-		{
-			i--;
-			if (_fileName[i] == '.') endInd = i;
-			else if (_fileName[i] == '\\' || _fileName[i] == '/') 
-			{
-				beginInd = i+1;
-				break;
-			}
-		}
-		//use it witout the file ending as name for the module
-		string packageName = _fileName.substr(beginInd, endInd);
+		//use it without the file ending as name for the module
+		string packageName = extractName(_fileName);
 		m_modules.emplace_back(new NaReTi::Module(packageName));
 		NaReTi::Module& module = *m_modules.back();
 
-
+		//look for dependencies
+		m_parser.preParse(fileContent, module);
+		auto dep = m_parser.getDependencies();
+		for (auto& modName : dep)
+		{
+			Module* mod = getModule(modName + ".nrt");
+			if (mod) module.m_dependencies.push_back(mod);
+			else
+			{
+				cout << "Could not load depended module: " << modName << endl;
+				break;
+			}
+		}
 		bool ret = m_parser.parse(fileContent, module);
 		if (ret)
 		{
@@ -89,6 +99,8 @@ namespace NaReTi
 		for (auto& module : m_modules)
 			for (auto& func : module->m_functions)
 				if (func->name == _name) return FunctionHandle(func->binary);
+
+		return FunctionHandle();
 	}
 
 	// ******************************************************* //
@@ -96,5 +108,25 @@ namespace NaReTi
 	void ScriptEngine::call(FunctionHandle _hndl)
 	{
 		((basicFunc*)_hndl.ptr)();
+	}
+
+	string ScriptEngine::extractName(const std::string& _fullName)
+	{
+		//extract file name
+		size_t endInd = _fullName.size();
+		size_t beginInd = 0;
+		size_t i = _fullName.size();
+		while (i != 0)
+		{
+			i--;
+			if (_fullName[i] == '.') endInd = i;
+			else if (_fullName[i] == '\\' || _fullName[i] == '/')
+			{
+				beginInd = i + 1;
+				break;
+			}
+		}
+		//use it without the file ending as name for the module
+		return _fullName.substr(beginInd, endInd);
 	}
 }

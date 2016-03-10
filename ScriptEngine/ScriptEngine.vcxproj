@@ -125,6 +125,7 @@
     <ClInclude Include="modulelib.hpp" />
     <ClInclude Include="parexception.hpp" />
     <ClInclude Include="parser.hpp" />
+    <ClInclude Include="preparser.hpp" />
     <ClInclude Include="scriptengine.h" />
     <ClInclude Include="semanticparser.hpp" />
     <ClInclude Include="skipper.hpp" />

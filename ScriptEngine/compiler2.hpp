@@ -62,7 +62,7 @@ namespace codeGen
 		std::vector<asmjit::X86GpVar> m_anonymousVars; 
 		std::vector<asmjit::X86XmmVar> m_anonymousFloats;
 		// registers that have relevant content that should not be overwritten
-		// appart from assignments.
+		// apart from assignments.
 		UsageState m_usageState;
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches

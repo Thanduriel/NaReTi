@@ -57,11 +57,8 @@ namespace codeGen
 	void Compiler::compileHeapVar(VarSymbol& _var, utils::StackAlloc& _allocator)
 	{
 		_var.ownership.rawPtr = _allocator.alloc(_var.typeInfo.type.size);
-	//	auto memMgr = m_runtime.getMemMgr();
-	//	_var.ownership.rawPtr = memMgr->alloc(_var.typeInfo.type.size);
-	//	ZeroMemory(_var.ownership.rawPtr, _var.typeInfo.type.size);
 		_var.ownership.ownerType = OwnershipType::Heap;
-		_var.typeInfo.isReference = true;
+	//	_var.typeInfo.isReference = true;
 	}
 
 	// *************************************************** //
@@ -222,7 +219,12 @@ namespace codeGen
 						m_compiler.lea(var, getMemberAdr(*(ASTMember*)arg));
 						m_isRefSet = true;
 					}
-				//	args.emplace_back(&compileMemberLd(*(ASTMember*)arg));
+					else
+					{
+						X86GpVar& var = getUnusedVar();
+						args.emplace_back(&var);
+						compileMemberLd(*(ASTMember*)arg, &var);
+					}
 					break;
 				case ASTType::Call: 
 					ASTCall* astCall = (ASTCall*)arg;

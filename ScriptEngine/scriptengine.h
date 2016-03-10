@@ -12,15 +12,22 @@ namespace NaReTi{
 	public:
 		ScriptEngine();
 
+		// Loads the module if it is not found.
+		Module* getModule(const std::string& _name);
 		//compiles a given source file and adds the module
+		//the name is the file name without ending.
 		bool loadModule(const std::string& _fileName);
-		// Removes a module with the given name and all it's symbols to realease it's memory.
+		// Removes a module with the given name and all it's symbols to release it's memory.
 		// This should only be used if no other module depends on the module.
 		bool unloadModule(const std::string& _moduleName);
 
-		//
+		//Creates a new and empty module to build extern.
+		Module& createModule(const std::string& _moduleName);
+
+		//returns a handle to the function with the given name if existent
 		FunctionHandle getFuncHndl(const std::string& _name);
 
+		//call without template params(just for convenience)
 		void call(FunctionHandle _hndl);
 		
 		template< typename _Ret, typename... _Args>
@@ -33,7 +40,7 @@ namespace NaReTi{
 		};
 
 	private:
-		tok::Lexer m_lexer;
+		std::string extractName(const std::string& _fullName);
 		par::Parser m_parser;
 		codeGen::Compiler m_compiler;
 

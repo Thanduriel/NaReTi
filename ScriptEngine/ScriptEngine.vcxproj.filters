@@ -207,6 +207,9 @@
     <ClInclude Include="compiledsymbols.hpp">
       <Filter>compiler</Filter>
     </ClInclude>
+    <ClInclude Include="preparser.hpp">
+      <Filter>par\boost</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

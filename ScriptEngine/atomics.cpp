@@ -38,7 +38,7 @@ namespace lang
 	{
 		m_types.resize(6);
 		//basic types
-		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int));
+		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int)); m_types[BasicType::Int]->size = 4;
 		m_types[BasicType::Float] = std::unique_ptr<ComplexType>(new ComplexType("float", BasicType::Float));
 		m_types[BasicType::String] = std::unique_ptr<ComplexType>(new ComplexType("string", BasicType::String));
 		m_types[BasicType::Void] = std::unique_ptr<ComplexType>(new ComplexType("void", BasicType::Void));
@@ -63,7 +63,7 @@ namespace lang
 		BASICOPERATION("&", BasicType::Int, InstructionType::And);
 		BASICOPERATION("^", BasicType::Int, InstructionType::Xor);
 		BASICOPERATION("|", BasicType::Int, InstructionType::Or);
-		//comparisation
+		//comparison
 		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 

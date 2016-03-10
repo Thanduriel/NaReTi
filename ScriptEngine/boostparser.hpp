@@ -4,8 +4,6 @@
 #include <boost/bind.hpp>
 
 #include "attributecasts.hpp"
-//testing / debugging
-#include <iostream>
 #include "semanticparser.hpp"
 #include "skipper.hpp"
 
@@ -26,12 +24,17 @@ namespace par
 			using ascii::char_;
 
 
-			//the actual grammer
+			//the actual grammar
 
 			// by default declarations go to the global scope
 			BaseExpression = 
+				*UseStatement >>
 				*((TypeDeclaration | FuncDeclaration | VarDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]) >>
 				qi::eoi;
+
+			UseStatement =
+				"use" >> Symbol
+				;
 
 			TypeDeclaration = 
 				("type" >> Symbol)[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
@@ -145,6 +148,7 @@ namespace par
 		qi::rule<Iterator, Skipper> BaseExpression;
 		qi::rule<Iterator, Skipper> TypeDeclaration;
 		qi::rule<Iterator, Skipper> VarDeclaration;
+		qi::rule<Iterator, Skipper> UseStatement;
 		qi::rule<Iterator, Skipper> FuncDeclaration;
 
 		qi::rule<Iterator, Skipper> Expression;
@@ -164,6 +168,6 @@ namespace par
 		par::SemanticParser& m_semanticParser;
 	};
 
-	typedef NaReTiSyntax<std::string::const_iterator, NaReTiSkipper> NaReTiGrammer;
+	typedef NaReTiSyntax<std::string::const_iterator, NaReTiSkipper> NaReTiGrammar;
 
 }

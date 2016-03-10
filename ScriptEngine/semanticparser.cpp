@@ -19,11 +19,13 @@ namespace par
 	void SemanticParser::setModule(NaReTi::Module& _module)
 	{ 
 		m_currentModule = &_module; 
-		m_currentCode = &_module.m_text; 
+		resetScope();
 		m_allocator = &_module.getAllocator();
 		m_moduleLib.reset(); 
+		for (auto& dep : _module.m_dependencies)
+			m_moduleLib.addModule(*dep);
 
-		//the current module is a valid resource aswell
+		//the current module is a valid resource as well
 		m_moduleLib.addModule(_module);
 	}
 
@@ -66,7 +68,7 @@ namespace par
 	{
 		//search type
 		ComplexType* type = m_moduleLib.getType(_attr.m0);
-		if (!type) throw ParsingError("Unknown type");
+		if (!type) throw ParsingError("Unknown type: " + _attr.m0);
 
 		m_currentScope->m_variables.emplace_back(_attr.m2, *type, _attr.m1.is_initialized());
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
@@ -109,6 +111,7 @@ namespace par
 		m_currentFunction = m_currentModule->m_functions.back().get();
 		m_targetScope = &m_currentModule->m_functions.back()->scope;
 		m_targetScope->m_parent = m_currentScope;
+		//param dec is outside of the following code scope
 		m_currentScope = m_targetScope;
 	}
 

@@ -1,13 +1,28 @@
-int xorshift(int num)
+type GlobalInt
 {
-	    num = num ^ (num << 13)
-        num = num ^ (num >> 17)
-        num = num ^ (num << 5)
-        
-        return num
+	int val
 }
 
-int rand(int num, int max, int min)
+GlobalInt xsNumber
+
+initRandom(int seed)
 {
-	return (num % (max + 1 - min)) + min
+	xsNumber.val = seed
+}
+
+int xorshift(int num)
+{
+	num = num ^ (num << 13)
+    num = num ^ (num >> 17)
+    num = num ^ (num << 5)
+        
+    return num
+}
+
+// returns a evenly distributed number in [min, max]
+int rand(int max, int min)
+{
+//	xsNumber = xorshift(xsNumber)
+	
+	return (xsNumber.val % (max + 1 - min)) + min
 }

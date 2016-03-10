@@ -5,7 +5,7 @@
 #include "symbols.hpp"
 
 #include "boostparser.hpp"
-#include "semanticparser.hpp"
+#include "preparser.hpp"
 
 namespace par{
 	class Parser
@@ -13,11 +13,16 @@ namespace par{
 	public:
 		Parser();
 		bool parse(const std::string& _text, NaReTi::Module& _module);
+		void preParse(const std::string& _text, NaReTi::Module& _module);
 
+		//per cpy
+		std::vector<std::string> getDependencies() { return m_preParser.dependencies; }
 	private:
-		//parsing pipline
+		//parsing pipeline
 		par::SemanticParser m_semanticParser;
-		par::NaReTiGrammer m_grammer;
+		par::NaReTiGrammar m_grammar;
+		par::PreParserGrammar m_preParserGrammar;
+		PreParser m_preParser;
 		par::NaReTiSkipper m_skipper;
 	};
 

@@ -34,10 +34,12 @@ namespace NaReTi{
 		par::ASTCode m_text;
 
 		std::string m_name;
+
+		std::vector < Module* > m_dependencies;
 	protected:
 
 		// allocator for the ast-nodes
-		// todo: types and functions could be allocated by this aswell to make destruction faster
+		// todo: types and functions could be allocated by this as well to make destruction faster
 		utils::StackAlloc m_allocator;
 	};
 }

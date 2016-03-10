@@ -86,6 +86,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		scriptEngine.call<void>(hndlGlobalInit);
 		NaReTi::FunctionHandle hndlGlobal = scriptEngine.getFuncHndl("test_global");
 		cout << scriptEngine.call<int>(hndlGlobal) << " global" << endl;
+
+		if (!hndlGlobal) cout << "trlololro";
 	}
 
 /*	success = scriptEngine.loadModule("random.nrt");

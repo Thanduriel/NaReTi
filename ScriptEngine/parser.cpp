@@ -11,8 +11,22 @@ namespace par{
 
 	Parser::Parser():
 		m_semanticParser(),
-		m_grammer(m_semanticParser)
+		m_grammar(m_semanticParser),
+		m_preParserGrammar(m_preParser)
 	{
+	}
+
+	// ************************************************** //
+
+	void Parser::preParse(const std::string& _text, NaReTi::Module& _module)
+	{
+		m_preParser.dependencies.clear();
+		std::string::const_iterator iter = _text.begin();
+		std::string::const_iterator end = _text.end();
+
+		using boost::spirit::ascii::space;
+
+		boost::spirit::qi::phrase_parse(iter, end, m_preParserGrammar, m_skipper);
 	}
 
 	// ************************************************** //
@@ -31,7 +45,7 @@ namespace par{
 		bool b = false;
 		try
 		{
-			b = boost::spirit::qi::phrase_parse(iter, end, m_grammer, m_skipper);
+			b = boost::spirit::qi::phrase_parse(iter, end, m_grammar, m_skipper);
 		}
 		catch (ParsingError& _error)
 		{

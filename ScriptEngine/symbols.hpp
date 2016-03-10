@@ -26,6 +26,10 @@ namespace par{
 		String,
 		Void, //when no type is given it is implicitly void
 		FlagBool, // bool in the form of eflags after a cmp instr
+		IntRef,
+		FloatRef,
+		BoolRef,
+		StringRef,
 		Complex,
 		Undefined // has to be linked first (currently not in use)
 	};
