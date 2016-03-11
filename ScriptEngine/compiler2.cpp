@@ -28,13 +28,6 @@ namespace codeGen
 		for (auto& function : _module.m_functions)
 		{
 			compileFuction(*function);
-
-			// Finalize the current function.
-			m_compiler.endFunc();
-			m_compiler.finalize();
-			function->binary = m_assembler.make();
-			m_assembler.reset(true);
-			m_compiler.attach(&m_assembler);
 		}
 	}
 
@@ -94,13 +87,15 @@ namespace codeGen
 
 		//setup signature
 		convertSignature(_function);
+		//externals are not compiled
+		if (_function.bExternal) return;
 		m_compiler.addFunc(_function.funcBuilder);
 
 
 		//setup registers
 
 		m_anonymousVars.clear();
-		m_anonymousVars.reserve(32); // make shure that no move will occure
+		m_anonymousVars.reserve(32); // make sure that no move will occur
 		m_anonymousVars.push_back(m_compiler.newInt32("accumulator"));
 		m_accumulator = &m_anonymousVars[0];
 
@@ -154,8 +149,13 @@ namespace codeGen
 
 		//code
 		compileCode(_function.scope);
-		//a final return
-//		m_compiler.ret();
+		
+		// Finalize the current function.
+		m_compiler.endFunc();
+		m_compiler.finalize();
+		_function.binary = m_assembler.make();
+		m_assembler.reset(true);
+		m_compiler.attach(&m_assembler);
 
 	}
 

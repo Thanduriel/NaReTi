@@ -13,6 +13,11 @@ int foo(int i)
 	return i+2;
 }
 
+void printI(int num)
+{
+	cout << num << endl;
+}
+
 struct Vec2
 {
 	float x;
@@ -34,6 +39,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	//some native function
 	NaReTi::FunctionHandle hndl(foo);
 	cout << (scriptEngine.call<int, int>(hndl, 5) == 7) << endl;
+
+	NaReTi::Module* externals = scriptEngine.getModule("externals.nrt");
+	externals->linkExternal("printI", &printI);
 
 	//script functions
 	bool success = scriptEngine.loadModule("test.txt");
@@ -94,7 +102,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		for (int i = 0; i < 1000; ++i) sum += scriptEngine.call<int, int, int>(hndlRnd, 15, 0);
 		cout << sum / 1000 << " random" << endl;
 	}
-
+	
 /*	success = scriptEngine.loadModule("random.nrt");
 	if (success)
 	{

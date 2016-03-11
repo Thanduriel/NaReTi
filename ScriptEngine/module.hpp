@@ -24,11 +24,16 @@ namespace NaReTi{
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
 			const std::vector<par::ASTExpNode*>::iterator& _end);
 
+		par::Function* getFunction(const std::string& _name);
+
 		par::VarSymbol* getGlobalVar(const std::string& _name);
 
 		utils::StackAlloc& getAllocator() { return m_allocator; }
 
-		//their lifetime equals 
+		//external construction
+		bool linkExternal(const std::string& _name, void* _funcPtr);
+
+		//their lifetime equals the module's
 		std::vector < std::unique_ptr<par::ComplexType> > m_types;
 		std::vector < std::unique_ptr<par::Function> > m_functions;
 		par::ASTCode m_text;

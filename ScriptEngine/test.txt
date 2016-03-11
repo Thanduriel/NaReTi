@@ -1,5 +1,5 @@
 use random
-use random
+use externals
 
 int sum(int arg0, int arg1)
 {
@@ -90,5 +90,6 @@ test_globalInit()
 
 int test_global()
 {
+	printI(g_test_vec.x)
 	return g_test_vec.y
 }

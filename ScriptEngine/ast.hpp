@@ -63,7 +63,7 @@ namespace par{
 		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
 		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
-		Function(const std::string& _name, ComplexType& _type) : Symbol(_name), returnTypeInfo(_type, false){};
+		Function(const std::string& _name, ComplexType& _type) : Symbol(_name), returnTypeInfo(_type, false), bExternal(false){};
 
 		TypeInfo returnTypeInfo;
 		ASTCode scope;
@@ -71,6 +71,7 @@ namespace par{
 		int paramCount; //< amount of params this function expects, corresponds to the first elements in scope.locals
 		//flags
 		bool bInline;
+		bool bExternal;
 	};
 
 	struct ASTBranch : public ASTNode

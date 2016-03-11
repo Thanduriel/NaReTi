@@ -59,7 +59,8 @@ namespace par
 				-VarDeclaration >> 
 				*(',' >> VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
-				CodeScope
+				(lit("external")[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
+				| CodeScope)
 				;
 
 			GeneralExpression = 

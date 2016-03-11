@@ -4,6 +4,7 @@
 namespace NaReTi
 {
 	using namespace par;
+	using namespace std;
 
 	par::ComplexType* Module::getType(const std::string& _name)
 	{
@@ -43,6 +44,15 @@ namespace NaReTi
 		return nullptr;
 	}
 
+	Function* Module::getFunction(const std::string& _name)
+	{
+		for (auto& func : m_functions)
+		{
+			if (func->name == _name) return func.get();
+		}
+		return nullptr;
+	}
+
 	VarSymbol* Module::getGlobalVar(const std::string& _name)
 	{
 		for (auto& var : m_text.m_variables)
@@ -50,5 +60,16 @@ namespace NaReTi
 			if (_name == var.name) return &var;
 		}
 		return nullptr;
+	}
+
+	// ******************************************************** //
+
+	bool Module::linkExternal(const string& _name, void* _funcPtr)
+	{
+		Function* func = getFunction(_name);
+		if (!func) return false;
+
+		func->binary = _funcPtr;
+		return true;
 	}
 }
