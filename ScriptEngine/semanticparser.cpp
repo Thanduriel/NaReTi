@@ -36,7 +36,32 @@ namespace par
 		for (auto& arg : _node.args)
 		{
 			//only not linked functions have no typeinfo at this point
-			if (arg->typeInfo == nullptr) linkCall(*(ASTCall*)arg);
+			if (arg->typeInfo == nullptr && (arg->type == ASTType::Call || arg->type == ASTType::Member))
+			{
+				ASTCall& call = *(ASTCall*)arg;
+				linkCall(call);
+			}
+		}
+
+		if (_node.type == ASTType::Member)
+		{
+			ASTMember& memberNode = *(ASTMember*)&_node;
+			ASTUnlinkedSym* strLeaf = (ASTUnlinkedSym*)_node.args[1];
+			size_t i = 0;
+			// check members of the type on top of the stack
+			for (auto& member : _node.args[0]->typeInfo->type.scope.m_variables)
+			{
+				if (member.name == strLeaf->name)
+				{
+					memberNode.typeInfo = &member.typeInfo;
+					memberNode.index = 0;
+					memberNode.instance = memberNode.args[0];
+					return;
+				}
+				i++;
+			}
+
+			throw ParsingError(_node.args[0]->typeInfo->type.name + " has no member called \"" + strLeaf->name + "\"");
 		}
 
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
@@ -212,10 +237,8 @@ namespace par
 
 	void SemanticParser::term(string& _operator)
 	{
-		if (_operator == ".") return; // member access is currently handled in pushSymbol
-
 		//build new node
-		ASTCall* astNode = m_allocator->construct<ASTCall>();
+		ASTCall* astNode = _operator == "." ? m_allocator->construct<ASTMember>() : m_allocator->construct<ASTCall>();
 		astNode->name = _operator;
 		astNode->typeInfo = nullptr;
 
@@ -227,7 +250,7 @@ namespace par
 		ASTExpNode** dest = findPrecPos(&m_stack.back(), *astNode);
 		astNode->args[0] = *dest;
 		*dest = astNode; // put this node there
-	//	m_stack.push_back(astNode);
+
 		cout << _operator << endl;
 	}
 
@@ -243,7 +266,7 @@ namespace par
 
 	void SemanticParser::argSeperator()
 	{
-		ASTExpNode* expNode = popNode();
+		ASTExpNode* expNode = m_stack.back(); m_stack.pop_back();
 		ASTCall* callNode = (ASTCall*)m_stack.back();
 		callNode->args.push_back(expNode);
 	}
@@ -262,25 +285,11 @@ namespace par
 			if(!isImported) m_currentFunction->m_importedVars.push_back(var);
 		}
 		else var = m_currentCode->getVar(_name);
-		if (!var)
+
+		if (!var) //could still be a member
 		{
-			size_t i = 0;
-			// check members of the type on top of the stack
-			for (auto& member : m_stack.back()->typeInfo->type.scope.m_variables)
-			{
-				if (member.name == _name)
-				{
-					ASTMember* memberNode = m_allocator->construct<ASTMember>(*popNode(), i);
-					memberNode->typeInfo = &member.typeInfo;
-					m_stack.push_back(memberNode);
-
-					return;
-				}
-				i++;
-			}
-
-			throw ParsingError("Unknown symbol");
-
+			m_stack.push_back(m_allocator->construct<ASTUnlinkedSym>(_name));
+			return;
 		}
 		
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(var);
@@ -330,25 +339,6 @@ namespace par
 			return _tree;
 		}
 		return _tree;
-	}
-
-	// ************************************************** //
-
-	void SemanticParser::popParam()
-	{
-/*		par::InstructionType instrT;
-		switch (m_paramStack.back().type)
-		{
-		case ParamType::PtrFunc: instrT = InstructionType::Call;
-			break;
-		case ParamType::Ptr:
-		case ParamType::Float:
-		case ParamType::Int: instrT = InstructionType::Push;
-			break;
-		}
-
-		m_currentCode->m_instructions.emplace_back(instrT, m_paramStack.back());
-		m_paramStack.pop_back();*/
 	}
 
 	// ************************************************** //

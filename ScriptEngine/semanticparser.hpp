@@ -60,9 +60,7 @@ namespace par
 		//looks in the tree with the given node as root for the right position of the top level on the stack.
 		ASTExpNode** findPrecPos(ASTExpNode** _tree, ASTCall& _node);
 	private:
-		//pops a element from the param stack and translates it into an instruction
-		void popParam();
-		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call){ linkCall(*(ASTCall*)ptr); } return ptr; };
+		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call || ptr->type == ASTType::Member){ linkCall(*(ASTCall*)ptr); } return ptr; };
 
 		void linkCall(ASTCall& _node);
 

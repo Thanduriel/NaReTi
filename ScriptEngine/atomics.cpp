@@ -102,6 +102,6 @@ namespace lang
 		for (auto& prec : m_precedence)
 			if (prec.first == _op) return prec.second;
 
-		return 1; // uknown operator or function takes precedence
+		return 1; // unknown operator or function takes precedence
 	}
 }

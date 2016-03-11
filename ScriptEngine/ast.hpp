@@ -105,6 +105,12 @@ namespace par{
 		ASTLeaf(int _val) : Parameter(_val){ type = ASTType::Leaf; }
 	};
 
+	struct ASTUnlinkedSym : public ASTExpNode
+	{
+		ASTUnlinkedSym(const std::string& _name) : name(_name){}
+		std::string name;
+	};
+
 	struct ASTOp : public ASTNode
 	{
 		ASTOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
@@ -113,11 +119,12 @@ namespace par{
 //		Type* returnType; //setting the type is not mandentory in inlined functions
 	};
 
-	struct ASTMember : public ASTExpNode
+	struct ASTMember : public ASTCall
 	{
-		ASTMember(ASTExpNode& _var, size_t _index) : instance(&_var), index(_index) { type = ASTType::Member; }
+		ASTMember() { type = ASTType::Member; }
 		
 		ASTExpNode* instance;
 		size_t index;
+	//	ASTUnlinkedSym* member;
 	};
 }

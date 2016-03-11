@@ -93,7 +93,7 @@ int test_global()
 {
 	iVec2 stackVec
 	stackVec.x = 42 + 2
-	stackVec.y = 1
+	stackVec.y = stackVec.x + 1
 	
 	printI(stackVec.y)
 	return g_test_vec.y
