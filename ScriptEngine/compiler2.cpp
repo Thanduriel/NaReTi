@@ -108,14 +108,16 @@ namespace codeGen
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
 			asmjit::Var* varPtr;
-			if (_function.scope.m_variables[i].typeInfo.isReference)
+			VarSymbol& varSymbol = _function.scope.m_variables[i];
+			if (varSymbol.typeInfo.isReference)
 			{
 				m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
 				varPtr = &m_anonymousVars.back();
+				varSymbol.isPtr = true;
 			}
 			else
 			{
-				switch (_function.scope.m_variables[i].typeInfo.type.basic)
+				switch (varSymbol.typeInfo.type.basic)
 				{
 				case BasicType::Int:
 					m_anonymousVars.push_back(m_compiler.newInt32(("arg" + std::to_string(i)).c_str()));
@@ -124,6 +126,14 @@ namespace codeGen
 				case BasicType::Float:
 					m_anonymousFloats.push_back(m_compiler.newXmmSs(("arg" + std::to_string(i)).c_str()));
 					varPtr = &m_anonymousFloats.back();
+					break;
+				case BasicType::Complex:
+					m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
+					X86GpVar& gpVar = m_anonymousVars.back();
+					varPtr = &gpVar;
+					X86Mem mem = m_compiler.newStack(varSymbol.typeInfo.type.size, 4);
+					m_compiler.lea(gpVar, mem);
+					varSymbol.isPtr = true;
 					break;
 				}
 			}
@@ -139,8 +149,7 @@ namespace codeGen
 			m_anonymousVars.push_back(m_compiler.newIntPtr());
 			X86GpVar& gpVar = m_anonymousVars.back();
 			var->compiledVar = &gpVar;
-			int test = *(int*)(var->ownership.rawPtr);
-			m_compiler.mov(gpVar, asmjit::imm((int)var->ownership.rawPtr));
+			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
 		}
 
 		//args are relevant through out the function
@@ -279,7 +288,6 @@ namespace codeGen
 			X86CallNode* call = m_compiler.call(*m_accumulator, func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[0]);
-
 			if (func.returnTypeInfo.type.basic == BasicType::Float)
 				call->setRet(0, *m_fp0);
 			else 

@@ -1,3 +1,4 @@
+
 use random
 use externals
 
@@ -90,6 +91,10 @@ test_globalInit()
 
 int test_global()
 {
-	printI(g_test_vec.x)
+	iVec2 stackVec
+	stackVec.x = 42 + 2
+	stackVec.y = 1
+	
+	printI(stackVec.y)
 	return g_test_vec.y
 }
