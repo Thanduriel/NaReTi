@@ -54,7 +54,7 @@ namespace par
 				if (member.name == strLeaf->name)
 				{
 					memberNode.typeInfo = &member.typeInfo;
-					memberNode.index = 0;
+					memberNode.index = i;
 					memberNode.instance = memberNode.args[0];
 					return;
 				}
@@ -65,7 +65,16 @@ namespace par
 		}
 
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
-		if (!func) throw ParsingError("No function with the given signature found.");
+		if (!func)
+		{
+			string args;
+			for (auto& arg : _node.args)
+			{
+				args += arg->typeInfo->type.name + (arg->typeInfo->isReference ? "&" : "") + ',';
+			}
+			args.resize(args.size() - 1); //remove final comma
+			throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
+		}
 
 		_node.function = func;
 		_node.typeInfo = &func->returnTypeInfo;
@@ -111,7 +120,7 @@ namespace par
 
 	void SemanticParser::finishTypeDec()
 	{
-		// generate default assigment
+		// generate default assignment
 
 	}
 
@@ -123,8 +132,15 @@ namespace par
 		if (_attr.m1.is_initialized())
 		{
 			ComplexType* type = m_moduleLib.getType(_attr.m0);
-			if (!type) throw ParsingError("Unkown type: " + _attr.m0);
+			if (!type) throw ParsingError("Unknown type: " + _attr.m0);
 			m_currentModule->m_functions.emplace_back(new Function(_attr.m1.get(), *type));
+			
+			if (type->basic == BasicType::Complex)
+			{
+				Function& func = *m_currentModule->m_functions.back();
+				func.scope.m_variables.emplace_back("", *type, true);
+				func.bHiddenParam = true;
+			}
 		}
 		//assume void
 		else
@@ -132,7 +148,7 @@ namespace par
 			m_currentModule->m_functions.emplace_back(new Function(_attr.m0, *m_moduleLib.getType("void")));
 		}
 
-		//init envoirement
+		//init environment
 		m_currentFunction = m_currentModule->m_functions.back().get();
 		m_currentFunction->bInline = false;
 		m_targetScope = &m_currentModule->m_functions.back()->scope;

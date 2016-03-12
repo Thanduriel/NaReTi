@@ -33,6 +33,7 @@ namespace codeGen
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
+		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register
 		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);

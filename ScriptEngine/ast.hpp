@@ -63,7 +63,7 @@ namespace par{
 		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
 		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
-		Function(const std::string& _name, ComplexType& _type) : Symbol(_name), returnTypeInfo(_type, false), bExternal(false){};
+		Function(const std::string& _name, ComplexType& _type) : Symbol(_name), returnTypeInfo(_type, false), bExternal(false), bHiddenParam(false){};
 
 		TypeInfo returnTypeInfo;
 		ASTCode scope;
@@ -72,6 +72,7 @@ namespace par{
 		//flags
 		bool bInline;
 		bool bExternal;
+		bool bHiddenParam; // has a hidden first parameter
 	};
 
 	struct ASTBranch : public ASTNode
@@ -116,7 +117,7 @@ namespace par{
 		ASTOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
 		InstructionType instruction;
 
-//		Type* returnType; //setting the type is not mandentory in inlined functions
+//		Type* returnType; //setting the type is not mandatory in inlined functions
 	};
 
 	struct ASTMember : public ASTCall

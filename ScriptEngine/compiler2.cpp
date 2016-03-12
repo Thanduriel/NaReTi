@@ -208,10 +208,22 @@ namespace codeGen
 
 		UsageState preCallState = getUsageState();
 
+		auto begin = _node.args.begin();
+		if (func.bHiddenParam)
+		{
+			//allocate the stack var and provide a reference as param
+			X86GpVar& gpVar = getUnusedVar();
+			X86Mem mem = m_compiler.newStack(func.scope.m_variables[0].typeInfo.type.size, 4);
+			m_compiler.lea(gpVar, mem);
+			args.emplace_back(&gpVar);
+			//this arg is already managed
+	//		begin++;
+		}
 		int i = 0;
 		//manage args and put make sure that all are located in virtual registers
-		for (auto& arg : _node.args)
+		for (; begin != _node.args.end(); ++begin)
 		{
+			auto& arg = *begin;
 			switch (arg->type)
 			{
 			case ASTType::Leaf:
@@ -219,6 +231,9 @@ namespace codeGen
 				args.emplace_back(compileLeaf(*leaf));
 				break;
 			case ASTType::Member:
+			{
+				ASTMember& member = *(ASTMember*)arg;
+				if (member.instance->type == ASTType::Call) compileCall(*(ASTCall*)member.instance);
 				if (func.name == "=" && i == 0)
 				{
 					X86GpVar& var = getUnusedVar();
@@ -233,6 +248,7 @@ namespace codeGen
 					compileMemberLd(*(ASTMember*)arg, &var);
 				}
 				break;
+			}
 			case ASTType::Call:
 				ASTCall* astCall = (ASTCall*)arg;
 				if (astCall->function->returnTypeInfo.type.basic == BasicType::Int)
@@ -287,7 +303,7 @@ namespace codeGen
 			m_compiler.mov(*m_accumulator, imm_ptr(func.binary));
 			X86CallNode* call = m_compiler.call(*m_accumulator, func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
-				call->_setArg(i, *args[0]);
+				call->_setArg(i, *args[i]);
 			if (func.returnTypeInfo.type.basic == BasicType::Float)
 				call->setRet(0, *m_fp0);
 			else 
@@ -412,6 +428,13 @@ namespace codeGen
 			var = (X86GpVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
 
+		if (m_function->bHiddenParam)
+		{
+			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0].compiledVar;
+			compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
+
+			var = &dest;
+		}
 		m_compiler.ret(*var);
 	}
 
@@ -441,16 +464,51 @@ namespace codeGen
 
 	// *************************************************** //
 
+	void Compiler::compileMemCpy(X86GpVar& _dst, X86GpVar& _src, size_t _size)
+	{
+		X86GpVar& tmp = getUnusedVar();
+		size_t chunks = _size / 4;
+		for (size_t i = 0; i < chunks; ++i)
+		{
+			m_compiler.mov(tmp, x86::dword_ptr(_src, i*4));
+			m_compiler.mov(x86::dword_ptr(_dst, i*4), tmp);
+		}
+/*		X86GpVar& cnt = getUnusedVar();
+
+		Label L_Loop(m_compiler);
+
+		m_compiler.mov(cnt, imm(_size));
+
+		m_compiler.bind(L_Loop);                                // Bind the loop label here.
+
+		X86GpVar& tmp = getUnusedVar();              // Copy a single dword (4 bytes).
+		m_compiler.mov(tmp, x86::dword_ptr(_src));
+		m_compiler.mov(x86::dword_ptr(_dst), tmp);
+
+		m_compiler.add(_src, 4);                                 // Increment dst/src pointers.
+		m_compiler.add(_dst, 4);
+
+		m_compiler.dec(cnt);                                    // Loop until cnt isn't zero.
+		m_compiler.jnz(L_Loop);*/
+	}
+
+	// *************************************************** //
+
 	X86Mem Compiler::getMemberAdr(ASTMember& _node)
 	{
 		X86GpVar* gpVar;
 		switch (_node.instance->type)
 		{
 		case ASTType::Leaf:
+		{
 			//can only be a pointer
 			ASTLeaf& leaf = *(ASTLeaf*)_node.instance;
 			gpVar = (X86GpVar*)leaf.ptr->compiledVar;
-			//			case ASTType::
+			break;
+		}
+		case ASTType::Call:
+			gpVar = m_accumulator;
+			break;
 		}
 
 		ComplexType& type = _node.instance->typeInfo->type;

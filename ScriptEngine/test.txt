@@ -89,12 +89,23 @@ test_globalInit()
 	g_test_vec.y = 9
 }
 
+iVec2 addiVec(int x0, int y0, int x1, int y1 )
+{
+	iVec2 res
+	res.x = x0 + x1
+	res.y = y0 + y1
+	
+	return res
+}
+
 int test_global()
 {
 	iVec2 stackVec
-	stackVec.x = 42 + 2
-	stackVec.y = stackVec.x + 1
+//	stackVec = addiVec(2, 3, 8, 9)
+//	stackVec.x = 42 + 2
+//	stackVec.y = stackVec.x + 1
 	
-	printI(stackVec.y)
+	printI(addiVec(2, 3, 8, 9).x)
+	printI(addiVec(2, 3, 8, 9).y)
 	return g_test_vec.y
 }

@@ -23,15 +23,16 @@ namespace NaReTi
 			if (func->name != _name) continue;
 	//		if (&func.returnType != &_ret) continue;
 
+			int i = func->bHiddenParam ? 1 : 0;
 			auto dist = std::distance(_begin, _end);
-			if (dist != func->paramCount) continue;
+			if (dist != func->paramCount-i) continue;
 
-			//make a copy
-			auto begin = _begin;
 			bool paramsMatch = true;
-			for (int i = 0; i < dist; ++i)
+			auto begin = _begin;
+			// hidden param is not part of the signature
+			for (; i < dist; ++i)
 			{
-				par::ASTExpNode* found = *(_begin + i);
+				par::ASTExpNode* found = *(begin++);
 
 				if (*found->typeInfo != func->scope.m_variables[i].typeInfo)
 				{
