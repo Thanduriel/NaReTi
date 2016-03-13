@@ -126,11 +126,12 @@ namespace par
 		Function& func = *m_currentModule->m_functions.back();
 		func.returnTypeInfo.isReference = true;
 
-		func.scope.m_variables.emplace_back("slf", type, false);
+		func.scope.m_variables.reserve(2); // prevent moves
+		func.scope.m_variables.emplace_back("slf", type, true);
 		VarSymbol& slf = func.scope.m_variables.back();
 		ASTLeaf& slfInst = *m_allocator->construct<ASTLeaf>(&slf);
 		slfInst.typeInfo = &slf.typeInfo;
-		func.scope.m_variables.emplace_back("oth", type, false);
+		func.scope.m_variables.emplace_back("oth", type, true);
 		VarSymbol& oth = func.scope.m_variables.back();
 		ASTLeaf& othInst = *m_allocator->construct<ASTLeaf>(&oth);
 		othInst.typeInfo = &oth.typeInfo;

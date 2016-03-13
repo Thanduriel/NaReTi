@@ -243,9 +243,9 @@ namespace codeGen
 				}
 				else
 				{
-					X86GpVar& var = getUnusedVar();
-					args.emplace_back(&var);
-					compileMemberLd(*(ASTMember*)arg, &var);
+				//	X86GpVar& var = getUnusedVar();
+					args.emplace_back(member.typeInfo->type.basic == BasicType::Float ? (Operand*)&getUnusedFloat() : &getUnusedVar());
+					compileMemberLd(*(ASTMember*)arg, args.back());
 				}
 				break;
 			}
@@ -385,6 +385,13 @@ namespace codeGen
 				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
 			} else
 				m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case InstructionType::fSet:
+			if (m_isRefSet) {
+				m_compiler.movss(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86XmmVar*)_args[1]); m_isRefSet = false;
+			}
+			else
+				m_compiler.movss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
