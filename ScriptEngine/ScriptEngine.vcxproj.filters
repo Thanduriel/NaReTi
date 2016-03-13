@@ -210,6 +210,9 @@
     <ClInclude Include="preparser.hpp">
       <Filter>par\boost</Filter>
     </ClInclude>
+    <ClInclude Include="optimizer.hpp">
+      <Filter>compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -316,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="symbols.cpp">
       <Filter>par</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer.cpp">
+      <Filter>compiler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

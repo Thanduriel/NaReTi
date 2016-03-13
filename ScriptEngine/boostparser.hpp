@@ -40,7 +40,7 @@ namespace par
 				("type" >> Symbol)[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
 				'{' >> 
 				*VarDeclaration >> 
-				'}';
+				lit('}')[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
 			VarDeclaration = 
 				(Symbol >> 

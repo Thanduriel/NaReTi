@@ -120,8 +120,42 @@ namespace par
 
 	void SemanticParser::finishTypeDec()
 	{
+		ComplexType& type = *m_currentModule->m_types.back();
 		// generate default assignment
+		m_currentModule->m_functions.emplace_back(new Function("=", type));
+		Function& func = *m_currentModule->m_functions.back();
+		func.returnTypeInfo.isReference = true;
 
+		func.scope.m_variables.emplace_back("slf", type, false);
+		VarSymbol& slf = func.scope.m_variables.back();
+		ASTLeaf& slfInst = *m_allocator->construct<ASTLeaf>(&slf);
+		slfInst.typeInfo = &slf.typeInfo;
+		func.scope.m_variables.emplace_back("oth", type, false);
+		VarSymbol& oth = func.scope.m_variables.back();
+		ASTLeaf& othInst = *m_allocator->construct<ASTLeaf>(&oth);
+		othInst.typeInfo = &oth.typeInfo;
+
+		func.paramCount = 2;
+
+		for (int i = 0; i < (int)type.scope.m_variables.size(); ++i)
+		{
+			VarSymbol& member = type.scope.m_variables[i];
+			ASTMember& memberSlf = *m_allocator->construct<ASTMember>();
+			memberSlf.instance = &slfInst;
+			memberSlf.index = i;
+			memberSlf.typeInfo = &member.typeInfo;
+			ASTMember& memberOth = *m_allocator->construct<ASTMember>();
+			memberOth.instance = &othInst;
+			memberOth.index = i;
+			memberOth.typeInfo = &member.typeInfo;
+			ASTCall& call = *m_allocator->construct<ASTCall>();
+			call.args.push_back(&memberSlf);
+			call.args.push_back(&memberOth);
+			call.name = "=";
+			call.typeInfo = &func.returnTypeInfo;
+			call.function = m_moduleLib.getFunction(call.name, call.args.begin(), call.args.end());
+			func.scope.push_back(&call);
+		}
 	}
 
 	// ************************************************** //

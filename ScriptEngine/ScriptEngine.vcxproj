@@ -123,6 +123,7 @@
     <ClInclude Include="lexer.hpp" />
     <ClInclude Include="module.hpp" />
     <ClInclude Include="modulelib.hpp" />
+    <ClInclude Include="optimizer.hpp" />
     <ClInclude Include="parexception.hpp" />
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="preparser.hpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="module.cpp" />
     <ClCompile Include="modulelib.cpp" />
+    <ClCompile Include="optimizer.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="scriptengine.cpp" />
     <ClCompile Include="semanticparser.cpp" />
