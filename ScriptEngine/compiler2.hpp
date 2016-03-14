@@ -36,7 +36,8 @@ namespace codeGen
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register
-		void compileMemberLd(par::ASTMember& _node, asmjit::Operand* _destination);
+		void compileMemberLd(par::ASTMember& _node, asmjit::X86GpVar& _destination);
+		void compileMemberLdF(par::ASTMember& _node, asmjit::X86XmmVar& _destination);
 		//store result in a member var
 		void compileMemberStr(par::ASTMember& _node);
 		void compileBranch(par::ASTBranch& _node);

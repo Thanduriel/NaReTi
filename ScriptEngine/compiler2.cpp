@@ -243,9 +243,18 @@ namespace codeGen
 				}
 				else
 				{
-				//	X86GpVar& var = getUnusedVar();
-					args.emplace_back(member.typeInfo->type.basic == BasicType::Float ? (Operand*)&getUnusedFloat() : &getUnusedVar());
-					compileMemberLd(*(ASTMember*)arg, args.back());
+					if (member.typeInfo->type.basic == BasicType::Float)
+					{
+						X86XmmVar& var = getUnusedFloat();
+						args.emplace_back(&var);
+						compileMemberLdF(*(ASTMember*)arg, var);
+					}
+					else
+					{
+						X86GpVar& var = getUnusedVar();
+						args.emplace_back(&var);
+						compileMemberLd(*(ASTMember*)arg, var);
+					}
 				}
 				break;
 			}
@@ -427,7 +436,7 @@ namespace codeGen
 		else if (_node.body->type == ASTType::Member)
 		{
 			ASTMember& member = *(ASTMember*)_node.body;
-			compileMemberLd(member, m_accumulator);
+			compileMemberLd(member, *m_accumulator);
 			var = m_accumulator;
 		}
 		else if (_node.body->type == ASTType::Leaf)
@@ -458,7 +467,7 @@ namespace codeGen
 		else if (_node.body->type == ASTType::Member)
 		{
 			ASTMember& member = *(ASTMember*)_node.body;
-			compileMemberLd(member, m_fp0);
+			compileMemberLdF(member, *m_fp0);
 			var = m_fp0;
 		}
 		else if (_node.body->type == ASTType::Leaf)
@@ -524,20 +533,22 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::compileMemberLd(ASTMember& _node, asmjit::Operand* _destination)
+	void Compiler::compileMemberLd(ASTMember& _node, X86GpVar& _destination)
 	{
 		ComplexType& type = _node.instance->typeInfo->type;
 		auto adr = getMemberAdr(_node);
-		if (type.scope.m_variables[_node.index].typeInfo.type.basic == BasicType::Float)
-		{
-			X86XmmVar& var = *(X86XmmVar*)_destination;
-			m_compiler.movss(var, adr);
-		}
-		else
-		{
-			X86GpVar& var = *(X86GpVar*)_destination;
-			m_compiler.mov(var, adr);
-		}
+
+		m_compiler.mov(_destination, adr);
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileMemberLdF(ASTMember& _node, X86XmmVar& _destination)
+	{
+		ComplexType& type = _node.instance->typeInfo->type;
+		auto adr = getMemberAdr(_node);
+		
+		m_compiler.movss(_destination, adr);
 	}
 
 	// *************************************************** //

@@ -63,6 +63,7 @@ namespace par
 		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call || ptr->type == ASTType::Member){ linkCall(*(ASTCall*)ptr); } return ptr; };
 
 		void linkCall(ASTCall& _node);
+		void linkMember(ASTMember& _node);
 
 		std::vector < ASTExpNode* > m_stack;
 

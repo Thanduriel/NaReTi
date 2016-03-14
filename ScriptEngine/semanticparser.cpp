@@ -46,27 +46,14 @@ namespace par
 		if (_node.type == ASTType::Member)
 		{
 			ASTMember& memberNode = *(ASTMember*)&_node;
-			ASTUnlinkedSym* strLeaf = (ASTUnlinkedSym*)_node.args[1];
-			size_t i = 0;
-			// check members of the type on top of the stack
-			for (auto& member : _node.args[0]->typeInfo->type.scope.m_variables)
-			{
-				if (member.name == strLeaf->name)
-				{
-					memberNode.typeInfo = &member.typeInfo;
-					memberNode.index = i;
-					memberNode.instance = memberNode.args[0];
-					return;
-				}
-				i++;
-			}
-
-			throw ParsingError(_node.args[0]->typeInfo->type.name + " has no member called \"" + strLeaf->name + "\"");
+			linkMember(memberNode);
+			return;
 		}
 
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
 		if (!func)
 		{
+			//construct a fancy error message
 			string args;
 			for (auto& arg : _node.args)
 			{
@@ -78,6 +65,26 @@ namespace par
 
 		_node.function = func;
 		_node.typeInfo = &func->returnTypeInfo;
+	}
+
+	void SemanticParser::linkMember(ASTMember& _node)
+	{
+		ASTUnlinkedSym* strLeaf = (ASTUnlinkedSym*)_node.args[1];
+		size_t i = 0;
+		// check members of the type on top of the stack
+		for (auto& member : _node.args[0]->typeInfo->type.scope.m_variables)
+		{
+			if (member.name == strLeaf->name)
+			{
+				_node.typeInfo = &member.typeInfo;
+				_node.index = i;
+				_node.instance = _node.args[0];
+				return;
+			}
+			i++;
+		}
+
+		throw ParsingError(_node.args[0]->typeInfo->type.name + " has no member called \"" + strLeaf->name + "\"");
 	}
 
 	// ************************************************** //
@@ -121,11 +128,13 @@ namespace par
 	void SemanticParser::finishTypeDec()
 	{
 		ComplexType& type = *m_currentModule->m_types.back();
+
 		// generate default assignment
 		m_currentModule->m_functions.emplace_back(new Function("=", type));
 		Function& func = *m_currentModule->m_functions.back();
 		func.returnTypeInfo.isReference = true;
 
+		// =(Type& slf, Type& oth)
 		func.scope.m_variables.reserve(2); // prevent moves
 		func.scope.m_variables.emplace_back("slf", type, true);
 		VarSymbol& slf = func.scope.m_variables.back();
@@ -138,8 +147,10 @@ namespace par
 
 		func.paramCount = 2;
 
+		//code scope
 		for (int i = 0; i < (int)type.scope.m_variables.size(); ++i)
 		{
+			//slf.x = oth.x
 			VarSymbol& member = type.scope.m_variables[i];
 			ASTMember& memberSlf = *m_allocator->construct<ASTMember>();
 			memberSlf.instance = &slfInst;

@@ -113,6 +113,8 @@ namespace par{
 		CodeScope* m_parent; 
 	};
 
+	struct Function;
+
 	struct ComplexType : public Type
 	{
 		ComplexType(){};
@@ -120,6 +122,8 @@ namespace par{
 		{}
 		CodeScope scope;
 
+		// available casts for this type
+		std::vector< Function* > m_typeCasts;
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;

@@ -34,7 +34,16 @@ namespace NaReTi
 			{
 				par::ASTExpNode* found = *(begin++);
 
-				if (*found->typeInfo != func->scope.m_variables[i].typeInfo)
+				//type does not match
+				if (&found->typeInfo->type != &func->scope.m_variables[i].typeInfo.type)
+				{
+					paramsMatch = false;
+					break;
+				}
+				//reference or value does not match
+				// complex types are always by reference and the distinction only matters for the caller
+				else if (!(found->typeInfo->type.basic == BasicType::Complex
+					|| found->typeInfo->isReference == func->scope.m_variables[i].typeInfo.isReference))
 				{
 					paramsMatch = false;
 					break;
