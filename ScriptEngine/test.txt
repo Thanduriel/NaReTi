@@ -105,7 +105,12 @@ int test_global()
 //	stackVec.x = 42 + 2
 //	stackVec.y = stackVec.x + 1
 	
-	printI(addiVec(2, 3, 8, 9).x)
-	printI(addiVec(2, 3, 8, 9).y)
+	stackVec = addiVec(2, 3, 8, 9)
+	printI(stackVec.x)
+	printI(stackVec.y)
+	stackVec = g_test_vec
+	printI(stackVec.x)
+	printI(stackVec.y)
+
 	return g_test_vec.y
 }

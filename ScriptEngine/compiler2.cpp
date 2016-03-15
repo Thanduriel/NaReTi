@@ -220,7 +220,7 @@ namespace codeGen
 	//		begin++;
 		}
 		int i = 0;
-		//manage args and put make sure that all are located in virtual registers
+		//make sure that all are located in virtual registers
 		for (; begin != _node.args.end(); ++begin)
 		{
 			auto& arg = *begin;
@@ -260,19 +260,19 @@ namespace codeGen
 			}
 			case ASTType::Call:
 				ASTCall* astCall = (ASTCall*)arg;
-				if (astCall->function->returnTypeInfo.type.basic == BasicType::Int)
-				{
-					X86GpVar& var = getUnusedVar();
-					args.emplace_back(&var);
-					compileCall(*astCall);
-					m_compiler.mov(var, *m_accumulator);
-				}
-				else if (astCall->function->returnTypeInfo.type.basic == BasicType::Float)
+				if (astCall->function->returnTypeInfo.type.basic == BasicType::Float)
 				{
 					X86XmmVar& var = getUnusedFloat();
 					args.emplace_back(&var);
 					compileCall(*astCall);
 					m_compiler.movss(var, *m_fp0);
+				}
+				else
+				{
+					X86GpVar& var = getUnusedVar();
+					args.emplace_back(&var);
+					compileCall(*astCall);
+					m_compiler.mov(var, *m_accumulator);
 				}
 				break;
 			}
