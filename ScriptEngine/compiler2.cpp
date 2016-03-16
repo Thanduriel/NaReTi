@@ -107,8 +107,11 @@ namespace codeGen
 		//create arguments and locals
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
-			asmjit::Var* varPtr;
 			VarSymbol& varSymbol = _function.scope.m_variables[i];
+			if (varSymbol.isSubstituted) continue;
+
+			asmjit::Var* varPtr;
+
 			if (varSymbol.typeInfo.isReference)
 			{
 				m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
@@ -208,18 +211,23 @@ namespace codeGen
 
 		UsageState preCallState = getUsageState();
 
-		auto begin = _node.args.begin();
 		if (func.bHiddenParam)
 		{
-			//allocate the stack var and provide a reference as param
-			X86GpVar& gpVar = getUnusedVar();
-			X86Mem mem = m_compiler.newStack(func.scope.m_variables[0].typeInfo.type.size, 4);
-			m_compiler.lea(gpVar, mem);
-			args.emplace_back(&gpVar);
-			//this arg is already managed
-	//		begin++;
+			if (_node.returnSub)
+			{
+				args.emplace_back(_node.returnSub->compiledVar);
+			}
+			else
+			{
+				//allocate the stack var and provide a reference as param
+				X86GpVar& gpVar = getUnusedVar();
+				X86Mem mem = m_compiler.newStack(func.scope.m_variables[0].typeInfo.type.size, 4);
+				m_compiler.lea(gpVar, mem);
+				args.emplace_back(&gpVar);
+			}
 		}
 		int i = 0;
+		auto begin = _node.args.begin();
 		//make sure that all are located in virtual registers
 		for (; begin != _node.args.end(); ++begin)
 		{

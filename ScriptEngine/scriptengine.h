@@ -2,6 +2,7 @@
 #include "enginetypes.hpp"
 #include "parser.hpp"
 #include "compiler2.hpp"
+#include "optimizer.hpp"
 
 #pragma once
 
@@ -43,6 +44,7 @@ namespace NaReTi{
 		std::string extractName(const std::string& _fullName);
 		par::Parser m_parser;
 		codeGen::Compiler m_compiler;
+		codeGen::Optimizer m_optimizer;
 
 		std::vector< FunctionHandle > m_nativeFunctions;
 		std::vector< std::unique_ptr<Module> > m_modules;

@@ -66,6 +66,7 @@ namespace NaReTi
 		bool ret = m_parser.parse(fileContent, module);
 		if (ret)
 		{
+			m_optimizer.optimize(module);
 			m_compiler.compile(module);
 		}
 		else
