@@ -387,17 +387,17 @@ namespace par
 	{
 		switch ((*_tree)->type)
 		{
+		case ASTType::Member:
 		case ASTType::Call:
 		{
 			ASTCall& call = *((ASTCall*)(*_tree));
 			if (!call.isLocked && lang::g_module.getPrecedence(call.name) > lang::g_module.getPrecedence(_node.name))
 			{
-				return (ASTExpNode**)&call.args[1];
+				return findPrecPos((ASTExpNode**)&call.args[1], _node);
 			}
 			break;
 		}
 		case ASTType::Leaf:
-		case ASTType::Member:
 			return _tree;
 		}
 		return _tree;

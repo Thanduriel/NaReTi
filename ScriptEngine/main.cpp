@@ -18,6 +18,11 @@ void printI(int num)
 	cout << num << endl;
 }
 
+void printF(float num)
+{
+	cout << num << endl;
+}
+
 struct Vec2
 {
 	float x;

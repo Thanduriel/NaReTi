@@ -98,6 +98,15 @@ iVec2 addiVec(int x0, int y0, int x1, int y1 )
 	return res
 }
 
+iVec2 +(iVec2& slf, iVec2& oth)
+{
+	iVec2 res
+	res.x = slf.x + oth.x
+	res.y = slf.y + oth.y
+	
+	return res
+}
+
 int test_global()
 {
 	iVec2 stackVec
@@ -112,5 +121,9 @@ int test_global()
 	printI(stackVec.x)
 	printI(stackVec.y)
 
+	stackVec = g_test_vec + stackVec
+	printI(stackVec.x)
+	printI(stackVec.y)
+	
 	return g_test_vec.y
 }
