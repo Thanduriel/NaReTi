@@ -49,12 +49,28 @@ namespace par{
 		}
 		catch (ParsingError& _error)
 		{
-			std::cout << _error.message << endl;
+			cout << _error.message << endl;
 			return false;
 		}
+		catch (qi::expectation_failure<std::string::const_iterator>& e)
+		{
+			logError(_text.begin(), e.first, "syntax error");
+		}
+
 		clock_t endClock = clock();
-		std::cout << endl << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec";
+		std::cout << endl << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
 
 		return b;
+	}
+
+	void Parser::logError(std::string::const_iterator _begin, const std::string::const_iterator& _it, const std::string& _msg)
+	{
+		int lineCount = 1; //lines are numbered beginning with 1
+		while (_begin != _it)
+		{
+			if (*_begin == '\n') lineCount++;
+			_begin++;
+		}
+		std::cout << "[l." << lineCount << "] " << _msg << endl;
 	}
 }

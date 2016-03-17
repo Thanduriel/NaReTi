@@ -77,7 +77,6 @@ namespace par
 		//the current module's allocator
 		utils::StackAlloc* m_allocator;
 	};
-
 	 // simple print for debugging
 	void testFunc();
 	void testFuncStr(std::string& _str);

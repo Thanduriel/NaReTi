@@ -29,7 +29,7 @@ namespace par
 			// by default declarations go to the global scope
 			BaseExpression = 
 				*UseStatement >>
-				*((TypeDeclaration | FuncDeclaration | VarDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]) >>
+				*((TypeDeclaration | FuncDeclaration | VarDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]) >
 				qi::eoi;
 
 			UseStatement =
@@ -49,9 +49,9 @@ namespace par
 			
 			//type is optional
 			FuncDeclaration = 
-				(Symbol >> -(Symbol | Operator) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >>
+				(Symbol >> -(Symbol | Operator) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
 				-VarDeclaration >> 
-				*(',' >> VarDeclaration) >> 
+				*(',' > VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
 				(lit("external")[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
 				| CodeScope)
@@ -69,20 +69,20 @@ namespace par
 			//here we have terms...
 			Expression = 
 				(((('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
-				| Operand) >>
+				| Operand) >
 				-RExpression)) //match with an operator
 				;
 
 			RExpression =
-				(Operator >>
+				(Operator >
 				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)] >>
 				-RExpression
 				;
 
 			CodeScope =
-				lit('{')[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >>
-				*(GeneralExpression) >>
+				lit('{')[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >
+				*(GeneralExpression) >
 				lit('}')[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
 				;
 
@@ -142,8 +142,16 @@ namespace par
 				!char_('.') //cannot be followed by an . as that would indicate a float
 				;
 			Float = double_;
+
+
+//			qi::on_error<qi::fail>(BaseExpression, handler);
 		}
 	private:
+/*		static void handler(boost::fusion::vector< Iterator&, Iterator const&, Iterator const&, std::string&> args)
+		{
+			cout << "bla";
+		}*/
+
 		qi::rule<Iterator, Skipper> BaseExpression;
 		qi::rule<Iterator, Skipper> TypeDeclaration;
 		qi::rule<Iterator, Skipper> VarDeclaration;

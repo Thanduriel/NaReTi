@@ -18,6 +18,8 @@ namespace par{
 		//per cpy
 		std::vector<std::string> getDependencies() { return m_preParser.dependencies; }
 	private:
+		void logError(std::string::const_iterator _begin, const std::string::const_iterator& _it, const std::string& _msg);
+
 		//parsing pipeline
 		par::SemanticParser m_semanticParser;
 		par::NaReTiGrammar m_grammar;

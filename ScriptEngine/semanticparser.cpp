@@ -17,7 +17,7 @@ namespace par
 	// ************************************************** //
 
 	void SemanticParser::setModule(NaReTi::Module& _module)
-	{ 
+	{
 		m_currentModule = &_module; 
 		resetScope();
 		m_allocator = &_module.getAllocator();
