@@ -5,7 +5,7 @@ type GlobalInt
 
 GlobalInt xsNumber
 
-initRandom(int seed)
+void initRandom(int seed)
 {
 	xsNumber.val = seed
 }

@@ -28,12 +28,17 @@ namespace par
 		//set the scope back to the default scope of the module
 		void resetScope() { m_currentCode = &m_currentModule->m_text; m_currentScope = &m_currentModule->m_text; };
 
-		void varDeclaration(boost::fusion::vector3< std::string, boost::optional<char>, std::string >& _attr);
+		void varDeclaration(std::string& _attr);
 		void typeDeclaration(std::string& _attr);
 		void useStatement(std::string& _attr);
 		void finishTypeDec();
-		void funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string >>& _attr);
+		void funcDeclaration(std::string& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
+		//typeinfo
+		void newTypeInfo(const std::string& _attr) { m_typeName = _attr; m_typeInfo.isReference = false; m_typeInfo.isConst = false; }
+		void makeReference() { m_typeInfo.isReference = true; }
+		void makeConst() { m_typeInfo.isConst = true; }
+
 		void makeExternal() { m_currentFunction->bExternal = true; }
 		void finishGeneralExpression();
 		void beginCodeScope();
@@ -65,7 +70,11 @@ namespace par
 		void linkCall(ASTCall& _node);
 		void linkMember(ASTMember& _node);
 
+		TypeInfo buildTypeInfo();
+
 		std::vector < ASTExpNode* > m_stack;
+		TypeInfo m_typeInfo;
+		std::string m_typeName;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to
 		par::Function* m_currentFunction; // currently parsed function

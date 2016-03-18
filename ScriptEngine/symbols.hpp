@@ -59,18 +59,19 @@ namespace par{
 
 	struct TypeInfo
 	{
-		TypeInfo(ComplexType& _type, bool _isRef) : type(_type), isReference(_isRef){}
+		TypeInfo(ComplexType& _type, bool _isRef = false, bool _isConst = false) : type(_type), isReference(_isRef), isConst(_isConst){}
 		ComplexType& type;
 		bool isReference;
+		bool isConst;
 
 		bool operator== (TypeInfo& oth)
 		{
-			return (&type == &oth.type && isReference == oth.isReference);
+			return (&type == &oth.type && isReference == oth.isReference && isConst == oth.isConst);
 		}
 
 		bool operator!= (TypeInfo& oth)
 		{
-			return !(&type == &oth.type && isReference == oth.isReference);
+			return !(*this == oth);
 		}
 	};
 

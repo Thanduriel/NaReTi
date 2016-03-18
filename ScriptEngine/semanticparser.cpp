@@ -9,7 +9,8 @@ using namespace std;
 namespace par
 {
 	SemanticParser::SemanticParser() :
-		m_moduleLib(lang::g_module)
+		m_moduleLib(lang::g_module),
+		m_typeInfo(lang::g_module.getBasicType(BasicType::Void))
 	{
 
 	}
@@ -105,13 +106,10 @@ namespace par
 
 		return str;
 	}
-	void SemanticParser::varDeclaration(vector3< string, boost::optional<char>, string >& _attr)
+	void SemanticParser::varDeclaration(string&  _attr)
 	{
-		//search type
-		ComplexType* type = m_moduleLib.getType(_attr.m0);
-		if (!type) throw ParsingError("Unknown type: " + _attr.m0);
-
-		m_currentScope->m_variables.emplace_back(_attr.m2, *type, _attr.m1.is_initialized());
+		auto typeInfo = buildTypeInfo();
+		m_currentScope->m_variables.emplace_back(_attr, typeInfo.type, typeInfo.isReference);
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
 	}
 
@@ -130,7 +128,7 @@ namespace par
 		ComplexType& type = *m_currentModule->m_types.back();
 
 		// generate default assignment
-		m_currentModule->m_functions.emplace_back(new Function("=", type));
+		m_currentModule->m_functions.emplace_back(new Function("=", TypeInfo(type, true)));
 		Function& func = *m_currentModule->m_functions.back();
 		func.returnTypeInfo.isReference = true;
 
@@ -172,30 +170,20 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::funcDeclaration(boost::fusion::vector2< std::string, boost::optional <std::string> >& _attr)
+	void SemanticParser::funcDeclaration(std::string & _attr)
 	{
-		//a type is provided
-		if (_attr.m1.is_initialized())
+		m_currentModule->m_functions.emplace_back(new Function(_attr, buildTypeInfo()));
+
+		m_currentFunction = m_currentModule->m_functions.back().get();
+
+		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex)
 		{
-			ComplexType* type = m_moduleLib.getType(_attr.m0);
-			if (!type) throw ParsingError("Unknown type: " + _attr.m0);
-			m_currentModule->m_functions.emplace_back(new Function(_attr.m1.get(), *type));
-			
-			if (type->basic == BasicType::Complex)
-			{
-				Function& func = *m_currentModule->m_functions.back();
-				func.scope.m_variables.emplace_back("", *type, true);
-				func.bHiddenParam = true;
-			}
-		}
-		//assume void
-		else
-		{
-			m_currentModule->m_functions.emplace_back(new Function(_attr.m0, *m_moduleLib.getType("void")));
+			Function& func = *m_currentModule->m_functions.back();
+			func.scope.m_variables.emplace_back("", m_currentFunction->returnTypeInfo.type, true);
+			func.bHiddenParam = true;
 		}
 
 		//init environment
-		m_currentFunction = m_currentModule->m_functions.back().get();
 		m_currentFunction->bInline = false;
 		m_targetScope = &m_currentModule->m_functions.back()->scope;
 		m_targetScope->m_parent = m_currentScope;
@@ -401,6 +389,16 @@ namespace par
 			return _tree;
 		}
 		return _tree;
+	}
+
+	// ************************************************** //
+
+	TypeInfo SemanticParser::buildTypeInfo()
+	{
+		ComplexType* type = m_moduleLib.getType(m_typeName);
+		if (!type) throw ParsingError("Unknown type: " + m_typeName);
+
+		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst);
 	}
 
 	// ************************************************** //

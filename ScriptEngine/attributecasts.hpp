@@ -38,6 +38,19 @@ namespace boost {
 				}
 				static void fail(std::string&) {}
 			};
+
+
+/*			//TypeInfo
+			template <>
+			struct transform_attribute<par::TypeInfo, boost::fusion::vector3<boost::optional<std::string>, std::string, boost::optional<char>>, qi::domain>
+			{
+				static int pre(std::string& d) { return 0; }//not useful in this case but required to avoid compiler errors
+				static void post(par::TypeInfo& val, boost::fusion::vector3<boost::optional<std::string>, std::string, boost::optional<char>> const& attr) //`val` is the "returned" string, `attr` is what  parses
+				{
+					val
+				}
+				static void fail(std::string&) {}
+			};*/
 		}
 	}
 }

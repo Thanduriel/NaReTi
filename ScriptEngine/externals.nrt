@@ -1,2 +1,2 @@
-printI(int num) external
-printF(float num) external
+void printI(int num) external
+void printF(float num) external

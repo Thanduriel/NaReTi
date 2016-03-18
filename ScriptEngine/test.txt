@@ -34,7 +34,7 @@ float memberAccess(Vec2& _vec)
 	return _vec.y
 }
 
-test_memberAssign(iVec2& _vec)
+void test_memberAssign(iVec2& _vec)
 {
 	_vec.x = 42
 }
@@ -83,7 +83,7 @@ int test_loop(int a, int b)
 
 iVec2 g_test_vec
 
-test_globalInit()
+void test_globalInit()
 {
 	g_test_vec.x = 11
 	g_test_vec.y = 9

@@ -43,18 +43,28 @@ namespace par
 				lit('}')[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
 			VarDeclaration = 
-				(Symbol >> 
-				-char_('&') >>
+				(TypeInformation >>
 				Symbol)[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)];
 			
 			//type is optional
 			FuncDeclaration = 
-				(Symbol >> -(Symbol | Operator) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
+				(TypeInformation >> (Symbol | Operator) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
 				-VarDeclaration >> 
 				*(',' > VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
 				(lit("external")[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
 				| CodeScope)
+				;
+
+			TypeInformation =
+			//	*TypeAttr >>
+				Symbol[boost::bind(&SemanticParser::newTypeInfo, &m_semanticParser, ::_1)] >>
+				*TypeAttr
+				;
+
+			TypeAttr =
+				lit("const")[boost::bind(&SemanticParser::makeConst, &m_semanticParser)]
+				| lit('&')[boost::bind(&SemanticParser::makeReference, &m_semanticParser)]
 				;
 
 			GeneralExpression = 
@@ -158,6 +168,9 @@ namespace par
 		qi::rule<Iterator, Skipper> UseStatement;
 		qi::rule<Iterator, Skipper> FuncDeclaration;
 
+		qi::rule<Iterator, Skipper> TypeInformation;
+		qi::rule<Iterator, Skipper> TypeAttr;
+
 		qi::rule<Iterator, Skipper> Expression;
 		qi::rule<Iterator, Skipper> GeneralExpression;
 		qi::rule<Iterator, Skipper> RExpression;
@@ -165,7 +178,6 @@ namespace par
 		qi::rule<Iterator, Skipper> Conditional;
 		qi::rule<Iterator, Skipper> Loop;
 		qi::rule<Iterator, Skipper> Call;
-
 		
 		qi::rule<Iterator, std::string()> Symbol;
 		qi::rule<Iterator, std::string()> ConstString;

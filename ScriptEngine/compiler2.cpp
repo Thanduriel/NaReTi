@@ -289,28 +289,35 @@ namespace codeGen
 
 		if (_node.function->bInline)
 		{
-			//code
-
-			// if types do not match, a typecast will move the data
-			if (func.returnTypeInfo.type.basic == func.scope.m_variables[0].typeInfo.type.basic && !(func.name[0] == '='))
+			if (_node.function->bIntrinsic)
 			{
-				//since the first operand of a binop is overwritten with the result copy the values first
-				if (func.returnTypeInfo.type.basic == BasicType::Float)
+				// if types do not match, a typecast will move the data
+				if (func.returnTypeInfo.type.basic == func.scope.m_variables[0].typeInfo.type.basic && !(func.name[0] == '='))
 				{
-					m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
-					args[0] = m_fp0;
+					//since the first operand of a binop is overwritten with the result copy the values first
+					if (func.returnTypeInfo.type.basic == BasicType::Float)
+					{
+						m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
+						args[0] = m_fp0;
+					}
+					else
+					{
+						m_compiler.mov(*m_accumulator, *(asmjit::X86GpVar*)args[0]);
+						args[0] = m_accumulator;
+					}
 				}
-				else
+
+				for (auto& node : _node.function->scope)
 				{
-					m_compiler.mov(*m_accumulator, *(asmjit::X86GpVar*)args[0]);
-					args[0] = m_accumulator;
+					ASTOp& op = *(ASTOp*)node;
+					compileOp(op.instruction, args);
 				}
 			}
-
-			for (auto& node : _node.function->scope)
+			else
 			{
-				ASTOp& op = *(ASTOp*)node;
-				compileOp(op.instruction, args);
+/*				for (int i = 0; i < func.paramCount; ++i)
+					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
+				compileCode(_node.function->scope);*/
 			}
 
 			//the result is already in ax or fp0
