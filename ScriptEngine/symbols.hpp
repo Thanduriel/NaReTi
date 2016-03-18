@@ -77,10 +77,9 @@ namespace par{
 
 	struct VarSymbol : public Symbol, public codeGen::CVarSymbol
 	{
-//		VarSymbol(){}; //todo: add better way to acuire atom type; use this here
-		VarSymbol(const std::string& _name, ComplexType& _type, bool _isRef = false) :
+		VarSymbol(const std::string& _name, TypeInfo& _typeInfo) :
 			Symbol(_name),
-			typeInfo(_type, _isRef)
+			typeInfo(_typeInfo)
 		{}
 
 		VarSymbol& operator= (VarSymbol& oth)

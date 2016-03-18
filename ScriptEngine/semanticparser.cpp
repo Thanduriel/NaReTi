@@ -109,7 +109,7 @@ namespace par
 	void SemanticParser::varDeclaration(string&  _attr)
 	{
 		auto typeInfo = buildTypeInfo();
-		m_currentScope->m_variables.emplace_back(_attr, typeInfo.type, typeInfo.isReference);
+		m_currentScope->m_variables.emplace_back(_attr, typeInfo);
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
 	}
 
@@ -126,19 +126,20 @@ namespace par
 	void SemanticParser::finishTypeDec()
 	{
 		ComplexType& type = *m_currentModule->m_types.back();
+		TypeInfo typeInfo = TypeInfo(type, true);
 
 		// generate default assignment
-		m_currentModule->m_functions.emplace_back(new Function("=", TypeInfo(type, true)));
+		m_currentModule->m_functions.emplace_back(new Function("=", typeInfo));
 		Function& func = *m_currentModule->m_functions.back();
 		func.returnTypeInfo.isReference = true;
 
 		// =(Type& slf, Type& oth)
 		func.scope.m_variables.reserve(2); // prevent moves
-		func.scope.m_variables.emplace_back("slf", type, true);
+		func.scope.m_variables.emplace_back("slf", typeInfo);
 		VarSymbol& slf = func.scope.m_variables.back();
 		ASTLeaf& slfInst = *m_allocator->construct<ASTLeaf>(&slf);
 		slfInst.typeInfo = &slf.typeInfo;
-		func.scope.m_variables.emplace_back("oth", type, true);
+		func.scope.m_variables.emplace_back("oth", typeInfo);
 		VarSymbol& oth = func.scope.m_variables.back();
 		ASTLeaf& othInst = *m_allocator->construct<ASTLeaf>(&oth);
 		othInst.typeInfo = &oth.typeInfo;
@@ -179,7 +180,7 @@ namespace par
 		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex)
 		{
 			Function& func = *m_currentModule->m_functions.back();
-			func.scope.m_variables.emplace_back("", m_currentFunction->returnTypeInfo.type, true);
+			func.scope.m_variables.emplace_back("", m_currentFunction->returnTypeInfo);
 			func.bHiddenParam = true;
 		}
 
@@ -301,7 +302,7 @@ namespace par
 		astNode->args[0] = *dest;
 		*dest = astNode; // put this node there
 
-		cout << _operator << endl;
+//		cout << _operator << endl;
 	}
 
 	void SemanticParser::call(string& _name)
@@ -345,7 +346,7 @@ namespace par
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(var);
 		leaf->typeInfo = &var->typeInfo;
 		m_stack.push_back(leaf);
-		cout << _name << endl;
+//		cout << _name << endl;
 	}
 
 	void SemanticParser::pushFloat(double _val)
@@ -357,9 +358,9 @@ namespace par
 	void SemanticParser::pushInt(int _val)
 	{
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(_val);
-		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Int), false);
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Int));
 		m_stack.push_back(leaf);
-		cout << _val << endl;
+//		cout << _val << endl;
 	}
 
 	// ************************************************** //

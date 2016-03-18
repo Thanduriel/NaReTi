@@ -9,8 +9,8 @@ namespace par{
 		paramCount = 2;
 
 		//args
-		scope.m_variables.emplace_back("0", _type);
-		scope.m_variables.emplace_back("1", _type);
+		scope.m_variables.emplace_back("0", returnTypeInfo);
+		scope.m_variables.emplace_back("1", returnTypeInfo);
 
 		//params do not need to be set
 		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
@@ -25,8 +25,8 @@ namespace par{
 		//args
 		if (!_t1) _t1 = &_t0;
 		if (!_t2) _t2 = &_t0;
-		scope.m_variables.emplace_back("0", *_t1);
-		scope.m_variables.emplace_back("1", *_t2);
+		scope.m_variables.emplace_back("0", TypeInfo(*_t1));
+		scope.m_variables.emplace_back("1", TypeInfo(*_t2));
 
 		//params do not need to be set
 		for (auto instr : _instr)
