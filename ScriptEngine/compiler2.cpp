@@ -8,7 +8,8 @@ namespace codeGen
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
 		m_compiler(&m_assembler),
-		m_isRefSet(false)
+		m_isRefSet(false),
+		m_ignoreRet(0)
 	{
 		m_labelStack.reserve(64); // prevent moving
 	}
@@ -317,7 +318,9 @@ namespace codeGen
 			{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
+				m_ignoreRet++;
 				compileCode(_node.function->scope);
+				m_ignoreRet--;
 			}
 
 			//the result is already in ax or fp0
@@ -467,7 +470,13 @@ namespace codeGen
 
 			var = &dest;
 		}
-		m_compiler.ret(*var);
+
+		if (m_ignoreRet)
+		{
+			if (var != m_accumulator) m_compiler.mov(*m_accumulator, *var);
+		}
+		else
+			m_compiler.ret(*var);
 	}
 
 	// *************************************************** //
@@ -491,7 +500,12 @@ namespace codeGen
 			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
 
-		m_compiler.ret(*var);
+		if (m_ignoreRet)
+		{
+			if (var != m_fp0) m_compiler.movss(*m_fp0, *var);
+		}
+		else
+			m_compiler.ret(*var);
 	}
 
 	// *************************************************** //

@@ -20,7 +20,7 @@ namespace codeGen
 	private:
 		// calculates the member offsets and alignment
 		void compileType(par::ComplexType& _type);
-
+		// allocates heap space for a local var and stores the address in _var
 		void compileHeapVar(par::VarSymbol& _var, utils::StackAlloc& _allocator);
 
 		//sets up a par::Function's asmjit funcbuilder
@@ -33,16 +33,17 @@ namespace codeGen
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
+		//utils
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register
 		void compileMemberLd(par::ASTMember& _node, asmjit::X86GpVar& _destination);
 		void compileMemberLdF(par::ASTMember& _node, asmjit::X86XmmVar& _destination);
-		//store result in a member var
+		//store result in a member var; not in use
 		void compileMemberStr(par::ASTMember& _node);
 		void compileBranch(par::ASTBranch& _node);
 		void compileLoop(par::ASTLoop& _node);
-		//compiles an expression that resolves to a branch descicion
+		//compiles an expression that resolves to a branch decision
 		void compileCondExp(par::ASTCall& _node);
 
 		UsageState getUsageState() { return m_usageState; }
@@ -69,5 +70,7 @@ namespace codeGen
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
 		bool m_isRefSet; //flag: lvalue is a reference 
+		int m_ignoreRet; // currently in lining a call -> ignore return
+		// implemented as a pseudo stack to allow recursive inlining
 	};
 }

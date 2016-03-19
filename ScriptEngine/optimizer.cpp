@@ -41,8 +41,8 @@ namespace codeGen{
 				break;
 			}
 		}
-	//	if (_func.scope.size() < InlineTreshhold && isConst)
-	//		_func.bInline = true;
+		if (_func.scope.size() < InlineTreshhold && isConst)
+			_func.bInline = true;
 	}
 
 	// ****************************************************** //
