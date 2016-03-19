@@ -315,9 +315,9 @@ namespace codeGen
 			}
 			else
 			{
-/*				for (int i = 0; i < func.paramCount; ++i)
+				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
-				compileCode(_node.function->scope);*/
+				compileCode(_node.function->scope);
 			}
 
 			//the result is already in ax or fp0
@@ -462,7 +462,8 @@ namespace codeGen
 		if (m_function->bHiddenParam)
 		{
 			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0].compiledVar;
-			compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
+			//due to substitution the value can already be in the destination
+			if(&dest != var) compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
 
 			var = &dest;
 		}

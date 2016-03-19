@@ -39,7 +39,7 @@ namespace par{
 
 	struct ASTCall : public ASTExpNode
 	{
-		ASTCall(): isLocked(false), returnSub(false) { type = ASTType::Call; }
+		ASTCall(): isLocked(false), returnSub(nullptr) { type = ASTType::Call; }
 		Function* function;
 		std::vector< ASTExpNode* > args;
 

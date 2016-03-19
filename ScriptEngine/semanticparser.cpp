@@ -181,6 +181,7 @@ namespace par
 		{
 			Function& func = *m_currentModule->m_functions.back();
 			func.scope.m_variables.emplace_back("", m_currentFunction->returnTypeInfo);
+			func.scope.m_variables.back().typeInfo.isReference = true; // it is the pointer to the stack var
 			func.bHiddenParam = true;
 		}
 

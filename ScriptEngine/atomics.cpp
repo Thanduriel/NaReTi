@@ -1,6 +1,7 @@
 #include "atomics.hpp"
 #include "symbols.hpp"
 
+#define BASICASSIGN(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, *m_types[ T ], Instr)); m_functions.back()->scope.m_variables[0].typeInfo.isConst = false;
 #define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
 #define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
 
@@ -57,7 +58,7 @@ namespace lang
 		BASICOPERATION("*", BasicType::Int, InstructionType::Mul);
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
-		BASICOPERATION("=", BasicType::Int, InstructionType::Set);
+		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
 		BASICOPERATION("<<", BasicType::Int, InstructionType::ShL);
 		BASICOPERATION(">>", BasicType::Int, InstructionType::ShR);
 		BASICOPERATION("&", BasicType::Int, InstructionType::And);
@@ -72,7 +73,7 @@ namespace lang
 		BASICOPERATION("-", BasicType::Float, InstructionType::fSub);
 		BASICOPERATION("*", BasicType::Float, InstructionType::fMul);
 		BASICOPERATION("/", BasicType::Float, InstructionType::fDiv);
-		BASICOPERATION("=", BasicType::Float, InstructionType::fSet);
+		BASICASSIGN("=", BasicType::Float, InstructionType::fSet);
 
 		//float x int
 		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
