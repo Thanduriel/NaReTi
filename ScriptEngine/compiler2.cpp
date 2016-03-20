@@ -1,4 +1,5 @@
 #include "compiler2.hpp"
+#include "ptr_stuff.hpp"
 
 namespace codeGen
 {
@@ -105,6 +106,8 @@ namespace codeGen
 		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
 		m_fp0 = &m_anonymousFloats[0];
 
+		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_function.scope.m_variables.size());
+
 		//create arguments and locals
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
@@ -143,6 +146,7 @@ namespace codeGen
 			}
 			
 			_function.scope.m_variables[i].compiledVar = varPtr;
+			binVarLocations.emplace_back(&_function.scope.m_variables[i].compiledVar);
 		}
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i].compiledVar);
@@ -209,6 +213,7 @@ namespace codeGen
 		Function& func = *_node.function;
 
 		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
+		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_node.args.size() + 1);
 
 		UsageState preCallState = getUsageState();
 
@@ -221,7 +226,9 @@ namespace codeGen
 			else
 			{
 				//allocate the stack var and provide a reference as param
-				args.emplace_back(allocLocalVar(func.scope.m_variables[0].typeInfo.type));
+				func.scope.m_variables[0].compiledVar = (Var*)allocLocalVar(func.scope.m_variables[0].typeInfo.type);
+				binVarLocations.emplace_back(&func.scope.m_variables[0].compiledVar);
+				args.emplace_back(func.scope.m_variables[0].compiledVar);
 			}
 		}
 		int i = 0;

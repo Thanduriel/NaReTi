@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);C:\Program Files\boost\boost_1_60_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);C:\Program Files\boost\boost_1_60_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -185,13 +185,13 @@
     <ClInclude Include="compiler2.hpp" />
     <ClInclude Include="enginetypes.hpp" />
     <ClInclude Include="instruction.hpp" />
-    <ClInclude Include="lexer.hpp" />
     <ClInclude Include="module.hpp" />
     <ClInclude Include="modulelib.hpp" />
     <ClInclude Include="optimizer.hpp" />
     <ClInclude Include="parexception.hpp" />
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="preparser.hpp" />
+    <ClInclude Include="ptr_stuff.hpp" />
     <ClInclude Include="scriptengine.h" />
     <ClInclude Include="semanticparser.hpp" />
     <ClInclude Include="skipper.hpp" />
@@ -199,7 +199,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="symbols.hpp" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="token.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\assembler.cpp" />
@@ -227,7 +226,6 @@
     <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86scheduler.cpp" />
     <ClCompile Include="atomics.cpp" />
     <ClCompile Include="compiler2.cpp" />
-    <ClCompile Include="lexer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="module.cpp" />
     <ClCompile Include="modulelib.cpp" />
@@ -242,7 +240,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="symbols.cpp" />
-    <ClCompile Include="token.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

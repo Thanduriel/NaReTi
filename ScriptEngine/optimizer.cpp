@@ -112,7 +112,7 @@ namespace codeGen{
 		{
 			VarSymbol* sym = ((ASTLeaf*)_node.args[0])->ptr;
 
-			stackLabel++; //left site operand of "=" is ofcourse the var itself
+			stackLabel++; //left site operand of "=" is of course the var itself
 			//if the var is given as param it may still be used in it's original form
 			for (; stackLabel < m_usageStack.size(); stackLabel++)
 				if (*m_usageStack[stackLabel] == sym) return;

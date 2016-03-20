@@ -1,6 +1,5 @@
 #pragma once
 
-#include "token.h"
 #include "module.hpp"
 #include "symbols.hpp"
 

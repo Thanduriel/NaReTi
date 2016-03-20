@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="tok">
-      <UniqueIdentifier>{6fd717c6-4b15-44ea-919a-87382e5ef4f5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="par">
       <UniqueIdentifier>{a6304735-0a07-4b2d-99b5-67a8fad034fb}</UniqueIdentifier>
     </Filter>
@@ -56,12 +53,6 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lexer.hpp">
-      <Filter>tok</Filter>
-    </ClInclude>
-    <ClInclude Include="token.h">
-      <Filter>tok</Filter>
     </ClInclude>
     <ClInclude Include="parser.hpp">
       <Filter>par</Filter>
@@ -213,22 +204,19 @@
     <ClInclude Include="optimizer.hpp">
       <Filter>compiler</Filter>
     </ClInclude>
+    <ClInclude Include="ptr_stuff.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="lexer.cpp">
-      <Filter>tok</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser.cpp">
       <Filter>par</Filter>
-    </ClCompile>
-    <ClCompile Include="token.cpp">
-      <Filter>tok</Filter>
     </ClCompile>
     <ClCompile Include="module.cpp">
       <Filter>engine</Filter>
