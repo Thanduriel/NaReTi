@@ -42,9 +42,12 @@ namespace par
 				*VarDeclaration >> 
 				lit('}')[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
+			//var declaration with optional init: int a = 10
 			VarDeclaration = 
 				(TypeInformation >>
-				Symbol)[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)];
+				Symbol)[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
+				-(lit("=")[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
+				Expression)[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))];
 			
 			//type is optional
 			FuncDeclaration = 

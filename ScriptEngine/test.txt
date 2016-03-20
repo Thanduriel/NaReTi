@@ -92,8 +92,8 @@ void test_globalInit()
 iVec2 addiVec(int x0, int y0, int x1, int y1 )
 {
 	iVec2 res
-	res.x = 12//x0 + x1
-	res.y = 11//y0 + y1
+	res.x = x0 + x1
+	res.y = y0 + y1
 	
 	return res
 }
@@ -109,9 +109,8 @@ iVec2 +(iVec2& slf, iVec2& oth)
 
 int test_global()
 {
-	iVec2 stackVec
+	iVec2 stackVec = addiVec(2, 3, 8, 9)
 	
-	stackVec = addiVec(2, 3, 8, 9)
 	printI(stackVec.x)
 	printI(stackVec.y)
 	stackVec = g_test_vec

@@ -29,6 +29,7 @@ namespace par
 		void resetScope() { m_currentCode = &m_currentModule->m_text; m_currentScope = &m_currentModule->m_text; };
 
 		void varDeclaration(std::string& _attr);
+		void pushLatestVar();
 		void typeDeclaration(std::string& _attr);
 		void useStatement(std::string& _attr);
 		void finishTypeDec();
@@ -57,7 +58,7 @@ namespace par
 		void pushSymbol(std::string& _name);
 		void pushFloat(double _val);
 		void pushInt(int _val);
-		void term(std::string& _operator);
+		void term(const std::string& _operator);
 		void call(std::string& _name);
 		void argSeperator();
 

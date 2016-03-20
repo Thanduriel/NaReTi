@@ -113,6 +113,13 @@ namespace par
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
 	}
 
+	void SemanticParser::pushLatestVar()
+	{
+		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(&m_currentScope->m_variables.back());
+		leaf->typeInfo = &leaf->ptr->typeInfo;
+		m_stack.push_back(leaf);
+	}
+
 	// ************************************************** //
 
 	void SemanticParser::typeDeclaration(std::string& _attr)
@@ -287,7 +294,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::term(string& _operator)
+	void SemanticParser::term(const string& _operator)
 	{
 		//build new node
 		ASTCall* astNode = _operator == "." ? m_allocator->construct<ASTMember>() : m_allocator->construct<ASTCall>();
