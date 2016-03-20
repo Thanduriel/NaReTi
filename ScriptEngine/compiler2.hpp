@@ -34,6 +34,7 @@ namespace codeGen
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
 		//utils
+		asmjit::Operand* allocLocalVar(par::ComplexType& _type);
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register

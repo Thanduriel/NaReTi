@@ -58,7 +58,7 @@ namespace par
 			string args;
 			for (auto& arg : _node.args)
 			{
-				args += arg->typeInfo->type.name + (arg->typeInfo->isReference ? "&" : "") + ',';
+				args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "") + (arg->typeInfo->isReference ? "&" : "") + ',';
 			}
 			args.resize(args.size() - 1); //remove final comma
 			throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');

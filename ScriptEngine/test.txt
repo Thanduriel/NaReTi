@@ -117,7 +117,7 @@ int test_global()
 	printI(stackVec.x)
 	printI(stackVec.y)
 
-	stackVec = g_test_vec + stackVec
+	stackVec = stackVec + g_test_vec
 	printI(stackVec.x)
 	printI(stackVec.y)
 	

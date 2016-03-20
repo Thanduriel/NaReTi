@@ -98,6 +98,7 @@ namespace codeGen{
 
 	void Optimizer::traceCall(ASTCall& _node)
 	{
+		int stackLabel = m_usageStack.size();
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
 			auto& arg = _node.args[i];
@@ -107,8 +108,15 @@ namespace codeGen{
 				((ASTLeaf*)arg)->ptr->typeInfo.isConst = false;
 		}
 		// a = foo()
-		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call)
+		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::Leaf)
 		{
+			VarSymbol* sym = ((ASTLeaf*)_node.args[0])->ptr;
+
+			stackLabel++; //left site operand of "=" is ofcourse the var itself
+			//if the var is given as param it may still be used in it's original form
+			for (; stackLabel < m_usageStack.size(); stackLabel++)
+				if (*m_usageStack[stackLabel] == sym) return;
+
 			ASTCall* rCall = (ASTCall*)_node.args[1];
 			if (rCall->function->bHiddenParam)
 			{

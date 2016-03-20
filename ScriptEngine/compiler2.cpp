@@ -97,7 +97,7 @@ namespace codeGen
 
 		m_anonymousVars.clear();
 		m_anonymousVars.reserve(32); // make sure that no move will occur
-		m_anonymousVars.push_back(m_compiler.newInt32("accumulator"));
+		m_anonymousVars.push_back(m_compiler.newIntPtr("accumulator"));
 		m_accumulator = &m_anonymousVars[0];
 
 		m_anonymousFloats.clear();
@@ -135,7 +135,7 @@ namespace codeGen
 					m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
 					X86GpVar& gpVar = m_anonymousVars.back();
 					varPtr = &gpVar;
-					X86Mem mem = m_compiler.newStack(varSymbol.typeInfo.type.size, 4);
+					X86Mem mem = m_compiler.newStack(varSymbol.typeInfo.type.size, 4);//x64
 					m_compiler.lea(gpVar, mem);
 					varSymbol.isPtr = true;
 					break;
@@ -221,10 +221,7 @@ namespace codeGen
 			else
 			{
 				//allocate the stack var and provide a reference as param
-				X86GpVar& gpVar = getUnusedVar();
-				X86Mem mem = m_compiler.newStack(func.scope.m_variables[0].typeInfo.type.size, 4);
-				m_compiler.lea(gpVar, mem);
-				args.emplace_back(&gpVar);
+				args.emplace_back(allocLocalVar(func.scope.m_variables[0].typeInfo.type));
 			}
 		}
 		int i = 0;
@@ -318,6 +315,10 @@ namespace codeGen
 			{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
+		/*		for (int i = func.paramCount; i < func.scope.m_variables.size(); ++i)
+				{
+					args.emplace_back(allocLocalVar(func.scope.m_variables[i].typeInfo.type));
+				}*/
 				m_ignoreRet++;
 				compileCode(_node.function->scope);
 				m_ignoreRet--;
@@ -519,23 +520,17 @@ namespace codeGen
 			m_compiler.mov(tmp, x86::dword_ptr(_src, i*4));
 			m_compiler.mov(x86::dword_ptr(_dst, i*4), tmp);
 		}
-/*		X86GpVar& cnt = getUnusedVar();
+	}
 
-		Label L_Loop(m_compiler);
+	// *************************************************** //
 
-		m_compiler.mov(cnt, imm(_size));
+	Operand* Compiler::allocLocalVar(ComplexType& _type)
+	{
+		X86GpVar& gpVar = getUnusedVar();
+		X86Mem mem = m_compiler.newStack(_type.size, 4);
+		m_compiler.lea(gpVar, mem);
 
-		m_compiler.bind(L_Loop);                                // Bind the loop label here.
-
-		X86GpVar& tmp = getUnusedVar();              // Copy a single dword (4 bytes).
-		m_compiler.mov(tmp, x86::dword_ptr(_src));
-		m_compiler.mov(x86::dword_ptr(_dst), tmp);
-
-		m_compiler.add(_src, 4);                                 // Increment dst/src pointers.
-		m_compiler.add(_dst, 4);
-
-		m_compiler.dec(cnt);                                    // Loop until cnt isn't zero.
-		m_compiler.jnz(L_Loop);*/
+		return &gpVar;
 	}
 
 	// *************************************************** //
@@ -648,7 +643,7 @@ namespace codeGen
 
 	asmjit::X86GpVar& Compiler::getUnusedVar()
 	{
-		if (m_anonymousVars.size() == m_usageState.varsInUse) m_anonymousVars.push_back(m_compiler.newInt32());
+		if (m_anonymousVars.size() == m_usageState.varsInUse) m_anonymousVars.push_back(m_compiler.newIntPtr());
 
 		return m_anonymousVars[m_usageState.varsInUse++];
 	}
