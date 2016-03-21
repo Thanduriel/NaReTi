@@ -6,6 +6,14 @@ namespace codeGen
 	using namespace asmjit;
 	using namespace par;
 
+#ifdef	_M_IX86
+#define PTRSIZE 4
+#endif
+#ifdef _M_AMD64
+#define PTRSIZE 8
+#endif
+
+
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
 		m_compiler(&m_assembler),
@@ -42,7 +50,7 @@ namespace codeGen
 		for (auto& member : _type.scope.m_variables)
 		{
 			_type.displacement.push_back(currentOffset);
-			currentOffset += 4;
+			currentOffset += member.typeInfo.isReference ? PTRSIZE : member.typeInfo.type.size;
 		}
 		_type.size = currentOffset;
 	}
