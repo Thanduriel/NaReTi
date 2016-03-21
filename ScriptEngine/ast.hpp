@@ -23,7 +23,8 @@ namespace par{
 		Loop,
 		Ret,
 		BinOp,
-		Member
+		Member,
+		String
 	};
 
 	struct ASTNode
@@ -110,7 +111,7 @@ namespace par{
 
 	struct ASTUnlinkedSym : public ASTExpNode
 	{
-		ASTUnlinkedSym(const std::string& _name) : name(_name){}
+		ASTUnlinkedSym(const std::string& _name) : name(_name){ type = ASTType::String; }
 		std::string name;
 	};
 

@@ -58,6 +58,7 @@ namespace par
 		void pushSymbol(std::string& _name);
 		void pushFloat(double _val);
 		void pushInt(int _val);
+		void pushString(std::string& _str);
 		void term(const std::string& _operator);
 		void call(std::string& _name);
 		void argSeperator();

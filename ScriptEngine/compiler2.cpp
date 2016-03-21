@@ -262,6 +262,13 @@ namespace codeGen
 				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
 				args.emplace_back(compileLeaf(*leaf));
 				break;
+			case ASTType::String:
+			{
+				X86GpVar& var = getUnusedVar();
+				args.emplace_back(&var);
+				m_compiler.mov(var, imm_ptr(((ASTUnlinkedSym*)arg)->name.c_str()));
+				break; 
+			}
 			case ASTType::Member:
 			{
 				ASTMember& member = *(ASTMember*)arg;

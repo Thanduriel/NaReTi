@@ -134,7 +134,7 @@ namespace par
 				| Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
 				| Integer[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
 				| Float[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
-				| ConstString
+				| ConstString[boost::bind(&SemanticParser::pushString, &m_semanticParser, ::_1)]
 				;
 
 			//lexer definitions
@@ -143,7 +143,7 @@ namespace par
 			Symbol = (lexeme[char_("a-zA-Z_") >> *(char_("a-zA-Z_0-9"))]);
 
 			//a quoted string
-			ConstString = lexeme['"' >> +(char_ - '"') >> '"'];
+			ConstString = lexeme[lit('"') >> +(char_ - '"') >> lit('"')];
 
 			// match any special char that can be used as an operator
 			//pay attention that '-' needs to be the last char so that it is not interpreted as range

@@ -1,2 +1,3 @@
 void printI(int num) external
 void printF(float num) external
+void printStr(string& str) external

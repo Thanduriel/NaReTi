@@ -23,6 +23,11 @@ void printF(float num)
 	cout << num << endl;
 }
 
+void printStr(char* _str)
+{
+	cout << _str << endl;
+}
+
 struct Vec2
 {
 	float x;
@@ -47,6 +52,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	NaReTi::Module* externals = scriptEngine.getModule("externals.nrt");
 	externals->linkExternal("printI", &printI);
+	externals->linkExternal("printF", &printF);
+	externals->linkExternal("printStr", &printStr);
 
 	//script functions
 	bool success = scriptEngine.loadModule("test.txt");

@@ -121,5 +121,7 @@ int test_global()
 	printI(stackVec.x)
 	printI(stackVec.y)
 	
+	printStr("hello world!")
+	
 	return g_test_vec.y
 }

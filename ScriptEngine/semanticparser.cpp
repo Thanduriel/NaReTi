@@ -371,6 +371,14 @@ namespace par
 //		cout << _val << endl;
 	}
 
+	void SemanticParser::pushString(std::string& _str)
+	{
+		ASTUnlinkedSym* leaf = m_allocator->construct<ASTUnlinkedSym>(_str);
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::String));
+		leaf->typeInfo->isReference = true; // actually false, but strings can not be used as value currently
+		m_stack.push_back(leaf);
+	}
+
 	// ************************************************** //
 
 	void SemanticParser::lockLatestNode()
