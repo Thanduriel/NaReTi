@@ -25,6 +25,8 @@ namespace codeGen
 
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function);
+		void allocVar(par::VarSymbol& _sym, bool _isParam = false);
+		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type);
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
@@ -33,8 +35,7 @@ namespace codeGen
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
-		//utils
-		asmjit::Operand* allocLocalVar(par::ComplexType& _type);
+		
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
 		//load some member var into the given destination register
@@ -50,7 +51,7 @@ namespace codeGen
 		UsageState getUsageState() { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
 		// returns a virtual register currently not in use
-		asmjit::X86GpVar& getUnusedVar();
+		asmjit::X86GpVar& getUnusedVar(bool _make32 = false); //param: should the given var be of 32 bit size
 		asmjit::X86XmmVar& getUnusedFloat();
 
 

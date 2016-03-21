@@ -83,6 +83,49 @@ namespace codeGen
 
 	// *************************************************** //
 
+	void Compiler::allocVar(VarSymbol& _sym, bool _isParam)
+	{
+		asmjit::Var* varPtr;
+
+		if (_sym.typeInfo.isReference)
+		{
+			varPtr = &getUnusedVar();
+			_sym.isPtr = true;
+		}
+		else
+		{
+			switch (_sym.typeInfo.type.basic)
+			{
+			case BasicType::Int:
+				varPtr = &getUnusedVar(_isParam);
+				break;
+			case BasicType::Float:
+				varPtr = &getUnusedFloat();
+				break;
+			case BasicType::Complex:
+				_sym.isPtr = true;
+				varPtr = allocStackVar(_sym.typeInfo.type);
+				break;
+			}
+		}
+
+		_sym.compiledVar = varPtr;
+
+	}
+
+	// *************************************************** //
+
+	X86GpVar* Compiler::allocStackVar(ComplexType& _type)
+	{
+		X86GpVar& gpVar = getUnusedVar();
+		X86Mem mem = m_compiler.newStack(_type.size, 4);
+		m_compiler.lea(gpVar, mem);
+
+		return &gpVar;
+	}
+
+	// *************************************************** //
+
 	void Compiler::compileFuction(par::Function& _function)
 	{
 		m_function = &_function;
@@ -106,6 +149,9 @@ namespace codeGen
 		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
 		m_fp0 = &m_anonymousFloats[0];
 
+		m_usageState.varsInUse = 1;
+		m_usageState.floatsInUse = 1;
+
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_function.scope.m_variables.size());
 
 		//create arguments and locals
@@ -114,39 +160,9 @@ namespace codeGen
 			VarSymbol& varSymbol = _function.scope.m_variables[i];
 			if (varSymbol.isSubstituted) continue;
 
-			asmjit::Var* varPtr;
+			allocVar(varSymbol, true);
 
-			if (varSymbol.typeInfo.isReference)
-			{
-				m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
-				varPtr = &m_anonymousVars.back();
-				varSymbol.isPtr = true;
-			}
-			else
-			{
-				switch (varSymbol.typeInfo.type.basic)
-				{
-				case BasicType::Int:
-					m_anonymousVars.push_back(m_compiler.newInt32(("arg" + std::to_string(i)).c_str()));
-					varPtr = &m_anonymousVars.back();
-					break;
-				case BasicType::Float:
-					m_anonymousFloats.push_back(m_compiler.newXmmSs(("arg" + std::to_string(i)).c_str()));
-					varPtr = &m_anonymousFloats.back();
-					break;
-				case BasicType::Complex:
-					m_anonymousVars.push_back(m_compiler.newIntPtr(("arg" + std::to_string(i)).c_str()));
-					X86GpVar& gpVar = m_anonymousVars.back();
-					varPtr = &gpVar;
-					X86Mem mem = m_compiler.newStack(varSymbol.typeInfo.type.size, 4);//x64
-					m_compiler.lea(gpVar, mem);
-					varSymbol.isPtr = true;
-					break;
-				}
-			}
-			
-			_function.scope.m_variables[i].compiledVar = varPtr;
-			binVarLocations.emplace_back(&_function.scope.m_variables[i].compiledVar);
+			binVarLocations.emplace_back(&varSymbol.compiledVar);
 		}
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i].compiledVar);
@@ -154,15 +170,10 @@ namespace codeGen
 		//imported heap vars
 		for (auto& var : _function.m_importedVars)
 		{
-			m_anonymousVars.push_back(m_compiler.newIntPtr());
-			X86GpVar& gpVar = m_anonymousVars.back();
+			X86GpVar& gpVar = getUnusedVar();
 			var->compiledVar = &gpVar;
 			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
 		}
-
-		//args are relevant through out the function
-		m_usageState.varsInUse = m_anonymousVars.size();
-		m_usageState.floatsInUse = m_anonymousFloats.size();
 
 		//code
 		compileCode(_function.scope);
@@ -226,7 +237,7 @@ namespace codeGen
 			else
 			{
 				//allocate the stack var and provide a reference as param
-				func.scope.m_variables[0].compiledVar = (Var*)allocLocalVar(func.scope.m_variables[0].typeInfo.type);
+				func.scope.m_variables[0].compiledVar = (Var*)allocStackVar(func.scope.m_variables[0].typeInfo.type);
 				binVarLocations.emplace_back(&func.scope.m_variables[0].compiledVar);
 				args.emplace_back(func.scope.m_variables[0].compiledVar);
 			}
@@ -322,10 +333,15 @@ namespace codeGen
 			{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
-		/*		for (int i = func.paramCount; i < func.scope.m_variables.size(); ++i)
+				for (int i = func.paramCount; i < func.scope.m_variables.size(); ++i)
 				{
-					args.emplace_back(allocLocalVar(func.scope.m_variables[i].typeInfo.type));
-				}*/
+					if (!func.scope.m_variables[i].compiledVar)
+					{
+						
+						allocVar(func.scope.m_variables[i]);
+						binVarLocations.emplace_back(&func.scope.m_variables[0].compiledVar);
+					}
+				}
 				m_ignoreRet++;
 				compileCode(_node.function->scope);
 				m_ignoreRet--;
@@ -531,17 +547,6 @@ namespace codeGen
 
 	// *************************************************** //
 
-	Operand* Compiler::allocLocalVar(ComplexType& _type)
-	{
-		X86GpVar& gpVar = getUnusedVar();
-		X86Mem mem = m_compiler.newStack(_type.size, 4);
-		m_compiler.lea(gpVar, mem);
-
-		return &gpVar;
-	}
-
-	// *************************************************** //
-
 	X86Mem Compiler::getMemberAdr(ASTMember& _node)
 	{
 		X86GpVar* gpVar;
@@ -648,9 +653,9 @@ namespace codeGen
 
 	// *************************************************** //
 
-	asmjit::X86GpVar& Compiler::getUnusedVar()
+	asmjit::X86GpVar& Compiler::getUnusedVar(bool _make32)
 	{
-		if (m_anonymousVars.size() == m_usageState.varsInUse) m_anonymousVars.push_back(m_compiler.newIntPtr());
+		if (m_anonymousVars.size() == m_usageState.varsInUse) _make32 ? m_anonymousVars.push_back(m_compiler.newInt32()) : m_anonymousVars.push_back(m_compiler.newIntPtr());
 
 		return m_anonymousVars[m_usageState.varsInUse++];
 	}
