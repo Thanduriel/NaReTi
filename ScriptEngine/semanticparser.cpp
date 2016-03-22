@@ -51,6 +51,12 @@ namespace par
 			return;
 		}
 
+		for (auto& arg : _node.args) 
+			if (arg->typeInfo == nullptr && arg->type == ASTType::String) 
+			{ 
+				throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)arg)->name);
+			}
+
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
 		if (!func)
 		{
@@ -348,6 +354,7 @@ namespace par
 		if (!var) //could still be a member
 		{
 			m_stack.push_back(m_allocator->construct<ASTUnlinkedSym>(_name));
+			m_stack.back()->typeInfo = nullptr;
 			return;
 		}
 		

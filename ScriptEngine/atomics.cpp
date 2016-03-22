@@ -67,6 +67,7 @@ namespace lang
 		//comparison
 		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ Cmp, JNA }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 
 		//float -------------------------------------------------------
 		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);
@@ -74,6 +75,9 @@ namespace lang
 		BASICOPERATION("*", BasicType::Float, InstructionType::fMul);
 		BASICOPERATION("/", BasicType::Float, InstructionType::fDiv);
 		BASICASSIGN("=", BasicType::Float, InstructionType::fSet);
+
+		//comparison
+		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ fCmp, JE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
 
 		//float x int
 		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);

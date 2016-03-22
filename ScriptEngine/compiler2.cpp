@@ -465,12 +465,20 @@ namespace codeGen
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
+		case fCmp:
+			m_compiler.comiss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			break;
+		case JE:
+			m_compiler.je(m_labelStack.back());
+			break;
 		case JNE:
 			m_compiler.jne(m_labelStack.back());
 			break;
 		case JNL:
 			m_compiler.jnl(m_labelStack.back());
 			break;
+		case JNA:
+			m_compiler.jna(m_labelStack.back());
 		//float instructions
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
@@ -480,6 +488,9 @@ namespace codeGen
 			break;
 		case fMul:
 			m_compiler.mulss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			break;
+		case fDiv:
+			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
 		case InstructionType::iTof0:
 			X86XmmVar& var = *m_fp0;

@@ -2,7 +2,8 @@
 
 namespace par
 {
-	//not all of this are in use or even make sence in the current implementation
+	// instructions used to build intrinsics
+	//not all of this are in use or even make sense in the current implementation
 	enum InstructionType
 	{
 		Nop,
@@ -31,9 +32,12 @@ namespace par
 		SetRef,
 		fSetRef,
 		//comparisation
+		fCmp,
 		Cmp,
+		JE,
 		JNE,
 		JNL,
+		JNA,
 		Ret,
 		RetA, // return the accumulator; takes no param
 		Call, // call subroutine; is inlined when the flag is set

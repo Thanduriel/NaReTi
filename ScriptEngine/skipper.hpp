@@ -15,9 +15,9 @@ namespace par{
 		 * "/*" until the matching "* /"(without space) (this can be recursive)
 		 */
 		CommentSkipper() : CommentSkipper::base_type(Skip) {
-			using ascii::char_;
+			using standard::char_;
 
-			Skip = ascii::space | (ascii::string("//") >> *(char_ - '\n')) | VariableComment;
+			Skip = standard::space | (ascii::string("//") >> *(char_ - '\n')) | VariableComment;
 			VariableComment = ascii::string("/*") >> *(VariableComment | (char_ - ascii::string("*/"))) >> ascii::string("*/");
 		}
 		qi::rule<Iterator> Skip;

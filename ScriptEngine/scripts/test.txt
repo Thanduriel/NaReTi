@@ -1,4 +1,5 @@
 
+use math
 use random
 use externals
 
@@ -122,6 +123,9 @@ int test_global()
 	printI(stackVec.y)
 	
 	printStr("hello world!")
+	printF(sin(1.57))
+	printI(pow(2, 8))
+	printF(sqrt(765.34))
 	
 	return g_test_vec.y
 }
