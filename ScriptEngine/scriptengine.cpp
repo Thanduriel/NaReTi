@@ -27,12 +27,12 @@ namespace NaReTi
 
 	bool ScriptEngine::loadModule(const string& _fileName)
 	{
-		std::ifstream in(_fileName.c_str(), std::ios::in | std::ios::binary);
+		std::ifstream in((m_config.scriptLocation + _fileName).c_str(), std::ios::in | std::ios::binary);
 
 		//check if file is valid
 		if (!in)
 		{
-	//		LOG(ERROR) << "Could not open Code-File " << _fileName;
+			cout << "Could not open File " << _fileName;
 			return false;
 		}
 
@@ -66,7 +66,7 @@ namespace NaReTi
 		bool ret = m_parser.parse(fileContent, module);
 		if (ret)
 		{
-			m_optimizer.optimize(module);
+			if(m_config.optimizationLvl > None) m_optimizer.optimize(module);
 			m_compiler.compile(module);
 		}
 		else

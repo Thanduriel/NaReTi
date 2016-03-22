@@ -33,7 +33,7 @@ namespace codeGen
 		}
 		for (auto& var : _module.m_text.m_variables)
 		{
-			compileHeapVar(var, _module.getAllocator());
+			compileHeapVar(*var, _module.getAllocator());
 		}
 		for (auto& function : _module.m_functions)
 		{
@@ -50,7 +50,7 @@ namespace codeGen
 		for (auto& member : _type.scope.m_variables)
 		{
 			_type.displacement.push_back(currentOffset);
-			currentOffset += member.typeInfo.isReference ? PTRSIZE : member.typeInfo.type.size;
+			currentOffset += member->typeInfo.isReference ? PTRSIZE : member->typeInfo.type.size;
 		}
 		_type.size = currentOffset;
 	}
@@ -71,7 +71,7 @@ namespace codeGen
 		FuncBuilderX& funcBuilder = _function.funcBuilder;
 		for (int i = 0; i < _function.paramCount; ++i)
 		{
-			switch (_function.scope.m_variables[i].typeInfo.type.basic)
+			switch (_function.scope.m_variables[i]->typeInfo.type.basic)
 			{
 			case BasicType::Int: funcBuilder.addArgT<int>(); break;
 			case BasicType::Float: funcBuilder.addArgT<float>(); break;
@@ -165,7 +165,7 @@ namespace codeGen
 		//create arguments and locals
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
-			VarSymbol& varSymbol = _function.scope.m_variables[i];
+			VarSymbol& varSymbol = *_function.scope.m_variables[i];
 			if (varSymbol.isSubstituted) continue;
 
 			allocVar(varSymbol, true);
@@ -173,7 +173,7 @@ namespace codeGen
 			binVarLocations.emplace_back(&varSymbol.compiledVar);
 		}
 		for (int i = 0; i < _function.paramCount; ++i)
-			m_compiler.setArg(i, *_function.scope.m_variables[i].compiledVar);
+			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
 
 		//imported heap vars
 		for (auto& var : _function.m_importedVars)
@@ -245,9 +245,9 @@ namespace codeGen
 			else
 			{
 				//allocate the stack var and provide a reference as param
-				func.scope.m_variables[0].compiledVar = (Var*)allocStackVar(func.scope.m_variables[0].typeInfo.type);
-				binVarLocations.emplace_back(&func.scope.m_variables[0].compiledVar);
-				args.emplace_back(func.scope.m_variables[0].compiledVar);
+				func.scope.m_variables[0]->compiledVar = (Var*)allocStackVar(func.scope.m_variables[0]->typeInfo.type);
+				binVarLocations.emplace_back(&func.scope.m_variables[0]->compiledVar);
+				args.emplace_back(func.scope.m_variables[0]->compiledVar);
 			}
 		}
 		int i = 0;
@@ -323,7 +323,7 @@ namespace codeGen
 			if (_node.function->bIntrinsic)
 			{
 				// if types do not match, a typecast will move the data
-				if (func.returnTypeInfo.type.basic == func.scope.m_variables[0].typeInfo.type.basic && !(func.name[0] == '='))
+				if (func.returnTypeInfo.type.basic == func.scope.m_variables[0]->typeInfo.type.basic && !(func.name[0] == '='))
 				{
 					//since the first operand of a binop is overwritten with the result copy the values first
 					if (func.returnTypeInfo.type.basic == BasicType::Float)
@@ -347,14 +347,14 @@ namespace codeGen
 			else
 			{
 				for (int i = 0; i < args.size(); ++i)
-					func.scope.m_variables[i].compiledVar = (asmjit::Var*)args[i];
+					func.scope.m_variables[i]->compiledVar = (asmjit::Var*)args[i];
 				for (int i = func.paramCount; i < func.scope.m_variables.size(); ++i)
 				{
-					if (!func.scope.m_variables[i].compiledVar)
+					if (!func.scope.m_variables[i]->compiledVar)
 					{
 						
-						allocVar(func.scope.m_variables[i]);
-						binVarLocations.emplace_back(&func.scope.m_variables[0].compiledVar);
+						allocVar(*func.scope.m_variables[i]);
+						binVarLocations.emplace_back(&func.scope.m_variables[0]->compiledVar);
 					}
 				}
 				m_ignoreRet++;
@@ -392,7 +392,10 @@ namespace codeGen
 		}
 		else if (_node.parType == ParamType::Float)
 		{
-			//	m_compiler.
+			X86XmmVar& var = getUnusedFloat();
+			m_compiler.mov(*m_accumulator, imm_ptr(&_node.valFloat));
+			m_compiler.movss(var, x86::dword_ptr(*m_accumulator));
+			return &var;
 		}
 		else if (_node.parType == ParamType::Ptr)
 		{
@@ -472,6 +475,12 @@ namespace codeGen
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
+		case fSub:
+			m_compiler.subss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			break;
+		case fMul:
+			m_compiler.mulss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			break;
 		case InstructionType::iTof0:
 			X86XmmVar& var = *m_fp0;
 			m_compiler.cvtsi2ss(var, *(X86GpVar*)_args[0]);
@@ -503,7 +512,7 @@ namespace codeGen
 
 		if (m_function->bHiddenParam)
 		{
-			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0].compiledVar;
+			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0]->compiledVar;
 			//due to substitution the value can already be in the destination
 			if(&dest != var) compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
 

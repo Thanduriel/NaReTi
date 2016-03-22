@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace NaReTi{
 
 	/* types used by the script engine
@@ -36,4 +38,20 @@ namespace NaReTi{
 		void* ptr;
 	};
 
+	/* Configuration options
+	*/
+
+	enum OptimizationLvl
+	{
+		None,
+		Basic
+	};
+
+	struct Config
+	{
+		OptimizationLvl optimizationLvl;
+
+		//path where the script files are found
+		std::string scriptLocation;
+	};
 }

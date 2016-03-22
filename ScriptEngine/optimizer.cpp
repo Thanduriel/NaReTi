@@ -24,7 +24,7 @@ namespace codeGen{
 		for (int i = 0; i < _func.paramCount; ++i)
 		{
 			//assume that every var is const
-			_func.scope.m_variables[i].typeInfo.isConst = true;
+			_func.scope.m_variables[i]->typeInfo.isConst = true;
 		}
 
 		m_function = &_func;
@@ -35,7 +35,7 @@ namespace codeGen{
 		bool isConst = true;
 		for (int i = 0; i < _func.paramCount; ++i)
 		{
-			if (!_func.scope.m_variables[i].typeInfo.isConst)
+			if (!_func.scope.m_variables[i]->typeInfo.isConst)
 			{
 				isConst = false;
 				break;
@@ -104,7 +104,7 @@ namespace codeGen{
 			auto& arg = _node.args[i];
 			traceNode(arg);
 			// discard const qualifier when a call requires a non const arg
-			if (arg->type == ASTType::Leaf && ((ASTLeaf*)arg)->parType == ParamType::Ptr && !_node.function->scope.m_variables[i].typeInfo.isConst)
+			if (arg->type == ASTType::Leaf && ((ASTLeaf*)arg)->parType == ParamType::Ptr && !_node.function->scope.m_variables[i]->typeInfo.isConst)
 				((ASTLeaf*)arg)->ptr->typeInfo.isConst = false;
 		}
 		// a = foo()
@@ -137,10 +137,10 @@ namespace codeGen{
 		
 		if (m_function->bHiddenParam)
 		{
-			trySubstitution(**m_usageStack.back(), m_function->scope.m_variables[0]);
+			trySubstitution(**m_usageStack.back(), *m_function->scope.m_variables[0]);
 
 			//put return var on the stack as it can not be used again
-			m_tempPtrs.push_back(&m_function->scope.m_variables[0]);
+			m_tempPtrs.push_back(m_function->scope.m_variables[0]);
 			m_usageStack.push_back(&m_tempPtrs.back());
 		}
 	}

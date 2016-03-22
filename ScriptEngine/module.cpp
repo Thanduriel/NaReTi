@@ -37,10 +37,10 @@ namespace NaReTi
 				//type does not match
 				//reference or value does not match
 				// complex types are always by reference and the distinction only matters for the caller
-				if (&found->typeInfo->type != &func->scope.m_variables[i].typeInfo.type
+				if (&found->typeInfo->type != &func->scope.m_variables[i]->typeInfo.type
 					|| !(found->typeInfo->type.basic == BasicType::Complex
-					|| found->typeInfo->isReference == func->scope.m_variables[i].typeInfo.isReference)
-					|| (found->typeInfo->isConst && !func->scope.m_variables[i].typeInfo.isConst))
+					|| found->typeInfo->isReference == func->scope.m_variables[i]->typeInfo.isReference)
+					|| (found->typeInfo->isConst && !func->scope.m_variables[i]->typeInfo.isConst))
 				{
 					paramsMatch = false;
 					break;
@@ -64,7 +64,7 @@ namespace NaReTi
 	{
 		for (auto& var : m_text.m_variables)
 		{
-			if (_name == var.name) return &var;
+			if (_name == var->name) return var;
 		}
 		return nullptr;
 	}

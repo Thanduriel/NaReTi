@@ -10,8 +10,8 @@ namespace par{
 
 		//args
 		TypeInfo typeInfo(_type, false, true);
-		scope.m_variables.emplace_back("0", typeInfo);
-		scope.m_variables.emplace_back("1", typeInfo);
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("0", typeInfo));
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("1", typeInfo));
 
 		//params do not need to be set
 		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
@@ -26,8 +26,8 @@ namespace par{
 		//args
 		if (!_t1) _t1 = &_t0;
 		if (!_t2) _t2 = &_t0;
-		scope.m_variables.emplace_back("0", TypeInfo(*_t1, false, true));
-		scope.m_variables.emplace_back("1", TypeInfo(*_t2, false, true));
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("0", TypeInfo(*_t1, false, true)));
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("1", TypeInfo(*_t2, false, true)));
 
 		//params do not need to be set
 		for (auto instr : _instr)

@@ -43,6 +43,9 @@ struct iVec2
 int _tmain(int argc, _TCHAR* argv[])
 {
 	NaReTi::ScriptEngine scriptEngine;
+	NaReTi::Config& config = scriptEngine.config();
+	config.optimizationLvl = NaReTi::Basic;
+	config.scriptLocation = "scripts/";
 
 	//test cases
 

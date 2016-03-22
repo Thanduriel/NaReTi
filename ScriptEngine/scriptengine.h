@@ -39,7 +39,10 @@ namespace NaReTi{
 			return func(_args...);
 		};
 
+		Config& config() { return m_config; }
 	private:
+		Config m_config;
+
 		std::string extractName(const std::string& _fullName);
 		par::Parser m_parser;
 		codeGen::Compiler m_compiler;

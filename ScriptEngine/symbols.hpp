@@ -98,12 +98,12 @@ namespace par{
 	{
 		CodeScope() : m_parent(nullptr) {};
 
-		std::vector< VarSymbol > m_variables;
+		std::vector< VarSymbol* > m_variables;
 
 		VarSymbol* getVar(std::string& _name)
 		{
 			for (auto& var : m_variables)
-				if (var.name == _name) return &var;
+				if (var->name == _name) return var;
 
 			return m_parent ? m_parent->getVar(_name) : nullptr;
 		}

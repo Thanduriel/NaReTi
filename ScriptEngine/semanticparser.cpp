@@ -75,9 +75,9 @@ namespace par
 		// check members of the type on top of the stack
 		for (auto& member : _node.args[0]->typeInfo->type.scope.m_variables)
 		{
-			if (member.name == strLeaf->name)
+			if (member->name == strLeaf->name)
 			{
-				_node.typeInfo = &member.typeInfo;
+				_node.typeInfo = &member->typeInfo;
 				_node.index = i;
 				_node.instance = _node.args[0];
 				return;
@@ -109,13 +109,13 @@ namespace par
 	void SemanticParser::varDeclaration(string&  _attr)
 	{
 		auto typeInfo = buildTypeInfo();
-		m_currentScope->m_variables.emplace_back(_attr, typeInfo);
+		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>(_attr, typeInfo));
 		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
 	}
 
 	void SemanticParser::pushLatestVar()
 	{
-		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(&m_currentScope->m_variables.back());
+		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(m_currentScope->m_variables.back());
 		leaf->typeInfo = &leaf->ptr->typeInfo;
 		m_stack.push_back(leaf);
 	}
@@ -142,12 +142,12 @@ namespace par
 
 		// =(Type& slf, Type& oth)
 		func.scope.m_variables.reserve(2); // prevent moves
-		func.scope.m_variables.emplace_back("slf", typeInfo);
-		VarSymbol& slf = func.scope.m_variables.back();
+		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("slf", typeInfo));
+		VarSymbol& slf = *func.scope.m_variables.back();
 		ASTLeaf& slfInst = *m_allocator->construct<ASTLeaf>(&slf);
 		slfInst.typeInfo = &slf.typeInfo;
-		func.scope.m_variables.emplace_back("oth", typeInfo);
-		VarSymbol& oth = func.scope.m_variables.back();
+		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("oth", typeInfo));
+		VarSymbol& oth = *func.scope.m_variables.back();
 		ASTLeaf& othInst = *m_allocator->construct<ASTLeaf>(&oth);
 		othInst.typeInfo = &oth.typeInfo;
 
@@ -157,7 +157,7 @@ namespace par
 		for (int i = 0; i < (int)type.scope.m_variables.size(); ++i)
 		{
 			//slf.x = oth.x
-			VarSymbol& member = type.scope.m_variables[i];
+			VarSymbol& member = *type.scope.m_variables[i];
 			ASTMember& memberSlf = *m_allocator->construct<ASTMember>();
 			memberSlf.instance = &slfInst;
 			memberSlf.index = i;
@@ -187,8 +187,8 @@ namespace par
 		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex)
 		{
 			Function& func = *m_currentModule->m_functions.back();
-			func.scope.m_variables.emplace_back("", m_currentFunction->returnTypeInfo);
-			func.scope.m_variables.back().typeInfo.isReference = true; // it is the pointer to the stack var
+			func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("", m_currentFunction->returnTypeInfo));
+			func.scope.m_variables.back()->typeInfo.isReference = true; // it is the pointer to the stack var
 			func.bHiddenParam = true;
 		}
 
@@ -359,8 +359,10 @@ namespace par
 
 	void SemanticParser::pushFloat(double _val)
 	{
-//		m_paramStack.emplace_back((float)_val);
-		cout << _val << endl;
+		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>((float)_val);
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Float));
+		m_stack.push_back(leaf);
+//		cout << _val << endl;
 	}
 
 	void SemanticParser::pushInt(int _val)
