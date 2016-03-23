@@ -30,7 +30,7 @@ namespace NaReTi
 			bool paramsMatch = true;
 			auto begin = _begin;
 			// hidden param is not part of the signature
-			for (; i < dist; ++i)
+			for (; i < func->paramCount; ++i)
 			{
 				par::ASTExpNode* found = *(begin++);
 

@@ -128,6 +128,7 @@ namespace par{
 		//is set by the compiler
 		std::vector < int > displacement;
 		size_t size; // size in bytes
+		size_t alignment; // required alignment when stack allocated
 
 		int sizeOf() override
 		{

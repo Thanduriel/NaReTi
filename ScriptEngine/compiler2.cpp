@@ -1,5 +1,6 @@
 #include "compiler2.hpp"
 #include "ptr_stuff.hpp"
+#include <iostream> //temp
 
 namespace codeGen
 {
@@ -46,11 +47,15 @@ namespace codeGen
 	void Compiler::compileType(ComplexType& _type)
 	{
 		int currentOffset = 0;
+		_type.alignment = 16; // if any stack var has a different alignment float vars wont work properly
 		_type.displacement.reserve(_type.scope.m_variables.size());
 		for (auto& member : _type.scope.m_variables)
 		{
 			_type.displacement.push_back(currentOffset);
 			currentOffset += member->typeInfo.isReference ? PTRSIZE : member->typeInfo.type.size;
+
+//			if (member->typeInfo.type.basic == BasicType::Float && !member->typeInfo.isReference)
+//				_type.alignment = 16;
 		}
 		_type.size = currentOffset;
 	}
@@ -126,7 +131,8 @@ namespace codeGen
 	X86GpVar* Compiler::allocStackVar(ComplexType& _type)
 	{
 		X86GpVar& gpVar = getUnusedVar();
-		X86Mem mem = m_compiler.newStack(_type.size, 4);
+		X86Mem mem = m_compiler.newStack(_type.size, _type.alignment); // if floats are used  -> operations with xmm(128) register
+
 		m_compiler.lea(gpVar, mem);
 
 		return &gpVar;
@@ -153,7 +159,7 @@ namespace codeGen
 		m_accumulator = &m_anonymousVars[0];
 
 		m_anonymousFloats.clear();
-		m_anonymousFloats.reserve(32);
+		m_anonymousFloats.reserve(64); //32
 		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
 		m_fp0 = &m_anonymousFloats[0];
 
@@ -230,6 +236,11 @@ namespace codeGen
 	void Compiler::compileCall(ASTCall& _node)
 	{
 		Function& func = *_node.function;
+
+		if (func.name == "printF")
+		{
+			int uie = 21;
+		}
 
 		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(func.scope.m_variables.size() - _node.args.size() + 1);
@@ -372,7 +383,7 @@ namespace codeGen
 				call->_setArg(i, *args[i]);
 			if (func.returnTypeInfo.type.basic == BasicType::Float)
 				call->setRet(0, *m_fp0);
-			else 
+			else if (func.returnTypeInfo.type.basic != BasicType::Void)
 				call->setRet(0, *m_accumulator);
 		}
 
@@ -600,14 +611,13 @@ namespace codeGen
 		}
 
 		ComplexType& type = _node.instance->typeInfo->type;
-		return x86::dword_ptr(*gpVar, type.displacement[_node.index]);
+		return x86::dword_ptr(*gpVar, type.displacement[_node.index]);//dword
 	}
 
 	// *************************************************** //
 
 	void Compiler::compileMemberLd(ASTMember& _node, X86GpVar& _destination)
 	{
-		ComplexType& type = _node.instance->typeInfo->type;
 		auto adr = getMemberAdr(_node);
 
 		m_compiler.mov(_destination, adr);
@@ -617,7 +627,6 @@ namespace codeGen
 
 	void Compiler::compileMemberLdF(ASTMember& _node, X86XmmVar& _destination)
 	{
-		ComplexType& type = _node.instance->typeInfo->type;
 		auto adr = getMemberAdr(_node);
 		
 		m_compiler.movss(_destination, adr);
@@ -702,5 +711,9 @@ namespace codeGen
 		if (m_anonymousFloats.size() == m_usageState.floatsInUse) m_anonymousFloats.push_back(m_compiler.newXmmSs());
 
 		return m_anonymousFloats[m_usageState.floatsInUse++];
+		if (m_anonymousFloats.size() > 30)
+			int oueo = 12;
+//		m_anonymousFloats.push_back(m_compiler.newXmmSs());
+//		return m_anonymousFloats.back();
 	}
 }

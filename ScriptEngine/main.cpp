@@ -34,6 +34,13 @@ struct Vec2
 	float y;
 };
 
+struct Vec3
+{
+	float x;
+	float y;
+	float z;
+};
+
 struct iVec2
 {
 	int x;
@@ -117,22 +124,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		for (int i = 0; i < 1000; ++i) sum += scriptEngine.call<int, int, int>(hndlRnd, 15, 0);
 		cout << sum / 1000 << " random" << endl;
 	}
-	
-/*	success = scriptEngine.loadModule("random.nrt");
-	if (success)
-	{
-		NaReTi::FunctionHandle hndlRnd = scriptEngine.getFuncHndl("xorshift");
-		NaReTi::FunctionHandle hndlMod = scriptEngine.getFuncHndl("rand");
-		int num = 3234604;
-		int buf[11];
-		ZeroMemory(&buf, sizeof(int) * 11);
-		for (int i = 0; i < 0xFFFFFF; ++i)
-		{
-			num = scriptEngine.call<int, int>(hndlRnd, num);
-			buf[scriptEngine.call<int, int, int, int>(hndlMod, num, 10, 0)]++;
-		}
-		for (int i = 0; i < 10; ++i) cout << buf[i] << endl;
-	}*/
 
 	char tmp;
 	std::cin >> tmp;

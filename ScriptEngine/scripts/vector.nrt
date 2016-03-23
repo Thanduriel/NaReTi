@@ -1,0 +1,117 @@
+//-------------------------------------------//
+// NaReTi - vector library                   //
+//-------------------------------------------//
+
+/* This library contains 2d and 3d vector types and usefull operations.
+ *
+ */
+ 
+use math
+
+type Vec2
+{
+	float x
+	float y
+}
+
+type Vec3
+{
+	float x
+	float y
+	float z
+}
+
+// basic operations
+
+//+
+
+Vec2 +(Vec2& _l, Vec2& _r)
+{
+	Vec2 res
+	res.x = _l.x + _r.x
+	res.y = _l.y + _r.y
+	
+	return res
+}
+
+Vec3 +(Vec3& _l, Vec3& _r)
+{
+	Vec3 res
+	res.x = _l.x + _r.x
+	res.y = _l.y + _r.y
+	res.z = _l.z + _r.z
+	
+	return res
+}
+
+//-
+
+Vec2 -(Vec2& _l, Vec2& _r)
+{
+	Vec2 res
+	res.x = _l.x - _r.x
+	res.y = _l.y - _r.y
+	
+	return res
+}
+
+Vec3 -(Vec3& _l, Vec3& _r)
+{
+	Vec3 res
+	res.x = _l.x - _r.x
+	res.y = _l.y - _r.y
+	res.z = _l.z - _r.z
+	
+	return res
+}
+
+//scalar *
+Vec2 *(float _scalar, Vec2& _vec)
+{
+	Vec2 res
+	res.x = _vec.x * _scalar
+	res.y = _vec.y * _scalar
+	
+	return res
+}
+
+Vec2 *(Vec2& _vec, float _scalar)
+{
+	Vec2 res
+	res.x = _vec.x * _scalar
+	res.y = _vec.y * _scalar
+	
+	return res
+}
+
+Vec3 *(float _scalar, Vec3& _vec)
+{
+	Vec3 res
+	res.x = _vec.x * _scalar
+	res.y = _vec.y * _scalar
+	res.z = _vec.z * _scalar
+	
+	return res
+}
+
+Vec3 *(Vec3& _vec, float _scalar)
+{
+	Vec3 res
+	res.x = _vec.x * _scalar
+	res.y = _vec.y * _scalar
+	res.z = _vec.z * _scalar
+	
+	return res
+}
+
+//length
+
+float len(Vec2& _vec)
+{
+	return sqrt(_vec.x * _vec.x + _vec.y * _vec.y)
+}
+
+float len(Vec3& _vec)
+{	
+	return sqrt(_vec.x * _vec.x + _vec.y * _vec.y + _vec.z * _vec.z)
+}

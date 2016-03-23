@@ -103,6 +103,13 @@ iVec2 +(iVec2& slf, iVec2& oth)
 	return res
 }
 
+void printVec3(Vec3& _vec)
+{
+	printF(_vec.x)
+	printF(_vec.y)
+	printF(_vec.z)
+}
+
 int test_global()
 {
 	iVec2 stackVec = addiVec(2, 3, 8, 9)
@@ -126,13 +133,10 @@ int test_global()
 	loc.x = 4.0
 	loc.y = 2.0
 	loc.z = 1.0
-	
-//	float l = len(loc)
+
 	printF(len(loc))
-	
-//	loc = loc + (2.9 * loc)
-	
-//	printF(len(loc))
-	
+	loc = loc + 2.0 * loc
+	printF(len(loc))
+		
 	return g_test_vec.y
 }

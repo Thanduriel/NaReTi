@@ -57,6 +57,10 @@ namespace par
 				throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)arg)->name);
 			}
 
+		if (_node.name == "*" && _node.args.size() == 2 && _node.args[0]->typeInfo->type.name == "float" && _node.args[1]->typeInfo->type.name == "Vec3")
+			int uo = 214;
+
+
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
 		if (!func)
 		{
