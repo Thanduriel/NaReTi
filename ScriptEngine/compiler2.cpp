@@ -232,7 +232,7 @@ namespace codeGen
 		Function& func = *_node.function;
 
 		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
-		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_node.args.size() + 1);
+		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(func.scope.m_variables.size() - _node.args.size() + 1);
 
 		UsageState preCallState = getUsageState();
 
@@ -354,7 +354,7 @@ namespace codeGen
 					{
 						
 						allocVar(*func.scope.m_variables[i]);
-						binVarLocations.emplace_back(&func.scope.m_variables[0]->compiledVar);
+						binVarLocations.emplace_back(&func.scope.m_variables[i]->compiledVar);
 					}
 				}
 				m_ignoreRet++;

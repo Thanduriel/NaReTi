@@ -47,6 +47,7 @@ float sqrt(float x)
 
 
 // fast sinus for x in [-π, π]
+//source: http://stackoverflow.com/questions/23837916/a-faster-but-less-accurate-fsin-for-intel-asm
 float sin(float x)
 {
 	float xx = x * x
