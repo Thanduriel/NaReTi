@@ -3,7 +3,7 @@
 namespace codeGen{
 	using namespace par;
 
-	const int InlineTreshhold = 5;
+	const int InlineTreshhold = 6;
 
 	Optimizer::Optimizer()
 	{
@@ -28,6 +28,7 @@ namespace codeGen{
 		}
 
 		m_function = &_func;
+		m_callCount = 0;
 		m_usageStack.clear();
 		m_tempPtrs.clear();
 		traceCode(_func.scope);
@@ -41,7 +42,7 @@ namespace codeGen{
 				break;
 			}
 		}
-		if (_func.scope.size() < InlineTreshhold && isConst)
+		if (m_callCount <= InlineTreshhold && isConst)
 			_func.bInline = true;
 	}
 
@@ -98,6 +99,8 @@ namespace codeGen{
 
 	void Optimizer::traceCall(ASTCall& _node)
 	{
+		m_callCount++;
+
 		int stackLabel = m_usageStack.size();
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{

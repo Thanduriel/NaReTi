@@ -29,5 +29,6 @@ namespace codeGen{
 		std::vector< par::VarSymbol** > m_usageStack; //< all vars 
 		std::vector< par::VarSymbol* > m_tempPtrs;
 		par::Function* m_function;
+		int m_callCount;
 	};
 }
