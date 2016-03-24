@@ -115,3 +115,23 @@ float len(Vec3& _vec)
 {	
 	return sqrt(_vec.x * _vec.x + _vec.y * _vec.y + _vec.z * _vec.z)
 }
+
+//dot product
+float *(Vec2 const& _l, Vec2 const& _r)
+{
+	return _l.x * _r.x + _l.y * _r.y
+}
+
+float *(Vec3 const& _l, Vec3 const& _r)
+{
+	return _l.x * _r.x + _l.y * _r.y + _l.z * _r.z
+}
+
+//cross product
+Vec3 cross(Vec3& _l, Vec3& _r)
+{
+	Vec3 res
+	res.x = _l.y * _r.z - _l.z * _r.y
+	res.y = _l.z * _r.x - _l.x * _r.z
+	res.y = _l.x * _r.y - _l.y * _r.x
+}

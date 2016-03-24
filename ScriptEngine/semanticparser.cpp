@@ -57,10 +57,6 @@ namespace par
 				throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)arg)->name);
 			}
 
-		if (_node.name == "*" && _node.args.size() == 2 && _node.args[0]->typeInfo->type.name == "float" && _node.args[1]->typeInfo->type.name == "Vec3")
-			int uo = 214;
-
-
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
 		if (!func)
 		{
@@ -80,6 +76,10 @@ namespace par
 
 	void SemanticParser::linkMember(ASTMember& _node)
 	{
+		//probably an error that will be thrown in linkCall
+		if (_node.args[0]->type == ASTType::String) 
+			throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)_node.args[0])->name);
+
 		ASTUnlinkedSym* strLeaf = (ASTUnlinkedSym*)_node.args[1];
 		size_t i = 0;
 		// check members of the type on top of the stack

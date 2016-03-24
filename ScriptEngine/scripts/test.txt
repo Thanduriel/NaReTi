@@ -134,9 +134,11 @@ int test_global()
 	loc.y = 2.0
 	loc.z = 1.0
 
+	printF(loc * loc)
+	Vec3 loc2 = loc
+	loc2.y = 7.0
 	printF(len(loc))
 	loc = loc + 2.0 * loc
 	printF(len(loc))
-		
 	return g_test_vec.y
 }
