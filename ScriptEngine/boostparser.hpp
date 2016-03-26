@@ -51,7 +51,7 @@ namespace par
 			
 			//type is optional
 			FuncDeclaration = 
-				(TypeInformation >> (Symbol | Operator) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
+				(TypeInformation >> (Symbol | Operator | qi::string("[]")) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
 				-VarDeclaration >> 
 				*(',' > VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
@@ -79,15 +79,17 @@ namespace par
 				)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
 				;
 
-			//here we have terms...
+			//mathematical terms including brackets"()"; function calls: foo(args); square bracket: a[]
 			Expression = 
 				(((('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand) >
-				-RExpression)) //match with an operator
+				-RExpression))
 				;
 
+			//operator and operand
 			RExpression =
-				(Operator >
+				('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))]
+				| (Operator >
 				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)] >>
 				-RExpression

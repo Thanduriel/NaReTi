@@ -110,6 +110,13 @@ void printVec3(Vec3& _vec)
 	printF(_vec.z)
 }
 
+float [](Vec3& _vec, int _i)
+{
+	if(_i == 0){return _vec.x}
+	else if(_i == 1){return _vec.y}
+	else if(_i == 2){return _vec.z}
+}
+
 int test_global()
 {
 	iVec2 stackVec = addiVec(2, 3, 8, 9)
@@ -134,11 +141,18 @@ int test_global()
 	loc.y = 2.0
 	loc.z = 1.0
 
+	printVec3(loc)
+//	float f = loc[0]
+	printF(loc[0])
+	printF(loc[1])
+	printF(loc[2])
+	
 	printF(loc * loc)
 	Vec3 loc2 = loc
 	loc2.y = 7.0
 	printF(len(loc))
 	loc = loc + 2.0 * loc
 	printF(len(loc))
+	
 	return g_test_vec.y
 }
