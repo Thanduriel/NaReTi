@@ -36,6 +36,8 @@ namespace codeGen
 		{
 			compileHeapVar(*var, _module.getAllocator());
 		}
+		compileModuleInit(_module);
+
 		for (auto& function : _module.m_functions)
 		{
 			compileFuction(*function);
@@ -66,7 +68,25 @@ namespace codeGen
 	{
 		_var.ownership.rawPtr = _allocator.alloc(_var.typeInfo.type.size);
 		_var.ownership.ownerType = OwnershipType::Heap;
-	//	_var.typeInfo.isReference = true;
+		_var.isPtr = true; 
+		_var.typeInfo.isReference = true;  // enforce reference assignment
+	}
+
+	// *************************************************** //
+
+	void Compiler::compileModuleInit(NaReTi::Module& _module)
+	{
+		if (_module.m_text.size() == 0) return;
+
+		m_compiler.addFunc(FuncBuilder0<void>());
+		resetRegisters();
+		compileCode(_module.m_text);
+
+		m_compiler.endFunc();
+		m_compiler.finalize();
+		((NaReTi::basicFunc*)m_assembler.make())();
+		m_assembler.reset(true);
+		m_compiler.attach(&m_assembler);
 	}
 
 	// *************************************************** //
@@ -147,24 +167,13 @@ namespace codeGen
 		//setup signature
 		convertSignature(_function);
 		//externals are not compiled
+		//but still require a signature to be called
 		if (_function.bExternal) return;
 		m_compiler.addFunc(_function.funcBuilder);
 
 
 		//setup registers
-
-		m_anonymousVars.clear();
-		m_anonymousVars.reserve(32); // make sure that no move will occur
-		m_anonymousVars.push_back(m_compiler.newIntPtr("accumulator"));
-		m_accumulator = &m_anonymousVars[0];
-
-		m_anonymousFloats.clear();
-		m_anonymousFloats.reserve(64); //32
-		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
-		m_fp0 = &m_anonymousFloats[0];
-
-		m_usageState.varsInUse = 1;
-		m_usageState.floatsInUse = 1;
+		resetRegisters();
 
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_function.scope.m_variables.size());
 
@@ -181,14 +190,6 @@ namespace codeGen
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
 
-		//imported heap vars
-		for (auto& var : _function.m_importedVars)
-		{
-			X86GpVar& gpVar = getUnusedVar();
-			var->compiledVar = &gpVar;
-			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
-		}
-
 		//code
 		compileCode(_function.scope);
 		
@@ -196,7 +197,7 @@ namespace codeGen
 		m_compiler.endFunc();
 		m_compiler.finalize();
 		_function.binary = m_assembler.make();
-		m_assembler.reset(true);
+		m_assembler.reset(false); // todo: performance/mem test
 		m_compiler.attach(&m_assembler);
 
 	}
@@ -205,6 +206,14 @@ namespace codeGen
 
 	void Compiler::compileCode(ASTCode& _node)
 	{
+		//imported heap vars
+		for (auto& var : _node.m_importedVars)
+		{
+			X86GpVar& gpVar = getUnusedVar();
+			var->compiledVar = &gpVar;
+			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
+		}
+
 		for (auto& subNode : _node)
 		{
 			switch (subNode->type)
@@ -236,11 +245,7 @@ namespace codeGen
 	void Compiler::compileCall(ASTCall& _node)
 	{
 		Function& func = *_node.function;
-
-		if (func.name == "printF")
-		{
-			int uie = 21;
-		}
+		bool indirect = false; // < use indirect addressing operations
 
 		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(func.scope.m_variables.size() - _node.args.size() + 1);
@@ -271,7 +276,7 @@ namespace codeGen
 			{
 			case ASTType::Leaf:
 				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
-				args.emplace_back(compileLeaf(*leaf));
+				args.emplace_back(compileLeaf(*leaf, &indirect));
 				break;
 			case ASTType::String:
 			{
@@ -289,7 +294,7 @@ namespace codeGen
 					X86GpVar& var = getUnusedVar();
 					args.emplace_back(&var);
 					m_compiler.lea(var, getMemberAdr(*(ASTMember*)arg));
-					m_isRefSet = true;
+					indirect = true;
 				}
 				else
 				{
@@ -326,6 +331,7 @@ namespace codeGen
 				}
 				break;
 			}
+			if (arg->typeInfo->isReference) indirect = true;
 			i++;
 		}
 
@@ -333,8 +339,12 @@ namespace codeGen
 		{
 			if (_node.function->bIntrinsic)
 			{
+				if (func.name[0] == '=')
+				{
+					if (indirect) m_isRefSet = true;
+				}
 				// if types do not match, a typecast will move the data
-				if (func.returnTypeInfo.type.basic == func.scope.m_variables[0]->typeInfo.type.basic && !(func.name[0] == '='))
+				else if (func.returnTypeInfo.type.basic == func.scope.m_variables[0]->typeInfo.type.basic)
 				{
 					//since the first operand of a binop is overwritten with the result copy the values first
 					if (func.returnTypeInfo.type.basic == BasicType::Float)
@@ -392,7 +402,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	asmjit::Operand* Compiler::compileLeaf(par::ASTLeaf& _node)
+	asmjit::Operand* Compiler::compileLeaf(par::ASTLeaf& _node, bool* _indirect)
 	{
 		//immediate val
 		if (_node.parType == ParamType::Int)
@@ -410,8 +420,10 @@ namespace codeGen
 		}
 		else if (_node.parType == ParamType::Ptr)
 		{
-			return ((ASTLeaf*)&_node)->ptr->compiledVar;
+			if (_indirect && _node.ptr->isPtr) *_indirect = true;
+			return _node.ptr->compiledVar;
 		}
+		return nullptr;
 	}
 
 	// *************************************************** //
@@ -715,5 +727,23 @@ namespace codeGen
 			int oueo = 12;
 //		m_anonymousFloats.push_back(m_compiler.newXmmSs());
 //		return m_anonymousFloats.back();
+	}
+
+	// *************************************************** //
+
+	void Compiler::resetRegisters()
+	{
+		m_anonymousVars.clear();
+		m_anonymousVars.reserve(32); // make sure that no move will occur
+		m_anonymousVars.push_back(m_compiler.newIntPtr("accumulator"));
+		m_accumulator = &m_anonymousVars[0];
+
+		m_anonymousFloats.clear();
+		m_anonymousFloats.reserve(32); //32
+		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
+		m_fp0 = &m_anonymousFloats[0];
+
+		m_usageState.varsInUse = 1;
+		m_usageState.floatsInUse = 1;
 	}
 }

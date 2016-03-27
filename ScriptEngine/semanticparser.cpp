@@ -125,9 +125,10 @@ namespace par
 
 	void SemanticParser::pushLatestVar()
 	{
-		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(m_currentScope->m_variables.back());
+		pushSymbol(m_currentScope->m_variables.back()->name);
+/*		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(m_currentScope->m_variables.back());
 		leaf->typeInfo = &leaf->ptr->typeInfo;
-		m_stack.push_back(leaf);
+		m_stack.push_back(leaf);*/
 	}
 
 	// ************************************************** //
@@ -203,7 +204,6 @@ namespace par
 		}
 
 		//init environment
-		m_currentFunction->bInline = false;
 		m_targetScope = &m_currentModule->m_functions.back()->scope;
 		m_targetScope->m_parent = m_currentScope;
 		//param dec is outside of the following code scope
@@ -350,8 +350,8 @@ namespace par
 		if (var)
 		{
 			bool isImported = false;
-			for (auto& impVar : m_currentFunction->m_importedVars) if (impVar == var){ isImported = true; break; }
-			if(!isImported) m_currentFunction->m_importedVars.push_back(var);
+			for (auto& impVar : m_currentCode->m_importedVars) if (impVar == var){ isImported = true; break; }
+			if (!isImported) m_currentCode->m_importedVars.push_back(var);
 		}
 		else var = m_currentCode->getVar(_name);
 

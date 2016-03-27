@@ -83,6 +83,9 @@ namespace lang
 		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
 		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof1, InstructionType::fAdd }), BasicType::Float, BasicType::Float, BasicType::Int);
 
+		//global constants
+		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("true", par::TypeInfo(*m_types[BasicType::Int])));
+		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("false", par::TypeInfo(*m_types[BasicType::Int])));
 	/*	m_functions.emplace_back("+", m_types[0], InstructionType::Add);
 		m_functions.emplace_back("-", m_types[0], InstructionType::Sub);
 		m_functions.emplace_back("*", m_types[0], InstructionType::Mul);

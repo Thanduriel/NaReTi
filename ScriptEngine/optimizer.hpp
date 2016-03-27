@@ -24,7 +24,7 @@ namespace codeGen{
 		void traceMember(par::ASTMember& _node);
 		void traceLeaf(par::ASTLeaf& _node);
 
-		//try to substitute _target with _sub in the current frame
+		//try to substitute _target with _sub in the current frame(all previous occurrences)
 		void trySubstitution(par::VarSymbol& _target, par::VarSymbol& _sub);
 		std::vector< par::VarSymbol** > m_usageStack; //< all vars 
 		std::vector< par::VarSymbol* > m_tempPtrs;

@@ -154,5 +154,6 @@ int test_global()
 	loc = loc + 2.0 * loc
 	printF(len(loc))
 	
+//	printF(pi)
 	return g_test_vec.y
 }

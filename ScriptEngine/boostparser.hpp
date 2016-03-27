@@ -29,7 +29,8 @@ namespace par
 			// by default declarations go to the global scope
 			BaseExpression = 
 				*UseStatement >>
-				*((TypeDeclaration | FuncDeclaration | VarDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]) >
+				*((TypeDeclaration | FuncDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
+				| VarDeclaration[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]) >
 				qi::eoi;
 
 			UseStatement =
@@ -49,9 +50,10 @@ namespace par
 				-(lit("=")[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
 				Expression)[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))];
 			
-			//type is optional
+			//func declaration including overloaded operators with keywords
 			FuncDeclaration = 
-				(TypeInformation >> (Symbol | Operator | qi::string("[]")) >> '(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
+				(TypeInformation >> (Symbol | Operator | qi::string("[]")) >> 
+				'(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
 				-VarDeclaration >> 
 				*(',' > VarDeclaration) >> 
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>

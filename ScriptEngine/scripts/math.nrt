@@ -6,6 +6,8 @@
  * With optimization level Basic or higher some functions are overwritten
  */
 
+float pi = 3.14159265
+ 
 int pow(int x, int y)
 {
 	if(y < 0)
@@ -33,6 +35,8 @@ int pow(int x, int y)
 	return x * z
 }
 
+// simple and slow, but with decent precision
+//see https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method
 float sqrt(float x)
 {
 	float n = x / 2.0

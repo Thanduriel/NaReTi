@@ -2,6 +2,7 @@
 
 #include "module.hpp"
 #include <asmjit.h>
+#include "enginetypes.hpp"
 
 namespace codeGen
 {
@@ -23,6 +24,9 @@ namespace codeGen
 		// allocates heap space for a local var and stores the address in _var
 		void compileHeapVar(par::VarSymbol& _var, utils::StackAlloc& _allocator);
 
+		// compiles and calls the module init function that contains assignments for global vars
+		void compileModuleInit(NaReTi::Module& _module);
+
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function);
 		void allocVar(par::VarSymbol& _sym, bool _isParam = false);
@@ -31,7 +35,7 @@ namespace codeGen
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
 		void compileCall(par::ASTCall& _node);
-		asmjit::Operand* compileLeaf(par::ASTLeaf& _node);
+		asmjit::Operand* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
@@ -53,10 +57,12 @@ namespace codeGen
 		// returns a virtual register currently not in use
 		asmjit::X86GpVar& getUnusedVar(bool _make32 = false); //param: should the given var be of 32 bit size
 		asmjit::X86XmmVar& getUnusedFloat();
+		void resetRegisters();
 
 
 
 		asmjit::JitRuntime m_runtime;
+		asmjit::JitRuntime m_tempRuntime; // runtime for single use functions (module inits)
 		asmjit::X86Assembler m_assembler;
 		asmjit::X86Compiler m_compiler;
 
