@@ -1,4 +1,4 @@
-//general language features
+﻿//general language features
 
 //-------------------------------
 // 1. TYPES
@@ -117,19 +117,37 @@ struct(member access): .
 // 6. includes
 //-------------------------------
 := use <filename>
-// A use clausal will make all symbols known declared in the specified package.
+// A use clausal will make all symbols known that are declared in the specified package.
 // It does not work recursive.
 
 //-------------------------------
-// 7. standard library ?or some way for dynamic arrays...
+// 7. arrays
 //-------------------------------
 <array declaration>:= <var declaration>[]
 // An array supports index based access, is cash efficient and can be changed in size.
-/// If an array size is not changed after its initialisation it may be intern reduced to a c-array.
+/// If an array size is not changed after its initialisation it may be reduced internly to a c-array.
 
 // 5.1 Array operations
+"+=" Append the right array to the left one. Both are left working.
+"+" Returns a new array containing both given arrays. The arguments remain unchanged.
 // These member functions are provided operating with iterators on single elements or ranges.
 // insert
 // clear
 // size
 // remove
+
+//-------------------------------
+// 8. standard library
+//-------------------------------
+// A collection of generally usefull tools and functions is provided with the compiler.
+
+// 8.1 math
+// Implements basic math functions like sin, pow, sqrt and constants: π,e.
+
+// 8.2 vector
+// Definitions for 2d and 3d vectors aswell as basic operations and matrix rotations.
+
+// 8.3 random
+// Simple pseudo random number generation.
+
+

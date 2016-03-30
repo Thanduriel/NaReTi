@@ -177,6 +177,7 @@
     <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86inst.h" />
     <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86operand.h" />
     <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86scheduler_p.h" />
+    <ClInclude Include="array.hpp" />
     <ClInclude Include="ast.hpp" />
     <ClInclude Include="atomics.hpp" />
     <ClInclude Include="attributecasts.hpp" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86operand.cpp" />
     <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86operand_regs.cpp" />
     <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86scheduler.cpp" />
+    <ClCompile Include="array.cpp" />
     <ClCompile Include="atomics.cpp" />
     <ClCompile Include="compiler2.cpp" />
     <ClCompile Include="main.cpp" />

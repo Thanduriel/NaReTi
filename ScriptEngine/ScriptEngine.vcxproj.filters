@@ -207,6 +207,9 @@
     <ClInclude Include="ptr_stuff.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="array.hpp">
+      <Filter>lang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="optimizer.cpp">
       <Filter>compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="array.cpp">
+      <Filter>lang</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

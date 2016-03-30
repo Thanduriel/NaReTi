@@ -18,8 +18,7 @@ namespace codeGen
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
 		m_compiler(&m_assembler),
-		m_isRefSet(false),
-		m_ignoreRet(0)
+		m_isRefSet(false)
 	{
 		m_labelStack.reserve(64); // prevent moving
 	}
@@ -84,9 +83,11 @@ namespace codeGen
 
 		m_compiler.endFunc();
 		m_compiler.finalize();
-		((NaReTi::basicFunc*)m_assembler.make())();
+		void* ptr = m_assembler.make();
+		((NaReTi::basicFunc*)ptr)();
 		m_assembler.reset(true);
 		m_compiler.attach(&m_assembler);
+		m_runtime.release(ptr); // this function wont be needed anymore
 	}
 
 	// *************************************************** //
@@ -242,7 +243,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::compileCall(ASTCall& _node)
+	void Compiler::compileCall(ASTCall& _node, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
 		bool indirect = false; // < use indirect addressing operations
@@ -251,6 +252,18 @@ namespace codeGen
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(func.scope.m_variables.size() - _node.args.size() + 1);
 
 		UsageState preCallState = getUsageState();
+
+		if (!_dest)
+		{
+			if (func.returnTypeInfo.type.basic == BasicType::Float)
+			{
+				_dest = m_fp0;
+			}
+			else
+			{
+				_dest = m_accumulator;
+			}
+		}
 
 		if (func.bHiddenParam)
 		{
@@ -319,15 +332,15 @@ namespace codeGen
 				{
 					X86XmmVar& var = getUnusedFloat();
 					args.emplace_back(&var);
-					compileCall(*astCall);
-					m_compiler.movss(var, *m_fp0);
+					compileCall(*astCall, &var);
+				//	m_compiler.movss(var, *m_fp0);
 				}
 				else
 				{
 					X86GpVar& var = getUnusedVar();
 					args.emplace_back(&var);
-					compileCall(*astCall);
-					m_compiler.mov(var, *m_accumulator);
+					compileCall(*astCall, &var);
+				//	m_compiler.mov(var, *m_accumulator);
 				}
 				break;
 			}
@@ -349,14 +362,13 @@ namespace codeGen
 					//since the first operand of a binop is overwritten with the result copy the values first
 					if (func.returnTypeInfo.type.basic == BasicType::Float)
 					{
-						m_compiler.movss(*m_fp0, *(X86XmmVar*)args[0]);
-						args[0] = m_fp0;
+						m_compiler.movss(*(X86XmmVar*)_dest, *(X86XmmVar*)args[0]);
 					}
 					else
 					{
-						m_compiler.mov(*m_accumulator, *(asmjit::X86GpVar*)args[0]);
-						args[0] = m_accumulator;
+						m_compiler.mov(*(X86GpVar*)_dest, *(X86GpVar*)args[0]);
 					}
+					args[0] = _dest;
 				}
 
 				for (auto& node : _node.function->scope)
@@ -378,9 +390,9 @@ namespace codeGen
 						binVarLocations.emplace_back(&func.scope.m_variables[i]->compiledVar);
 					}
 				}
-				m_ignoreRet++;
+				m_retDstStack.push_back(_dest);
 				compileCode(_node.function->scope);
-				m_ignoreRet--;
+				m_retDstStack.pop_back();
 			}
 
 			//the result is already in ax or fp0
@@ -391,10 +403,7 @@ namespace codeGen
 			X86CallNode* call = m_compiler.call(*m_accumulator, func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[i]);
-			if (func.returnTypeInfo.type.basic == BasicType::Float)
-				call->setRet(0, *m_fp0);
-			else if (func.returnTypeInfo.type.basic != BasicType::Void)
-				call->setRet(0, *m_accumulator);
+			call->setRet(0, *_dest);
 		}
 
 		setUsageState(preCallState);
@@ -530,7 +539,7 @@ namespace codeGen
 		asmjit::X86GpVar* var;
 		if (_node.body->type == ASTType::Call)
 		{
-			compileCall(*(ASTCall*)_node.body);
+			compileCall(*(ASTCall*)_node.body, m_accumulator);
 			var = m_accumulator;
 		}
 		else if (_node.body->type == ASTType::Member)
@@ -553,9 +562,9 @@ namespace codeGen
 			var = &dest;
 		}
 
-		if (m_ignoreRet)
+		if (m_retDstStack.size())
 		{
-			if (var != m_accumulator) m_compiler.mov(*m_accumulator, *var);
+			if (var != m_retDstStack.back()) m_compiler.mov(*(X86GpVar*)m_retDstStack.back(), *var);
 		}
 		else
 			m_compiler.ret(*var);
@@ -582,9 +591,9 @@ namespace codeGen
 			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
 
-		if (m_ignoreRet)
+		if (m_retDstStack.size())
 		{
-			if (var != m_fp0) m_compiler.movss(*m_fp0, *var);
+			if (var != m_retDstStack.back()) m_compiler.movss(*(X86XmmVar*)m_retDstStack.back(), *var);
 		}
 		else
 			m_compiler.ret(*var);

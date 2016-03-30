@@ -34,7 +34,7 @@ namespace codeGen
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
-		void compileCall(par::ASTCall& _node);
+		void compileCall(par::ASTCall& _node, asmjit::Var* _dest = nullptr);
 		asmjit::Operand* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
 		void compileRet(par::ASTReturn& _node);
@@ -78,7 +78,7 @@ namespace codeGen
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
 		bool m_isRefSet; //flag: lvalue is a reference 
-		int m_ignoreRet; // currently in lining a call -> ignore return
+		std::vector< asmjit::Var* > m_retDstStack; // return destinations
 		// implemented as a pseudo stack to allow recursive inlining
 	};
 }
