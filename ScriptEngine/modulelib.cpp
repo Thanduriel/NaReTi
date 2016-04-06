@@ -17,11 +17,12 @@ namespace par
 
 	par::Function* ModuleLibrary::getFunction(const std::string& _name,
 		const std::vector<par::ASTExpNode*>::iterator& _begin,
-		const std::vector<par::ASTExpNode*>::iterator& _end)
+		const std::vector<par::ASTExpNode*>::iterator& _end,
+		std::vector<NaReTi::Module::FuncMatch>& _funcQuery)
 	{
 		for (auto& module : m_modules)
 		{
-			Function* func = module->getFunction(_name, _begin, _end);
+			Function* func = module->getFunction(_name, _begin, _end, _funcQuery);
 			if (func) return func;
 		}
 		return nullptr;

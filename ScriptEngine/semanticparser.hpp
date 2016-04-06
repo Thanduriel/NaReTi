@@ -72,11 +72,19 @@ namespace par
 		void linkCall(ASTCall& _node);
 		void linkMember(ASTMember& _node);
 
+		/* tries to add typecasts to the args to make them match the given function.
+		 * This will not perform any changes to the tree if it is unsuccessful.
+		 * @return success
+		 */
+		bool tryArgCasts(ASTCall& _node, Function& _func);
+
 		TypeInfo buildTypeInfo();
 
 		std::vector < ASTExpNode* > m_stack;
 		TypeInfo m_typeInfo;
 		std::string m_typeName;
+
+		std::vector<NaReTi::Module::FuncMatch> m_funcQuery;
 
 		NaReTi::Module* m_currentModule; // the module that is currently parsed to
 		par::Function* m_currentFunction; // currently parsed function

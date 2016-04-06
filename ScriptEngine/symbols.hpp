@@ -64,14 +64,13 @@ namespace par{
 		bool isReference;
 		bool isConst;
 
+		//
+
+		bool operator!= (TypeInfo& oth);
+
 		bool operator== (TypeInfo& oth)
 		{
-			return (&type == &oth.type && isReference == oth.isReference && isConst == oth.isConst);
-		}
-
-		bool operator!= (TypeInfo& oth)
-		{
-			return !(*this == oth);
+			return !(*this != oth);
 		}
 	};
 
@@ -124,7 +123,7 @@ namespace par{
 		CodeScope scope;
 
 		// available casts for this type
-		std::vector< Function* > m_typeCasts;
+		std::vector< Function* > typeCasts;
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;

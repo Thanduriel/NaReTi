@@ -65,6 +65,9 @@ namespace par{
 		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
 		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
+		
+		//typecast
+		Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, ComplexType& _t0, ComplexType& _t1);
 		Function(const std::string& _name, TypeInfo& _type) : Symbol(_name), returnTypeInfo(_type), bExternal(false), bHiddenParam(false), bInline(false), bIntrinsic(false){};
 
 		TypeInfo returnTypeInfo;
@@ -75,6 +78,14 @@ namespace par{
 		bool bIntrinsic; // is constructed from instructions
 		bool bExternal;
 		bool bHiddenParam; // has a hidden first parameter
+
+		enum IntrinsicType
+		{
+			Assignment,
+			BinOp,
+			Compare,
+			TypeCast
+		} intrinsicType;
 	};
 
 	struct ASTBranch : public ASTNode

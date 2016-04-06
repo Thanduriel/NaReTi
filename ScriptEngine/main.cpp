@@ -60,6 +60,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	NaReTi::FunctionHandle hndl(foo);
 	cout << (scriptEngine.call<int, int>(hndl, 5) == 7) << endl;
 
+	//link externals
 	NaReTi::Module* externals = scriptEngine.getModule("externals.nrt");
 	externals->linkExternal("printI", &printI);
 	externals->linkExternal("printF", &printF);

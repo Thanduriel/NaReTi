@@ -24,7 +24,8 @@ namespace par
 		ComplexType* getType(const std::string& _str);
 		par::Function* getFunction(const std::string& _name,
 			const std::vector<par::ASTExpNode*>::iterator& _begin,
-			const std::vector<par::ASTExpNode*>::iterator& _end);
+			const std::vector<par::ASTExpNode*>::iterator& _end,
+			std::vector<NaReTi::Module::FuncMatch>& _funcQuery);
 		VarSymbol* getGlobalVar(const std::string& _name);
 
 	private:

@@ -1,9 +1,10 @@
 #include "atomics.hpp"
 #include "symbols.hpp"
 
-#define BASICASSIGN(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, *m_types[ T ], Instr)); m_functions.back()->scope.m_variables[0]->typeInfo.isConst = false;
+#define BASICASSIGN(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, *m_types[ T ], Instr)); m_functions.back()->scope.m_variables[0]->typeInfo.isConst = false; m_functions.back()->intrinsicType = Function::Assignment;
 #define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
 #define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
+#define BASICCAST(Instr, T0, T1) m_types[ T0 ]->typeCasts.emplace_back(new Function( m_allocator, "", Instr, *m_types[ T1 ], *m_types[ T0 ]));
 
 namespace lang
 {
@@ -80,24 +81,17 @@ namespace lang
 		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ fCmp, JE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
 
 		//float x int
-		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
-		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof1, InstructionType::fAdd }), BasicType::Float, BasicType::Float, BasicType::Int);
+//		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
+//		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof1, InstructionType::fAdd }), BasicType::Float, BasicType::Float, BasicType::Int);
 
-		//global constants
+		//typecasts
+		BASICCAST(InstructionType::iTof, BasicType::Int, BasicType::Float);
+//		BASICCAST(InstructionType::fToi, BasicType::Float, BasicType::Int);
+
+
+		//global constants todo: make them useful
 		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("true", par::TypeInfo(*m_types[BasicType::Int])));
 		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("false", par::TypeInfo(*m_types[BasicType::Int])));
-	/*	m_functions.emplace_back("+", m_types[0], InstructionType::Add);
-		m_functions.emplace_back("-", m_types[0], InstructionType::Sub);
-		m_functions.emplace_back("*", m_types[0], InstructionType::Mul);
-		m_functions.emplace_back("/", m_types[0], InstructionType::Div);
-		//assignment
-		m_functions.emplace_back("=", m_types[0], InstructionType::Set);
-
-		//float --------------------------------------------------------
-		m_functions.emplace_back("+", m_types[1], InstructionType::fAdd);
-		m_functions.emplace_back("-", m_types[1], InstructionType::fSub);
-		m_functions.emplace_back("*", m_types[1], InstructionType::fMul);
-		m_functions.emplace_back("/", m_types[1], InstructionType::fDiv);*/
 	}
 
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)

@@ -44,8 +44,7 @@ namespace par
 		Push, // push anything on the virtual stack
 		Scope, // a new scope "{}" inside the current one
 		// type casts and which argument to take
-		iTof0,
-		iTof1,
+		iTof,
 		fToi
 	};
 

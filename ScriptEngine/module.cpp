@@ -16,7 +16,8 @@ namespace NaReTi
 
 	par::Function* Module::getFunction(const std::string& _name,
 		const std::vector<par::ASTExpNode*>::iterator& _begin,
-		const std::vector<par::ASTExpNode*>::iterator& _end)
+		const std::vector<par::ASTExpNode*>::iterator& _end,
+		std::vector<FuncMatch>& _funcQuery)
 	{
 		for (auto& func : m_functions)
 		{
@@ -27,7 +28,8 @@ namespace NaReTi
 			auto dist = std::distance(_begin, _end);
 			if (dist != func->paramCount-i) continue;
 
-			bool paramsMatch = true;
+			_funcQuery.emplace_back(*func);
+			FuncMatch& match = _funcQuery.back();
 			auto begin = _begin;
 			// hidden param is not part of the signature
 			for (; i < func->paramCount; ++i)
@@ -37,16 +39,12 @@ namespace NaReTi
 				//type does not match
 				//reference or value does not match
 				// complex types are always by reference and the distinction only matters for the caller
-				if (&found->typeInfo->type != &func->scope.m_variables[i]->typeInfo.type
-					|| !(found->typeInfo->type.basic == BasicType::Complex
-					|| found->typeInfo->isReference == func->scope.m_variables[i]->typeInfo.isReference)
-					|| (found->typeInfo->isConst && !func->scope.m_variables[i]->typeInfo.isConst))
+				if (*found->typeInfo  != func->scope.m_variables[i]->typeInfo)
 				{
-					paramsMatch = false;
-					break;
+					match.diff++;
 				}
 			}
-			if (paramsMatch) return func.get();
+			if (!match.diff) return func.get();
 		}
 		return nullptr;
 	}

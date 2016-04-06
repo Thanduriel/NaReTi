@@ -352,13 +352,12 @@ namespace codeGen
 		{
 			if (_node.function->bIntrinsic)
 			{
-				if (func.name[0] == '=')
+				switch (_node.function->intrinsicType)
 				{
+				case Function::Assignment:
 					if (indirect) m_isRefSet = true;
-				}
-				// if types do not match, a typecast will move the data
-				else if (func.returnTypeInfo.type.basic == func.scope.m_variables[0]->typeInfo.type.basic)
-				{
+					break;
+				case Function::BinOp:
 					//since the first operand of a binop is overwritten with the result copy the values first
 					if (func.returnTypeInfo.type.basic == BasicType::Float)
 					{
@@ -369,6 +368,10 @@ namespace codeGen
 						m_compiler.mov(*(X86GpVar*)_dest, *(X86GpVar*)args[0]);
 					}
 					args[0] = _dest;
+					break;
+				case Function::TypeCast:
+					args.push_back(_dest);
+					break;
 				}
 
 				for (auto& node : _node.function->scope)
@@ -524,10 +527,8 @@ namespace codeGen
 		case fDiv:
 			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
-		case InstructionType::iTof0:
-			X86XmmVar& var = *m_fp0;
-			m_compiler.cvtsi2ss(var, *(X86GpVar*)_args[0]);
-			_args[0] = &var;
+		case InstructionType::iTof:
+			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
 			break;
 		}
 	}

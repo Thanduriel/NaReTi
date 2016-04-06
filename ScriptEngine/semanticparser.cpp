@@ -57,22 +57,40 @@ namespace par
 				throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)arg)->name);
 			}
 
-		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end());
+		m_funcQuery.clear();
+		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end(), m_funcQuery);
 		if (!func)
 		{
-			//construct a fancy error message
-			string args;
-			for (auto& arg : _node.args)
+			bool match = false;
+			//try the match with the fewest differences first
+			std::sort(m_funcQuery.begin(), m_funcQuery.end());
+			for (auto& funcMatch : m_funcQuery)
 			{
-				args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "") + (arg->typeInfo->isReference ? "&" : "") + ',';
+				if (tryArgCasts(_node, *funcMatch.function))
+				{
+					func = funcMatch.function;
+					match = true;
+					break;
+				}
 			}
-			args.resize(args.size() - 1); //remove final comma
-			throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
+			// no match possible
+			if (!match)
+			{
+				//construct a fancy error message
+				string args;
+				for (auto& arg : _node.args)
+				{
+					args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "") + (arg->typeInfo->isReference ? "&" : "") + ',';
+				}
+				args.resize(args.size() - 1); //remove final comma
+				throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
+			}
 		}
-
 		_node.function = func;
 		_node.typeInfo = &func->returnTypeInfo;
 	}
+
+	// ************************************************** //
 
 	void SemanticParser::linkMember(ASTMember& _node)
 	{
@@ -96,6 +114,45 @@ namespace par
 		}
 
 		throw ParsingError(_node.args[0]->typeInfo->type.name + " has no member called \"" + strLeaf->name + "\"");
+	}
+
+	// ************************************************** //
+
+	bool SemanticParser::tryArgCasts(ASTCall& _node, Function& _func)
+	{
+		std::vector<Function*> casts; casts.resize(_node.args.size());
+		ZeroMemory(&casts[0], sizeof(Function*) * casts.size());
+
+		for (int i = 0; i < (int)_node.args.size(); ++i)
+		{
+			TypeInfo& t0 = *_node.args[i]->typeInfo;
+			TypeInfo& t1 = _func.scope.m_variables[i]->typeInfo;
+			if (t0 == t1) continue;
+
+			for (auto& cast : t0.type.typeCasts)
+			{
+				if (cast->returnTypeInfo == t1)
+				{
+					casts[i] = cast;
+					break;
+				}
+			}
+			if (!casts[i]) return false;
+		}
+
+		//put casts into the tree
+		for (int i = 0; i < (int)_node.args.size(); ++i)
+		{
+			if (!casts[i]) continue;
+
+			ASTCall& call = *m_allocator->construct<ASTCall>();
+			call.function = casts[i];
+			call.args.push_back(_node.args[i]);
+			call.typeInfo = &casts[i]->returnTypeInfo;
+			_node.args[i] = &call;
+		}
+
+		return true;
 	}
 
 	// ************************************************** //
@@ -182,7 +239,7 @@ namespace par
 			call.args.push_back(&memberOth);
 			call.name = "=";
 			call.typeInfo = &func.returnTypeInfo;
-			call.function = m_moduleLib.getFunction(call.name, call.args.begin(), call.args.end());
+			call.function = m_moduleLib.getFunction(call.name, call.args.begin(), call.args.end(), m_funcQuery);
 			func.scope.push_back(&call);
 		}
 	}

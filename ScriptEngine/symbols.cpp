@@ -6,6 +6,7 @@ namespace par{
 	{
 		bInline = true;
 		bIntrinsic = true;
+		intrinsicType = Function::BinOp;
 		paramCount = 2;
 
 		//args
@@ -21,6 +22,7 @@ namespace par{
 	{
 		bInline = true;
 		bIntrinsic = true;
+		intrinsicType = _t0.basic == BasicType::FlagBool ? Function::Compare : Function::BinOp;
 		paramCount = 2;
 
 		//args
@@ -33,4 +35,26 @@ namespace par{
 		for (auto instr : _instr)
 			scope.emplace_back(_alloc.construct<ASTOp>(instr));
 	};
+
+	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, ComplexType& _t0, ComplexType& _t1)
+		: Function(_name, TypeInfo(_t0, false, false))
+	{
+		bInline = true;
+		bIntrinsic = true;
+		intrinsicType = Function::TypeCast;
+		paramCount = 1;
+
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("0", TypeInfo(_t1, false, true)));
+		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
+	}
+
+	// ************************************************ //
+	
+	bool TypeInfo::operator!= (TypeInfo& oth)
+	{
+		return &type != &oth.type
+			|| !(type.basic == BasicType::Complex
+			|| isReference == oth.isReference)
+			|| (isConst && !oth.isConst);
+	}
 }

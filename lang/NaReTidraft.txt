@@ -6,10 +6,7 @@
 
 // 1.1 atomic types
 // These are always keywords.
-<type> := {int, float, string, bool, uint,}
-//Mind that the last element is void, meaning that a function declaration can be declared 
-//without naming a return type.
-Vec2? // not really because those probably should be bound to native code structures
+<type> := {int, float, string, bool, uint, void}
 
 // 1.2 custom types
 // Can be defined and afterwards used just like atomic types.
@@ -46,7 +43,13 @@ Left sides of assignments can not be casted.
 <reference declaration> := <type>& <name>
 // Ownership depends on the binding. It can generally be seen as shared ownership.
 // Thus a handle is always valid.
-// A reference can be rebound, working as if it would go out of scope.
+// A reference can be used just like a handle with the differences beeing that
+// a) no new object will be allocated
+// b) the two following special operators are provided.
+":="
+// Rebinds the left-operand reference to point to the object specified by the right operand.
+"=:="
+// Compares the addresses on both side for equality.
 /// Optimization should take care of references that lay within the scope of another.
 
 <var declaration> := <handle declaration> | <reference declaration> = <rvalue>
