@@ -86,7 +86,7 @@ namespace lang
 
 		//typecasts
 		BASICCAST(InstructionType::iTof, BasicType::Int, BasicType::Float);
-//		BASICCAST(InstructionType::fToi, BasicType::Float, BasicType::Int);
+		BASICCAST(InstructionType::fToi, BasicType::Float, BasicType::Int);
 
 
 		//global constants todo: make them useful

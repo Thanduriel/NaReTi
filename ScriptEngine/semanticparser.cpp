@@ -94,7 +94,7 @@ namespace par
 
 	void SemanticParser::linkMember(ASTMember& _node)
 	{
-		//probably an error that will be thrown in linkCall
+		//same error as in linkCall
 		if (_node.args[0]->type == ASTType::String) 
 			throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)_node.args[0])->name);
 
@@ -121,7 +121,7 @@ namespace par
 	bool SemanticParser::tryArgCasts(ASTCall& _node, Function& _func)
 	{
 		std::vector<Function*> casts; casts.resize(_node.args.size());
-		ZeroMemory(&casts[0], sizeof(Function*) * casts.size());
+		ZeroMemory(&casts[0], sizeof(Function*) * casts.size()); //make sure to only have nullptr; maybe not std conform
 
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{

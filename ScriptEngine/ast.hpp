@@ -130,8 +130,6 @@ namespace par{
 	{
 		ASTOp(InstructionType _instr) : instruction(_instr) { type = ASTType::BinOp; }
 		InstructionType instruction;
-
-//		Type* returnType; //setting the type is not mandatory in inlined functions
 	};
 
 	struct ASTMember : public ASTCall
