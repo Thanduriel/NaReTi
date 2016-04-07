@@ -15,7 +15,7 @@ namespace lang
 		int getPrecedence(const std::string& _op);
 
 	private:
-		std::array< std::pair< std::string, int >, 19> m_precedence;
+		std::array< std::pair< std::string, int >, 22> m_precedence;
 	};
 	extern BasicModule g_module;
 }

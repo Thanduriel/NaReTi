@@ -22,6 +22,7 @@ namespace par{
 	{
 		bInline = true;
 		bIntrinsic = true;
+		//FlagBool should only be returned by comparison
 		intrinsicType = _t0.basic == BasicType::FlagBool ? Function::Compare : Function::BinOp;
 		paramCount = 2;
 
@@ -52,6 +53,7 @@ namespace par{
 	
 	bool TypeInfo::operator!= (TypeInfo& oth)
 	{
+		// complex types are always by reference and the distinction only matters for the caller
 		return &type != &oth.type
 			|| !(type.basic == BasicType::Complex
 			|| isReference == oth.isReference)

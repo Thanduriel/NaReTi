@@ -27,6 +27,9 @@ namespace lang
 			pair<string, int>("<<", 7),
 			pair<string, int>(">>", 7),
 			pair<string, int>("<", 8),
+			pair<string, int>(">", 8),
+			pair<string, int>("<=", 8),
+			pair<string, int>(">=", 8),
 			pair<string, int>("==", 9),
 			pair<string, int>("!=", 9),
 			pair<string, int>("&", 10),
@@ -67,8 +70,11 @@ namespace lang
 		BASICOPERATION("|", BasicType::Int, InstructionType::Or);
 		//comparison
 		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ Cmp, JE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ Cmp, JNA }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ Cmp, JNG }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT(">=", (std::initializer_list<InstructionType>{ Cmp, JL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT("<=", (std::initializer_list<InstructionType>{ Cmp, JG }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
 
 		//float -------------------------------------------------------
 		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);
@@ -78,11 +84,13 @@ namespace lang
 		BASICASSIGN("=", BasicType::Float, InstructionType::fSet);
 
 		//comparison
+		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ fCmp, JNE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
 		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ fCmp, JE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
+		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ fCmp, JNB }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
+		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ fCmp, JNA }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
+		BASICOPERATIONEXT(">=", (std::initializer_list<InstructionType>{ fCmp, JB }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
+		BASICOPERATIONEXT("<=", (std::initializer_list<InstructionType>{ fCmp, JA }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
 
-		//float x int
-//		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof0, InstructionType::fAdd }), BasicType::Float, BasicType::Int, BasicType::Float);
-//		BASICOPERATIONEXT("+", (std::initializer_list<InstructionType>{ InstructionType::iTof1, InstructionType::fAdd }), BasicType::Float, BasicType::Float, BasicType::Int);
 
 		//typecasts
 		BASICCAST(InstructionType::iTof, BasicType::Int, BasicType::Float);

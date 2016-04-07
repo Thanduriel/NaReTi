@@ -37,12 +37,15 @@ namespace par
 		JE,
 		JNE,
 		JNL,
+		JL,
+		JNB,
+		JB,
+		JNG,
+		JG,
 		JNA,
+		JA,
 		Ret,
-		RetA, // return the accumulator; takes no param
-		Call, // call subroutine; is inlined when the flag is set
-		Push, // push anything on the virtual stack
-		Scope, // a new scope "{}" inside the current one
+		Call, // call subroutine
 		// type casts and which argument to take
 		iTof,
 		fToi

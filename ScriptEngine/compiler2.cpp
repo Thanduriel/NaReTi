@@ -512,8 +512,27 @@ namespace codeGen
 		case JNL:
 			m_compiler.jnl(m_labelStack.back());
 			break;
+		case JL:
+			m_compiler.jl(m_labelStack.back());
+			break;
+		case JNG:
+			m_compiler.jng(m_labelStack.back());
+			break;
+		case JG:
+			m_compiler.jg(m_labelStack.back());
+			break;
+		case JNB:
+			m_compiler.jnb(m_labelStack.back());
+			break;
+		case JB:
+			m_compiler.jb(m_labelStack.back());
+			break;
 		case JNA:
 			m_compiler.jna(m_labelStack.back());
+			break;
+		case JA:
+			m_compiler.ja(m_labelStack.back());
+			break;
 		//float instructions
 		case InstructionType::fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);

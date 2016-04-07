@@ -37,14 +37,12 @@ namespace NaReTi
 				par::ASTExpNode* found = *(begin++);
 
 				//type does not match
-				//reference or value does not match
-				// complex types are always by reference and the distinction only matters for the caller
 				if (*found->typeInfo  != func->scope.m_variables[i]->typeInfo)
 				{
 					//casts with data loss are of smaller priority
 					if ((*found->typeInfo).type.basic == BasicType::Float && func->scope.m_variables[i]->typeInfo.type.basic == BasicType::Int) 
 						match.diff++;
-					match.diff += 2;
+					match.diff += 64; // leave enough space
 				}
 			}
 			if (!match.diff) return func.get();
