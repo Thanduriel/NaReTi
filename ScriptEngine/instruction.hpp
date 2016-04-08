@@ -29,8 +29,9 @@ namespace par
 		//assign
 		Set, 
 		fSet,
-		SetRef,
-		fSetRef,
+		//load value from adr
+		Ld,
+		fLd,
 		//comparisation
 		fCmp,
 		Cmp,

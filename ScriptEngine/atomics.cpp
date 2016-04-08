@@ -4,12 +4,14 @@
 #define BASICASSIGN(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, *m_types[ T ], Instr)); m_functions.back()->scope.m_variables[0]->typeInfo.isConst = false; m_functions.back()->intrinsicType = Function::Assignment;
 #define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
 #define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
-#define BASICCAST(Instr, T0, T1) m_types[ T0 ]->typeCasts.emplace_back(new Function( m_allocator, "", Instr, *m_types[ T1 ], *m_types[ T0 ]));
+#define BASICCAST(Instr, T0, T1) T0.type.typeCasts.emplace_back(new Function( m_allocator, "", Instr, T1, T0));
 
 namespace lang
 {
 	using namespace par;
 	using namespace std;
+
+	typedef std::initializer_list<InstructionType> InstrList;
 
 	BasicModule g_module;
 
@@ -63,38 +65,45 @@ namespace lang
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
+		//assignment to address is currently decided by the compiler
+		// this is only to make sure that no typecast is necessary
+		//todo: better concept for ref assign
+		BASICASSIGN("=", BasicType::Int, InstructionType::Set); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true;
 		BASICOPERATION("<<", BasicType::Int, InstructionType::ShL);
 		BASICOPERATION(">>", BasicType::Int, InstructionType::ShR);
 		BASICOPERATION("&", BasicType::Int, InstructionType::And);
 		BASICOPERATION("^", BasicType::Int, InstructionType::Xor);
 		BASICOPERATION("|", BasicType::Int, InstructionType::Or);
 		//comparison
-		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ Cmp, JNE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ Cmp, JE }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ Cmp, JNL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ Cmp, JNG }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT(">=", (std::initializer_list<InstructionType>{ Cmp, JL }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
-		BASICOPERATIONEXT("<=", (std::initializer_list<InstructionType>{ Cmp, JG }), BasicType::FlagBool, BasicType::Int, BasicType::Int);
+		BASICOPERATIONEXT("==", (InstrList{ Cmp, JNE }), FlagBool, Int, Int);
+		BASICOPERATIONEXT("!=", (InstrList{ Cmp, JE }), FlagBool, Int, Int);
+		BASICOPERATIONEXT("<", (InstrList{ Cmp, JNL }), FlagBool, Int, Int);
+		BASICOPERATIONEXT(">", (InstrList{ Cmp, JNG }), FlagBool, Int, Int);
+		BASICOPERATIONEXT(">=", (InstrList{ Cmp, JL }), FlagBool, Int, Int);
+		BASICOPERATIONEXT("<=", (InstrList{ Cmp, JG }), FlagBool, Int, Int);
 
 		//float -------------------------------------------------------
-		BASICOPERATION("+", BasicType::Float, InstructionType::fAdd);
-		BASICOPERATION("-", BasicType::Float, InstructionType::fSub);
-		BASICOPERATION("*", BasicType::Float, InstructionType::fMul);
-		BASICOPERATION("/", BasicType::Float, InstructionType::fDiv);
-		BASICASSIGN("=", BasicType::Float, InstructionType::fSet);
+		BASICOPERATION("+", Float, InstructionType::fAdd);
+		BASICOPERATION("-", Float, InstructionType::fSub);
+		BASICOPERATION("*", Float, InstructionType::fMul);
+		BASICOPERATION("/", Float, InstructionType::fDiv);
+		BASICASSIGN("=", Float, InstructionType::fSet);
+		BASICASSIGN("=", Float, InstructionType::fSet); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true;
 
 		//comparison
-		BASICOPERATIONEXT("==", (std::initializer_list<InstructionType>{ fCmp, JNE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
-		BASICOPERATIONEXT("!=", (std::initializer_list<InstructionType>{ fCmp, JE }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
-		BASICOPERATIONEXT("<", (std::initializer_list<InstructionType>{ fCmp, JNB }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
-		BASICOPERATIONEXT(">", (std::initializer_list<InstructionType>{ fCmp, JNA }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
-		BASICOPERATIONEXT(">=", (std::initializer_list<InstructionType>{ fCmp, JB }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
-		BASICOPERATIONEXT("<=", (std::initializer_list<InstructionType>{ fCmp, JA }), BasicType::FlagBool, BasicType::Float, BasicType::Float);
+		BASICOPERATIONEXT("==", (InstrList{ fCmp, JNE }), FlagBool, Float, Float);
+		BASICOPERATIONEXT("!=", (InstrList{ fCmp, JE }), FlagBool, Float, Float);
+		BASICOPERATIONEXT("<", (InstrList{ fCmp, JNB }), FlagBool, Float, Float);
+		BASICOPERATIONEXT(">", (InstrList{ fCmp, JNA }), FlagBool, Float, Float);
+		BASICOPERATIONEXT(">=", (InstrList{ fCmp, JB }), FlagBool, Float, Float);
+		BASICOPERATIONEXT("<=", (InstrList{ fCmp, JA }), FlagBool, Float, Float);
 
 
 		//typecasts
-		BASICCAST(InstructionType::iTof, BasicType::Int, BasicType::Float);
-		BASICCAST(InstructionType::fToi, BasicType::Float, BasicType::Int);
+		BASICCAST(InstructionType::iTof, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[Float]));
+		BASICCAST(InstructionType::fToi, TypeInfo(*m_types[Float], false, true), TypeInfo(*m_types[Int]));
+		BASICCAST(InstructionType::Ld, TypeInfo(*m_types[Int], true, true), TypeInfo(*m_types[Int]));
+		BASICCAST(InstructionType::fLd, TypeInfo(*m_types[Float], true, true), TypeInfo(*m_types[Float]));
 
 
 		//global constants todo: make them useful

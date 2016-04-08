@@ -497,6 +497,12 @@ namespace codeGen
 			else
 				m_compiler.movss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
+		case InstructionType::Ld:
+			m_compiler.mov(*(X86GpVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
+			break;
+		case InstructionType::fLd:
+			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
+			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;

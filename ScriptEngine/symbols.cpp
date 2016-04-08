@@ -37,15 +37,15 @@ namespace par{
 			scope.emplace_back(_alloc.construct<ASTOp>(instr));
 	};
 
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, ComplexType& _t0, ComplexType& _t1)
-		: Function(_name, TypeInfo(_t0, false, false))
+	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1)
+		: Function(_name, TypeInfo(_t0))
 	{
 		bInline = true;
 		bIntrinsic = true;
 		intrinsicType = Function::TypeCast;
 		paramCount = 1;
 
-		scope.m_variables.push_back(_alloc.construct<VarSymbol>("0", TypeInfo(_t1, false, true)));
+		scope.m_variables.push_back(_alloc.construct<VarSymbol>("0", _t1));
 		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
 	}
 

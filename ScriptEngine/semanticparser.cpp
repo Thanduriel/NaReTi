@@ -408,7 +408,12 @@ namespace par
 		{
 			bool isImported = false;
 			for (auto& impVar : m_currentCode->m_importedVars) if (impVar == var){ isImported = true; break; }
-			if (!isImported) m_currentCode->m_importedVars.push_back(var);
+			if (!isImported)
+			{ 
+				m_currentCode->m_importedVars.push_back(var); 
+				//globals have to be pointers, this is the first point where we can make sure that isRef is set
+				var->typeInfo.isReference = true; 
+			}
 		}
 		else var = m_currentCode->getVar(_name);
 

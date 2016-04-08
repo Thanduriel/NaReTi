@@ -141,8 +141,6 @@ int test_global()
 	loc.y = 2.0
 	loc.z = 1.0
 
-//	if(loc.x <= loc.x){printI(11111111)}
-//	if(loc.x <= loc.y){printI(22222222)}
 	if(3.0 > 4.0){printStr("3.0 > 4.0")}
 	if(3.0 < 4.0){printStr("3.0 < 4.0")}
 	if(4.0 > 3.0){printStr("4.0 > 3.0")}
@@ -161,6 +159,6 @@ int test_global()
 	loc = loc + 2.0 * loc
 	printF(len(loc))
 	
-//	printF(pi)
+	printF(pi)
 	return g_test_vec.y
 }
