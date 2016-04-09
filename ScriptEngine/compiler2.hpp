@@ -17,7 +17,7 @@ namespace codeGen
 		Compiler();
 
 		void compile(NaReTi::Module& _module);
-
+		asmjit::JitRuntime& getRuntime() { return m_runtime; }
 	private:
 		// calculates the member offsets and alignment
 		void compileType(par::ComplexType& _type);
@@ -62,7 +62,6 @@ namespace codeGen
 
 
 		asmjit::JitRuntime m_runtime;
-		asmjit::JitRuntime m_tempRuntime; // runtime for single use functions (module inits)
 		asmjit::X86Assembler m_assembler;
 		asmjit::X86Compiler m_compiler;
 

@@ -13,9 +13,15 @@ namespace lang
 
 	typedef std::initializer_list<InstructionType> InstrList;
 
-	BasicModule g_module;
+	BasicModule* g_module;
+	//make a this call linkable to an external 
+	asmjit::JitRuntime* __runtime;
+	void* __allocBoundFunc(int _size)
+	{
+		return __runtime->getMemMgr()->alloc(_size);
+	}
 
-	BasicModule::BasicModule():
+	BasicModule::BasicModule(asmjit::JitRuntime& _runtime) :
 		Module(""),
 		m_precedence( { {
 			pair<string, int>("++", 2),
@@ -43,6 +49,9 @@ namespace lang
 			} }
 		)
 	{
+		__runtime = &_runtime;
+		g_module = this;
+
 		m_types.resize(6);
 		//basic types
 		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int)); m_types[BasicType::Int]->size = 4;
@@ -105,6 +114,13 @@ namespace lang
 		BASICCAST(InstructionType::Ld, TypeInfo(*m_types[Int], true, true), TypeInfo(*m_types[Int]));
 		BASICCAST(InstructionType::fLd, TypeInfo(*m_types[Float], true, true), TypeInfo(*m_types[Float]));
 
+		//build function for dynamic allocation
+		m_functions.emplace_back(new Function("alloc", TypeInfo(*m_types[BasicType::Void], true)));
+		Function& allocFunc = *m_functions.back();
+		allocFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("size", TypeInfo(*m_types[Int])));
+		allocFunc.paramCount = 1;
+		allocFunc.bExternal = true;
+		linkExternal("alloc", &__allocBoundFunc);
 
 		//global constants todo: make them useful
 		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("true", par::TypeInfo(*m_types[BasicType::Int])));

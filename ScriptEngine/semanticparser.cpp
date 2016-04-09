@@ -9,8 +9,8 @@ using namespace std;
 namespace par
 {
 	SemanticParser::SemanticParser() :
-		m_moduleLib(lang::g_module),
-		m_typeInfo(lang::g_module.getBasicType(BasicType::Void))
+		m_moduleLib(*lang::g_module),
+		m_typeInfo(lang::g_module->getBasicType(BasicType::Void))
 	{
 
 	}
@@ -433,7 +433,7 @@ namespace par
 	void SemanticParser::pushFloat(double _val)
 	{
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>((float)_val);
-		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Float));
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module->getBasicType(BasicType::Float));
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
 	}
@@ -441,7 +441,7 @@ namespace par
 	void SemanticParser::pushInt(int _val)
 	{
 		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(_val);
-		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::Int));
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module->getBasicType(BasicType::Int));
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
 	}
@@ -449,7 +449,7 @@ namespace par
 	void SemanticParser::pushString(std::string& _str)
 	{
 		ASTUnlinkedSym* leaf = m_allocator->construct<ASTUnlinkedSym>(_str);
-		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module.getBasicType(BasicType::String));
+		leaf->typeInfo = m_allocator->construct<TypeInfo>(lang::g_module->getBasicType(BasicType::String));
 		leaf->typeInfo->isReference = true; // actually false, but strings can not be used as value currently
 		m_stack.push_back(leaf);
 	}
@@ -471,7 +471,7 @@ namespace par
 		case ASTType::Call:
 		{
 			ASTCall& call = *((ASTCall*)(*_tree));
-			if (!call.isLocked && lang::g_module.getPrecedence(call.name) > lang::g_module.getPrecedence(_node.name))
+			if (!call.isLocked && lang::g_module->getPrecedence(call.name) > lang::g_module->getPrecedence(_node.name))
 			{
 				return findPrecPos((ASTExpNode**)&call.args[1], _node);
 			}

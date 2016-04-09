@@ -7,7 +7,10 @@ using namespace std;
 
 namespace NaReTi
 {
-	ScriptEngine::ScriptEngine()
+	ScriptEngine::ScriptEngine():
+		m_compiler(),
+		m_basicModule(m_compiler.getRuntime()),
+		m_parser()
 	{
 	}
 

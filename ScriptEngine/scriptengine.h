@@ -2,6 +2,7 @@
 #include "parser.hpp"
 #include "compiler2.hpp"
 #include "optimizer.hpp"
+#include "atomics.hpp"
 
 #pragma once
 
@@ -44,6 +45,8 @@ namespace NaReTi{
 		Config m_config;
 
 		std::string extractName(const std::string& _fullName);
+
+		lang::BasicModule m_basicModule;
 		par::Parser m_parser;
 		codeGen::Compiler m_compiler;
 		codeGen::Optimizer m_optimizer;

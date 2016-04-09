@@ -15,7 +15,7 @@ namespace lang{
 
 	void ArrayTypeGen::buildAppend()
 	{
-		m_module.m_functions.emplace_back(new Function("+=", TypeInfo(g_module.getBasicType(BasicType::Void))));
+		m_module.m_functions.emplace_back(new Function("+=", TypeInfo(g_module->getBasicType(BasicType::Void))));
 	}
 
 	void ArrayTypeGen::buildElemAccess()
