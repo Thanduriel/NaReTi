@@ -21,6 +21,11 @@ namespace lang
 		return __runtime->getMemMgr()->alloc(_size);
 	}
 
+	void __freeBoundFunc(void* _ptr)
+	{
+		__runtime->getMemMgr()->release(_ptr);
+	}
+
 	BasicModule::BasicModule(asmjit::JitRuntime& _runtime) :
 		Module(""),
 		m_precedence( { {
@@ -121,10 +126,17 @@ namespace lang
 		allocFunc.paramCount = 1;
 		allocFunc.bExternal = true;
 		linkExternal("alloc", &__allocBoundFunc);
+		//and free
+		m_functions.emplace_back(new Function("free", TypeInfo(*m_types[BasicType::Void])));
+		Function& freeFunc = *m_functions.back();
+		allocFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("ptr", TypeInfo(*m_types[Void], true)));
+		allocFunc.paramCount = 1;
+		allocFunc.bExternal = true;
+		linkExternal("free", &__freeBoundFunc);
 
 		//global constants todo: make them useful
-		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("true", par::TypeInfo(*m_types[BasicType::Int])));
-		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>("false", par::TypeInfo(*m_types[BasicType::Int])));
+		makeConstant("true", 1);
+		makeConstant("false", 0);
 	}
 
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)
@@ -138,5 +150,18 @@ namespace lang
 			if (prec.first == _op) return prec.second;
 
 		return 1; // unknown operator or function takes precedence
+	}
+
+	void BasicModule::makeConstant(const std::string& _name, int _val)
+	{
+		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], true, true)));
+		VarSymbol& var = *m_text.m_variables.back();
+		var.ownership.rawPtr = m_allocator.alloc(var.typeInfo.type.size);
+		var.ownership.ownerType = codeGen::OwnershipType::Heap;
+		var.isPtr = true;
+		var.typeInfo.isReference = true;
+
+		//write value
+		*(int*)var.ownership.rawPtr = _val;
 	}
 }

@@ -17,6 +17,8 @@ namespace lang
 		int getPrecedence(const std::string& _op);
 
 	private:
+		void makeConstant(const std::string& _name, int _val);
+
 		std::array< std::pair< std::string, int >, 22> m_precedence;
 	};
 
