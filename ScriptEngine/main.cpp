@@ -28,12 +28,6 @@ void printStr(char* _str)
 	cout << _str << endl;
 }
 
-//GetTickCount() uses the false calling convention
-int getTickCount()
-{
-	return (int)GetTickCount();
-}
-
 struct Vec2
 {
 	float x;
@@ -71,7 +65,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	externals->linkExternal("printI", &printI);
 	externals->linkExternal("printF", &printF);
 	externals->linkExternal("printStr", &printStr);
-	externals->linkExternal("getTickCount", &getTickCount);
+	externals->linkExternal("getTickCount", &GetTickCount);
 
 	//script functions
 	bool success = scriptEngine.loadModule("test.txt");

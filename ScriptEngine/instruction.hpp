@@ -36,6 +36,7 @@ namespace par
 		//comparisation
 		fCmp,
 		Cmp,
+		CmpZ, //compare to 0
 		JE,
 		JNE,
 		JNL,

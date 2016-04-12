@@ -118,6 +118,8 @@ namespace lang
 		BASICCAST(InstructionType::fToi, TypeInfo(*m_types[Float], false, true), TypeInfo(*m_types[Int]));
 		BASICCAST(InstructionType::Ld, TypeInfo(*m_types[Int], true, true), TypeInfo(*m_types[Int]));
 		BASICCAST(InstructionType::fLd, TypeInfo(*m_types[Float], true, true), TypeInfo(*m_types[Float]));
+		BASICCAST(InstructionType::CmpZ, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[FlagBool]));
+		m_types[Int]->typeCasts.back()->scope.emplace_back(m_allocator.construct<ASTOp>(InstructionType::JE));
 
 		//build function for dynamic allocation
 		m_functions.emplace_back(new Function("alloc", TypeInfo(*m_types[BasicType::Void], true)));

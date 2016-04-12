@@ -68,7 +68,10 @@ namespace par
 		//looks in the tree with the given node as root for the right position of the top level on the stack.
 		ASTExpNode** findPrecPos(ASTExpNode** _tree, ASTCall& _node);
 	private:
+		//take a expression node from the stack and link the containing functions
 		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call || ptr->type == ASTType::Member){ linkCall(*(ASTCall*)ptr); } return ptr; };
+		//pop a conditional node and verify that it is boolean
+		ASTExpNode* popCondNode();
 
 		void linkCall(ASTCall& _node);
 		void linkMember(ASTMember& _node);
@@ -78,6 +81,8 @@ namespace par
 		 * @return success
 		 */
 		bool tryArgCasts(ASTCall& _node, Function& _func);
+		//Try a cast between the given _node's type and _type.
+		Function* typeCast(TypeInfo& _t0, TypeInfo& _t1);
 
 		TypeInfo buildTypeInfo();
 

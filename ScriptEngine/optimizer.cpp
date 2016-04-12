@@ -3,6 +3,7 @@
 namespace codeGen{
 	using namespace par;
 
+	//amount of calls a function may contain to be inlined
 	const int InlineTreshhold = 6;
 
 	Optimizer::Optimizer()
@@ -110,7 +111,7 @@ namespace codeGen{
 			if (arg->type == ASTType::Leaf && ((ASTLeaf*)arg)->parType == ParamType::Ptr && !_node.function->scope.m_variables[i]->typeInfo.isConst)
 				((ASTLeaf*)arg)->ptr->typeInfo.isConst = false;
 		}
-		// a = foo()
+		// expressions of the form: a = foo()
 		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::Leaf)
 		{
 			VarSymbol* sym = ((ASTLeaf*)_node.args[0])->ptr;

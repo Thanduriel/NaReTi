@@ -129,14 +129,7 @@ namespace par
 			TypeInfo& t1 = _func.scope.m_variables[i]->typeInfo;
 			if (t0 == t1) continue;
 
-			for (auto& cast : t0.type.typeCasts)
-			{
-				if (cast->returnTypeInfo == t1)
-				{
-					casts[i] = cast;
-					break;
-				}
-			}
+			casts[i] = typeCast(t0, t1);
 			if (!casts[i]) return false;
 		}
 
@@ -153,6 +146,42 @@ namespace par
 		}
 
 		return true;
+	}
+
+	// ************************************************** //
+
+	Function* SemanticParser::typeCast(TypeInfo& _t0, TypeInfo& _t1)
+	{
+		for (auto& cast : _t0.type.typeCasts)
+		{
+			if (cast->returnTypeInfo == _t1)
+			{
+				return cast;
+			}
+		}
+
+		return nullptr;
+	}
+
+	// ************************************************** //
+
+	ASTExpNode* SemanticParser::popCondNode()
+	{
+		ASTExpNode* node = popNode();
+
+		if (node->typeInfo->type.basic != BasicType::FlagBool)
+		{
+			Function* cast = typeCast(*node->typeInfo, TypeInfo(lang::g_module->getBasicType(BasicType::FlagBool)));
+
+			if (!cast) throw ParsingError("Cannon interpret " + node->typeInfo->type.name + " as bool.");
+
+			ASTCall& call = *m_allocator->construct<ASTCall>();
+			call.function = cast;
+			call.args.push_back(node);
+			
+			return &call;
+		}
+		return node;
 	}
 
 	// ************************************************** //
@@ -317,7 +346,7 @@ namespace par
 	void SemanticParser::ifConditional()
 	{
 		ASTBranch& branchNode = *m_allocator->construct<ASTBranch>();
-		branchNode.condition = popNode();
+		branchNode.condition = popCondNode();
 		branchNode.ifBody = m_allocator->construct<ASTCode>();
 		m_targetScope = branchNode.ifBody;
 
@@ -352,7 +381,7 @@ namespace par
 	void SemanticParser::loop()
 	{
 		ASTLoop& node = *m_allocator->construct<ASTLoop>();
-		node.condition = popNode();
+		node.condition = popCondNode();
 		node.body = m_allocator->construct<ASTCode>();
 		m_targetScope = node.body;
 

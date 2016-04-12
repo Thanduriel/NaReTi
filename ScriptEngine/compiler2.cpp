@@ -510,6 +510,9 @@ namespace codeGen
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
+		case CmpZ:
+			m_compiler.cmp(*(X86GpVar*)_args[0], imm(0));
+			break;
 		case fCmp:
 			m_compiler.comiss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
