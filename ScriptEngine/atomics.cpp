@@ -134,7 +134,7 @@ namespace lang
 		allocFunc.bExternal = true;
 		linkExternal("free", &__freeBoundFunc);
 
-		//global constants todo: make them useful
+		//global constants
 		makeConstant("true", 1);
 		makeConstant("false", 0);
 	}

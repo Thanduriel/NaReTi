@@ -4,6 +4,11 @@ use random
 use externals
 use vector
 
+//use this to get a breakpoint in the compiler
+void breakpoint()
+{
+}
+
 int sum(int arg0, int arg1)
 {
 	return arg0 + arg1
@@ -119,22 +124,25 @@ float [](Vec3& _vec, int _i)
 
 int test_global()
 {
+	printStr("1 external")
 	iVec2 stackVec = addiVec(2, 3, 8, 9)
-	
 	printI(stackVec.x)
 	printI(stackVec.y)
-	stackVec = g_test_vec
-	printI(stackVec.x)
-	printI(stackVec.y)
+	printI(stackVec.x + stackVec.y)
+	if(stackVec.x == 10 && stackVec.y == 12) {printStr("1 val ret")}
+	else {printStr("0 val ret")}
 
-	stackVec = stackVec + g_test_vec
-	printI(stackVec.x)
-	printI(stackVec.y)
+//	stackVec = stackVec + g_test_vec
+//	printI(stackVec.x)
+//	printI(stackVec.y)
 	
-	printStr("hello world!")
-	printF(sin(1.57))
-	printI(pow(2, 8))
-	printF(sqrt(765.34))
+	printStr("---------------------- math tests ----------------------")
+	if(sin(0.25) > 0.247411 && sin(0.25) < 0.247413) { printStr("1 sin(0.25)")}
+	else {printStr("0 sin(0.25)")}
+	if(pow(2, 8) == 256){ printStr("1 pow(2,8)")}
+	else {printStr("0 pow(2,8)")}
+	if(sqrt(765.34) > 27.6647 && sqrt(765.34) < 27.6649) {printStr("1 sqrt(765.34)")}
+	else {printStr("0 sqrt(765.34)")}
 	
 	Vec3 loc
 	loc.x = 4.0
@@ -163,5 +171,22 @@ int test_global()
 	printI(trueVal)
 	
 	printF(pi)
+	
 	return g_test_vec.y
+}
+
+int test_performance()
+{
+	int tickCount = getTickCount()
+	
+	int i = 0
+	Vec2 test
+	test.x = 2.0
+	test.y = 1.0
+	while(i < 1000000)
+	{
+		i = i + 1
+		test = test * 1.00001f
+	}
+	return getTickCount() - tickCount
 }

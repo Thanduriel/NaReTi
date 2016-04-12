@@ -26,10 +26,6 @@ namespace par{
 		String,
 		Void, //when no type is given it is implicitly void
 		FlagBool, // bool in the form of eflags after a cmp instr
-		IntRef,
-		FloatRef,
-		BoolRef,
-		StringRef,
 		Complex,
 		Undefined // has to be linked first (currently not in use)
 	};
@@ -48,6 +44,7 @@ namespace par{
 			case Int:
 			case Float:
 			case String:
+			default:
 				return 4; // references, int and float all are one dword
 			}
 		};
@@ -59,10 +56,17 @@ namespace par{
 
 	struct TypeInfo
 	{
-		TypeInfo(ComplexType& _type, bool _isRef = false, bool _isConst = false) : type(_type), isReference(_isRef), isConst(_isConst){}
+		TypeInfo(ComplexType& _type, bool _isRef = false, bool _isConst = false, bool _isArray = false)
+			: type(_type), 
+			isReference(_isRef), 
+			isConst(_isConst),
+			isArray(_isArray){}
+
 		ComplexType& type;
 		bool isReference;
 		bool isConst;
+		bool isArray; // only useful in combination with const right now
+		int arraySize;
 
 		//
 

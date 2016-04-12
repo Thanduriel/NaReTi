@@ -131,7 +131,7 @@ namespace codeGen
 			switch (_sym.typeInfo.type.basic)
 			{
 			case BasicType::Int:
-				varPtr = &getUnusedVar(_isParam);
+				varPtr = _isParam ? &getUnusedVar32() : &getUnusedVar();
 				break;
 			case BasicType::Float:
 				varPtr = &getUnusedFloat();
@@ -246,6 +246,8 @@ namespace codeGen
 	void Compiler::compileCall(ASTCall& _node, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
+		if (func.name == "breakpoint")
+			int uidae = 2l;
 		bool indirect = false; // < use indirect addressing operations
 
 		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
@@ -319,7 +321,7 @@ namespace codeGen
 					}
 					else
 					{
-						X86GpVar& var = getUnusedVar();
+						X86GpVar& var = member.typeInfo->type.size == 4 ? getUnusedVar32() : getUnusedVar();
 						args.emplace_back(&var);
 						compileMemberLd(*(ASTMember*)arg, var);
 					}
@@ -372,6 +374,8 @@ namespace codeGen
 				case Function::TypeCast:
 					args.push_back(_dest);
 					break;
+				case Function::Compare: break;
+				default: break;
 				}
 
 				for (auto& node : _node.function->scope)
@@ -419,7 +423,7 @@ namespace codeGen
 		//immediate val
 		if (_node.parType == ParamType::Int)
 		{
-			X86GpVar& var = getUnusedVar();
+			X86GpVar& var = getUnusedVar32();
 			m_compiler.mov(var, Imm(_node.val));
 			return &var;
 		}
@@ -744,11 +748,25 @@ namespace codeGen
 
 	// *************************************************** //
 
-	asmjit::X86GpVar& Compiler::getUnusedVar(bool _make32)
+	asmjit::X86GpVar& Compiler::getUnusedVar()
 	{
-		if (m_anonymousVars.size() == m_usageState.varsInUse) _make32 ? m_anonymousVars.push_back(m_compiler.newInt32()) : m_anonymousVars.push_back(m_compiler.newIntPtr());
+		if (m_anonymousVars.size() == m_usageState.varsInUse) m_anonymousVars.push_back(m_compiler.newIntPtr());
 
 		return m_anonymousVars[m_usageState.varsInUse++];
+	}
+
+	// *************************************************** //
+
+	asmjit::X86GpVar& Compiler::getUnusedVar32()
+	{
+		//on x86 just one size of variables has to be managed
+#ifdef	_M_IX86
+		return getUnusedVar();
+#else
+		if (m_anonymousVars32.size() == m_usageState.vars32InUse) m_anonymousVars32.push_back(m_compiler.newInt32());
+
+		return m_anonymousVars32[m_usageState.vars32InUse++];
+#endif
 	}
 
 	// *************************************************** //
@@ -758,10 +776,6 @@ namespace codeGen
 		if (m_anonymousFloats.size() == m_usageState.floatsInUse) m_anonymousFloats.push_back(m_compiler.newXmmSs());
 
 		return m_anonymousFloats[m_usageState.floatsInUse++];
-		if (m_anonymousFloats.size() > 30)
-			int oueo = 12;
-//		m_anonymousFloats.push_back(m_compiler.newXmmSs());
-//		return m_anonymousFloats.back();
 	}
 
 	// *************************************************** //
@@ -773,6 +787,9 @@ namespace codeGen
 		m_anonymousVars.push_back(m_compiler.newIntPtr("accumulator"));
 		m_accumulator = &m_anonymousVars[0];
 
+		m_anonymousVars32.clear();
+		m_anonymousVars32.reserve(16);
+
 		m_anonymousFloats.clear();
 		m_anonymousFloats.reserve(32); //32
 		m_anonymousFloats.push_back(m_compiler.newXmmSs("fp0"));
@@ -780,5 +797,6 @@ namespace codeGen
 
 		m_usageState.varsInUse = 1;
 		m_usageState.floatsInUse = 1;
+		m_usageState.vars32InUse = 0;
 	}
 }

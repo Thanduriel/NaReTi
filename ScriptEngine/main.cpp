@@ -28,6 +28,12 @@ void printStr(char* _str)
 	cout << _str << endl;
 }
 
+//GetTickCount() uses the false calling convention
+int getTickCount()
+{
+	return (int)GetTickCount();
+}
+
 struct Vec2
 {
 	float x;
@@ -65,6 +71,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	externals->linkExternal("printI", &printI);
 	externals->linkExternal("printF", &printF);
 	externals->linkExternal("printStr", &printStr);
+	externals->linkExternal("getTickCount", &getTickCount);
 
 	//script functions
 	bool success = scriptEngine.loadModule("test.txt");
@@ -124,6 +131,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		int sum = 0;
 		for (int i = 0; i < 1000; ++i) sum += scriptEngine.call<int, int, int>(hndlRnd, 15, 0);
 		cout << sum / 1000 << " random" << endl;
+
+		//performance test:
+		NaReTi::FunctionHandle hndlPerf = scriptEngine.getFuncHndl("test_performance");
+		sum = 0;
+		for (int i = 0; i < 132; ++i) sum += scriptEngine.call<int>(hndlPerf);
+		cout << sum / 132 << " performance" << endl;
 	}
 
 	char tmp;

@@ -9,6 +9,7 @@ namespace codeGen
 	struct UsageState
 	{
 		size_t varsInUse;
+		size_t vars32InUse;
 		size_t floatsInUse;
 	};
 	class Compiler
@@ -55,7 +56,8 @@ namespace codeGen
 		UsageState getUsageState() { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
 		// returns a virtual register currently not in use
-		asmjit::X86GpVar& getUnusedVar(bool _make32 = false); //param: should the given var be of 32 bit size
+		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)
+		asmjit::X86GpVar& getUnusedVar32();
 		asmjit::X86XmmVar& getUnusedFloat();
 		void resetRegisters();
 
@@ -69,7 +71,8 @@ namespace codeGen
 		asmjit::X86GpVar* m_accumulator; //asmjit temp var of the currently compiled function
 		asmjit::X86XmmVar* m_fp0;
 		//virtual registers used
-		std::vector<asmjit::X86GpVar> m_anonymousVars; 
+		std::vector<asmjit::X86GpVar> m_anonymousVars;
+		std::vector<asmjit::X86GpVar> m_anonymousVars32;
 		std::vector<asmjit::X86XmmVar> m_anonymousFloats;
 		// registers that have relevant content that should not be overwritten
 		// apart from assignments.

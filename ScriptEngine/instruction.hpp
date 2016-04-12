@@ -32,6 +32,7 @@ namespace par
 		//load value from adr
 		Ld,
 		fLd,
+		LdO, // load offset adr
 		//comparisation
 		fCmp,
 		Cmp,

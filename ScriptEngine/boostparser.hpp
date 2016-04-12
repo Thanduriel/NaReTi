@@ -70,6 +70,9 @@ namespace par
 			TypeAttr =
 				lit("const")[boost::bind(&SemanticParser::makeConst, &m_semanticParser)]
 				| lit('&')[boost::bind(&SemanticParser::makeReference, &m_semanticParser)]
+				| lit('[') >>
+				Integer[boost::bind(&SemanticParser::setArraySize, &m_semanticParser, ::_1)] >>
+				lit(']')[boost::bind(&SemanticParser::makeArray, &m_semanticParser)]
 				;
 
 			GeneralExpression = 
