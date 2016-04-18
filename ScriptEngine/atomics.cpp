@@ -59,7 +59,7 @@ namespace lang
 
 		m_types.resize(6);
 		//basic types
-		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int)); m_types[BasicType::Int]->size = 4;
+		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int)); m_types[BasicType::Int]->size = 4; m_types[BasicType::Int]->alignment = 16;
 		m_types[BasicType::Float] = std::unique_ptr<ComplexType>(new ComplexType("float", BasicType::Float)); m_types[BasicType::Float]->size = 4;
 		m_types[BasicType::String] = std::unique_ptr<ComplexType>(new ComplexType("string", BasicType::String));
 		m_types[BasicType::Void] = std::unique_ptr<ComplexType>(new ComplexType("void", BasicType::Void));
@@ -114,11 +114,12 @@ namespace lang
 
 
 		//typecasts
-		BASICCAST(InstructionType::iTof, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[Float]));
-		BASICCAST(InstructionType::fToi, TypeInfo(*m_types[Float], false, true), TypeInfo(*m_types[Int]));
-		BASICCAST(InstructionType::Ld, TypeInfo(*m_types[Int], true, true), TypeInfo(*m_types[Int]));
-		BASICCAST(InstructionType::fLd, TypeInfo(*m_types[Float], true, true), TypeInfo(*m_types[Float]));
-		BASICCAST(InstructionType::CmpZ, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[FlagBool]));
+		BASICCAST(InstructionType::iTof, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[Float]));	// int -> float
+		BASICCAST(InstructionType::fToi, TypeInfo(*m_types[Float], false, true), TypeInfo(*m_types[Int]));	// float -> int
+		BASICCAST(InstructionType::Ld, TypeInfo(*m_types[Int], true, true), TypeInfo(*m_types[Int]));		// int& -> int
+		BASICCAST(InstructionType::fLd, TypeInfo(*m_types[Float], true, true), TypeInfo(*m_types[Float]));	// float& -> float
+		//this cast requires two instructions
+		BASICCAST(InstructionType::CmpZ, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[FlagBool]));// int -> bool
 		m_types[Int]->typeCasts.back()->scope.emplace_back(m_allocator.construct<ASTOp>(InstructionType::JE));
 
 		//build function for dynamic allocation

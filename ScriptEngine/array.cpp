@@ -24,8 +24,11 @@ namespace lang{
 
 	void ArrayTypeGen::buildConst(ComplexType& _type)
 	{
-	//	createModule("carrayType_" + _type.name);
+		//already existing
+		if (std::find(m_buildConstTypes.begin(), m_buildConstTypes.end(), &_type) != m_buildConstTypes.end()) return;
+
 		m_currentModule = lang::g_module;
+		m_currentType = &_type;
 
 		m_currentModule->m_functions.emplace_back(new Function("[]", TypeInfo(*m_currentType, true, false, false)));
 		Function& func = *m_currentModule->m_functions.back();
@@ -34,6 +37,11 @@ namespace lang{
 		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_1", TypeInfo(lang::g_module->getBasicType(BasicType::Int))));
 		func.paramCount = 2;
 		func.scope.emplace_back(m_currentModule->getAllocator().construct<ASTOp>(InstructionType::LdO));
+		func.bIntrinsic = true;
+		func.bInline = true;
+		func.intrinsicType = Function::TypeCast; //makes the compiler use _dest as arg
+
+		m_buildConstTypes.push_back(&_type);
 	}
 
 	NaReTi::Module* ArrayTypeGen::createModule(string& _name)

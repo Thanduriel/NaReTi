@@ -132,9 +132,6 @@ int test_global()
 	if(stackVec.x == 10 && stackVec.y == 12) {printStr("1 val ret")}
 	else {printStr("0 val ret")}
 
-//	stackVec = stackVec + g_test_vec
-//	printI(stackVec.x)
-//	printI(stackVec.y)
 	
 	printStr("---------------------- math tests ----------------------")
 	if(sin(0.25) > 0.247411 && sin(0.25) < 0.247413) { printStr("1 sin(0.25)")}
@@ -171,6 +168,18 @@ int test_global()
 	printI(trueVal)
 	
 	printF(pi)
+	
+	Vec2[5] arrrrray
+	int i = 0
+//	arrrrray[0] = 0
+	while(i < 5)
+	{
+		i = i + 1
+		arrrrray[i].x = i
+		arrrrray[i].y = 12.0
+	}
+	printF(arrrrray[4].x)
+	printF(arrrrray[4].y)
 	return g_test_vec.y
 }
 
@@ -185,7 +194,7 @@ int test_performance()
 	while(i < 1000000)
 	{
 		i = i + 1
-		test = test * 1.00001f
+		test = test * 1.00001
 	}
 	return getTickCount() - tickCount
 }

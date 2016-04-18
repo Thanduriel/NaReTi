@@ -72,10 +72,7 @@ namespace par{
 
 		bool operator!= (TypeInfo& oth);
 
-		bool operator== (TypeInfo& oth)
-		{
-			return !(*this != oth);
-		}
+		bool operator== (TypeInfo& oth);
 	};
 
 	struct VarSymbol : public Symbol, public codeGen::CVarSymbol

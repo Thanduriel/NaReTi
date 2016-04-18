@@ -93,10 +93,10 @@ namespace par
 
 			//operator and operand
 			RExpression =
-				('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))]
+				(('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))]
 				| (Operator >
 				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
-				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)] >>
+				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)]) >>
 				-RExpression
 				;
 

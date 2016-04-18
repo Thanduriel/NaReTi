@@ -30,8 +30,8 @@ namespace codeGen
 
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function);
-		void allocVar(par::VarSymbol& _sym, bool _isParam = false);
-		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type);
+		void allocVar(par::VarSymbol& _sym);
+		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type, int _count = 1);
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);

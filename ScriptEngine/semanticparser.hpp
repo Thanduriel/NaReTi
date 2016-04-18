@@ -8,6 +8,7 @@
 #include "modulelib.hpp"
 #include "ast.hpp"
 #include "stackalloc.hpp"
+#include "array.hpp"
 
 namespace par
 {
@@ -36,7 +37,7 @@ namespace par
 		void funcDeclaration(std::string& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
 		//typeinfo
-		void newTypeInfo(const std::string& _attr) { m_typeName = _attr; m_typeInfo.isReference = false; m_typeInfo.isConst = false; }
+		void newTypeInfo(const std::string& _attr) { m_typeName = _attr; m_typeInfo.isReference = false; m_typeInfo.isConst = false; m_typeInfo.isArray = false; }
 		void makeReference() { m_typeInfo.isReference = true; }
 		void makeConst() { m_typeInfo.isConst = true; }
 		void makeArray() { m_typeInfo.isArray = true; }
@@ -84,7 +85,12 @@ namespace par
 		//Try a cast between the given _node's type and _type.
 		Function* typeCast(TypeInfo& _t0, TypeInfo& _t1);
 
+		/* Constructs a typeinfo from the previously parsed declaration
+		 * and resets the parser state.
+		 */
 		TypeInfo buildTypeInfo();
+
+		lang::ArrayTypeGen m_arrayTypeGen;
 
 		std::vector < ASTExpNode* > m_stack;
 		TypeInfo m_typeInfo;

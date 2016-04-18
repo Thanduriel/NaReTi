@@ -51,12 +51,22 @@ namespace par{
 
 	// ************************************************ //
 	
+	bool TypeInfo::operator==(TypeInfo& oth)
+	{
+		return &type == &oth.type
+			&& (type.basic == BasicType::Complex || isArray || isReference == oth.isReference)
+			&& !(isConst && !oth.isConst)
+			&& isArray == oth.isArray;
+	}
+
 	bool TypeInfo::operator!= (TypeInfo& oth)
 	{
-		// complex types are always by reference and the distinction only matters for the caller
+		return !(*this == oth);
+/*		// complex types are always by reference and the distinction only matters for the caller
 		return &type != &oth.type
 			|| !(type.basic == BasicType::Complex
 			|| isReference == oth.isReference)
-			|| (isConst && !oth.isConst);
+			|| (isConst && !oth.isConst)
+			|| isArray != oth.isArray;*/
 	}
 }

@@ -76,7 +76,7 @@ namespace codeGen
 	void Compiler::compileModuleInit(NaReTi::Module& _module)
 	{
 		if (_module.m_text.size() == 0) return;
-
+		
 		m_compiler.addFunc(FuncBuilder0<void>());
 		resetRegisters();
 		compileCode(_module.m_text);
@@ -117,7 +117,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::allocVar(VarSymbol& _sym, bool _isParam)
+	void Compiler::allocVar(VarSymbol& _sym)
 	{
 		asmjit::Var* varPtr;
 
@@ -126,12 +126,17 @@ namespace codeGen
 			varPtr = &getUnusedVar();
 			_sym.isPtr = true;
 		}
+		else if (_sym.typeInfo.isArray)
+		{
+			_sym.isPtr = true;
+			varPtr = allocStackVar(_sym.typeInfo.type, _sym.typeInfo.arraySize);
+		}
 		else
 		{
 			switch (_sym.typeInfo.type.basic)
 			{
 			case BasicType::Int:
-				varPtr = _isParam ? &getUnusedVar32() : &getUnusedVar();
+				varPtr = &getUnusedVar32();
 				break;
 			case BasicType::Float:
 				varPtr = &getUnusedFloat();
@@ -149,10 +154,10 @@ namespace codeGen
 
 	// *************************************************** //
 
-	X86GpVar* Compiler::allocStackVar(ComplexType& _type)
+	X86GpVar* Compiler::allocStackVar(ComplexType& _type, int _count)
 	{
 		X86GpVar& gpVar = getUnusedVar();
-		X86Mem mem = m_compiler.newStack(_type.size, _type.alignment); // if floats are used  -> operations with xmm(128) register
+		X86Mem mem = m_compiler.newStack(_type.size * _count, _type.alignment); // if floats are used  -> operations with xmm(128) register
 
 		m_compiler.lea(gpVar, mem);
 
@@ -184,7 +189,7 @@ namespace codeGen
 			VarSymbol& varSymbol = *_function.scope.m_variables[i];
 			if (varSymbol.isSubstituted) continue;
 
-			allocVar(varSymbol, true);
+			allocVar(varSymbol);
 
 			binVarLocations.emplace_back(&varSymbol.compiledVar);
 		}
@@ -335,14 +340,12 @@ namespace codeGen
 					X86XmmVar& var = getUnusedFloat();
 					args.emplace_back(&var);
 					compileCall(*astCall, &var);
-				//	m_compiler.movss(var, *m_fp0);
 				}
 				else
 				{
-					X86GpVar& var = getUnusedVar();
+					X86GpVar& var = astCall->function->returnTypeInfo.type.size == 4 ? getUnusedVar32() : getUnusedVar();
 					args.emplace_back(&var);
 					compileCall(*astCall, &var);
-				//	m_compiler.mov(var, *m_accumulator);
 				}
 				break;
 			}
@@ -384,7 +387,7 @@ namespace codeGen
 					compileOp(op.instruction, args);
 				}
 			}
-			else
+			else // general purpose inline
 			{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i]->compiledVar = (asmjit::Var*)args[i];
@@ -401,8 +404,6 @@ namespace codeGen
 				compileCode(_node.function->scope);
 				m_retDstStack.pop_back();
 			}
-
-			//the result is already in ax or fp0
 		} // end if inline
 		else
 		{
@@ -507,6 +508,9 @@ namespace codeGen
 		case InstructionType::fLd:
 			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
 			break;
+		case InstructionType::LdO:
+			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 3)); //2
+			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
@@ -559,6 +563,8 @@ namespace codeGen
 		case fDiv:
 			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
+
+		//typecasts
 		case InstructionType::iTof:
 			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
 			break;

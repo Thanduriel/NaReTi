@@ -80,7 +80,10 @@ namespace par
 				string args;
 				for (auto& arg : _node.args)
 				{
-					args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "") + (arg->typeInfo->isReference ? "&" : "") + ',';
+					args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "")
+						+ (arg->typeInfo->isArray ? "[]" : "")
+						+ (arg->typeInfo->isReference ? "&" : "")
+						+ ',';
 				}
 				args.resize(args.size() - 1); //remove final comma
 				throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
@@ -519,7 +522,14 @@ namespace par
 		ComplexType* type = m_moduleLib.getType(m_typeName);
 		if (!type) throw ParsingError("Unknown type: " + m_typeName);
 
-		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst);
+		auto typeInfo = TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
+
+		if (typeInfo.isArray)
+		{
+			typeInfo.arraySize = m_typeInfo.arraySize;
+			m_arrayTypeGen.buildConst(*type);
+		}
+		return typeInfo;
 	}
 
 	// ************************************************** //
