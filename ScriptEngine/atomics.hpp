@@ -19,7 +19,7 @@ namespace lang
 	private:
 		void makeConstant(const std::string& _name, int _val);
 
-		std::array< std::pair< std::string, int >, 22> m_precedence;
+		std::array< std::pair< std::string, int >, 23> m_precedence;
 	};
 
 	extern BasicModule* g_module;

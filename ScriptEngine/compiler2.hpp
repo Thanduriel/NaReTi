@@ -36,8 +36,8 @@ namespace codeGen
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
 		void compileCall(par::ASTCall& _node, asmjit::Var* _dest = nullptr);
-		asmjit::Operand* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
-		void compileOp(par::InstructionType _instr, std::vector< asmjit::Operand* >& _args);
+		asmjit::Var* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
+		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
 		
@@ -59,6 +59,7 @@ namespace codeGen
 		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)
 		asmjit::X86GpVar& getUnusedVar32();
 		asmjit::X86XmmVar& getUnusedFloat();
+		asmjit::Var* getUnusedVarAuto(par::TypeInfo& _typeInfo); // returns the right var for the given type
 		void resetRegisters();
 
 

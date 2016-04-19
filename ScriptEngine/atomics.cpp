@@ -5,6 +5,7 @@
 #define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
 #define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
 #define BASICCAST(Instr, T0, T1) T0.type.typeCasts.emplace_back(new Function( m_allocator, "", Instr, T1, T0));
+#define UNARYOPERATION(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, Instr, T, T));
 
 namespace lang
 {
@@ -32,6 +33,7 @@ namespace lang
 			pair<string, int>("++", 2),
 			pair<string, int>("--", 2),
 			pair<string, int>(".", 2),
+			pair<string, int>("-", 3),
 			pair<string, int>("*", 5),
 			pair<string, int>("%", 5),
 			pair<string, int>("/", 5),
@@ -64,7 +66,7 @@ namespace lang
 		m_types[BasicType::String] = std::unique_ptr<ComplexType>(new ComplexType("string", BasicType::String));
 		m_types[BasicType::Void] = std::unique_ptr<ComplexType>(new ComplexType("void", BasicType::Void));
 		m_types[BasicType::Bool] = std::unique_ptr<ComplexType>(new ComplexType("bool", BasicType::Bool)); m_types[BasicType::Bool]->size = 4;
-		m_types[BasicType::FlagBool] = std::unique_ptr<ComplexType>(new ComplexType("flagBool", BasicType::FlagBool));
+		m_types[BasicType::FlagBool] = std::unique_ptr<ComplexType>(new ComplexType("flagBool", BasicType::FlagBool)); m_types[BasicType::FlagBool]->size = 4;
 
 		//operators
 		//logical -----------------------------------------------------
@@ -78,6 +80,7 @@ namespace lang
 		BASICOPERATION("*", BasicType::Int, InstructionType::Mul);
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
+		UNARYOPERATION("-", TypeInfo(*m_types[Int]), InstructionType::Neg);
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
 		//assignment to address is currently decided by the compiler
 		// this is only to make sure that no typecast is necessary

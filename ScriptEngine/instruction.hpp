@@ -13,6 +13,7 @@ namespace par
 		Mul,
 		Div,
 		Mod,
+		Neg,
 		//float arithmetic
 		fAdd,
 		fSub,

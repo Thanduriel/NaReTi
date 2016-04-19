@@ -86,17 +86,22 @@ namespace par
 
 			//mathematical terms including brackets"()"; function calls: foo(args); square bracket: a[]
 			Expression = 
-				(((('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
-				| Operand) >
-				-RExpression))
+				LExpression >
+				-RExpression
+				;
+
+			LExpression =
+				(-Operator >>
+				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
+				| Operand) >> 
+				(-('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))])
+				)[boost::bind(&SemanticParser::unaryTerm, &m_semanticParser, ::_1)]
 				;
 
 			//operator and operand
 			RExpression =
-				(('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))]
-				| (Operator >
-				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
-				| Operand))[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)]) >>
+				((Operator >
+				LExpression)[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)]) >>
 				-RExpression
 				;
 
@@ -183,6 +188,7 @@ namespace par
 
 		qi::rule<Iterator, Skipper> Expression;
 		qi::rule<Iterator, Skipper> GeneralExpression;
+		qi::rule<Iterator, Skipper> LExpression;
 		qi::rule<Iterator, Skipper> RExpression;
 		qi::rule<Iterator, Skipper> CodeScope;
 		qi::rule<Iterator, Skipper> Conditional;

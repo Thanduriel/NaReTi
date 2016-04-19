@@ -62,6 +62,7 @@ namespace par
 		void pushInt(int _val);
 		void pushString(std::string& _str);
 		void term(const std::string& _operator);
+		void unaryTerm(const boost::optional<std::string>& _str);
 		void call(std::string& _name);
 		void argSeperator();
 

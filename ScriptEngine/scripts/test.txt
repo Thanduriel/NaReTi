@@ -169,17 +169,18 @@ int test_global()
 	
 	printF(pi)
 	
-	Vec2[5] arrrrray
+	int[5] arrrrray
 	int i = 0
 //	arrrrray[0] = 0
 	while(i < 5)
 	{
 		i = i + 1
-		arrrrray[i].x = i
-		arrrrray[i].y = 12.0
+		arrrrray[i] = i
 	}
-	printF(arrrrray[4].x)
-	printF(arrrrray[4].y)
+	
+	i = -i
+	printI(i)
+	printI(-arrrrray[3])
 	return g_test_vec.y
 }
 

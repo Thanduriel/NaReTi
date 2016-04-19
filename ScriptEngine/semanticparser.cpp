@@ -85,7 +85,7 @@ namespace par
 						+ (arg->typeInfo->isReference ? "&" : "")
 						+ ',';
 				}
-				args.resize(args.size() - 1); //remove final comma
+				args.resize(args.size() - 1); //remove final comma; a function without args should not land here
 				throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
 			}
 		}
@@ -412,6 +412,42 @@ namespace par
 //		cout << _operator << endl;
 	}
 
+	// ************************************************** //
+
+	void SemanticParser::unaryTerm(const boost::optional<std::string>& _str)
+	{
+		if (!_str.is_initialized()) return;
+
+		ASTExpNode* arg = m_stack.back();
+		if (arg->type == ASTType::Leaf)
+		{
+			ASTLeaf* leaf = (ASTLeaf*)arg;
+			if (leaf->parType == ParamType::Int)
+			{
+				leaf->val = -leaf->val;
+				return;
+			}
+			else if (leaf->parType == ParamType::Float)
+			{
+				leaf->valFloat = -leaf->valFloat;
+				return;
+			}
+		}
+
+		//only take the arg of the stack when a new one is going to be added
+		m_stack.pop_back();
+
+		ASTCall* astNode = m_allocator->construct<ASTCall>();
+		astNode->name = _str.value();
+		astNode->typeInfo = nullptr;
+
+		astNode->args.resize(1);
+		astNode->args[0] = arg;
+		m_stack.push_back(astNode);
+	}
+
+	// ************************************************** //
+
 	void SemanticParser::call(string& _name)
 	{
 		//build new node
@@ -503,7 +539,7 @@ namespace par
 		case ASTType::Call:
 		{
 			ASTCall& call = *((ASTCall*)(*_tree));
-			if (!call.isLocked && lang::g_module->getPrecedence(call.name) > lang::g_module->getPrecedence(_node.name))
+			if (!call.isLocked && lang::g_module->getPrecedence(call.name) > lang::g_module->getPrecedence(_node.name) && call.args.size() == 2) // only enter bin ops (unarys should have higher precedence)
 			{
 				return findPrecPos((ASTExpNode**)&call.args[1], _node);
 			}
