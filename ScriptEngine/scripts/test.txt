@@ -174,12 +174,13 @@ int test_global()
 //	arrrrray[0] = 0
 	while(i < 5)
 	{
-		i = i + 1
+		(++i)
 		arrrrray[i] = i
 	}
 	
 	i = -i
 	printI(i)
+	printI(++i)
 	printI(-arrrrray[3])
 	return g_test_vec.y
 }
@@ -194,7 +195,6 @@ int test_performance()
 	test.y = 1.0
 	while(i < 1000000)
 	{
-		i = i + 1
 		test = test * 1.00001
 	}
 	return getTickCount() - tickCount

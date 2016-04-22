@@ -14,6 +14,8 @@ namespace par
 		Div,
 		Mod,
 		Neg,
+		Inc,
+		Dec,
 		//float arithmetic
 		fAdd,
 		fSub,

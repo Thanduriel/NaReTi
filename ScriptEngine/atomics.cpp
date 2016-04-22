@@ -81,6 +81,8 @@ namespace lang
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
 		UNARYOPERATION("-", TypeInfo(*m_types[Int]), InstructionType::Neg);
+		UNARYOPERATION("++", TypeInfo(*m_types[Int]), InstructionType::Inc); m_functions.back()->intrinsicType = Function::Assignment;
+		UNARYOPERATION("--", TypeInfo(*m_types[Int]), InstructionType::Dec); m_functions.back()->intrinsicType = Function::Assignment;
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
 		//assignment to address is currently decided by the compiler
 		// this is only to make sure that no typecast is necessary

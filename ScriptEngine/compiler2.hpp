@@ -12,6 +12,14 @@ namespace codeGen
 		size_t vars32InUse;
 		size_t floatsInUse;
 	};
+
+	struct UsageStateLock
+	{
+		UsageStateLock(UsageState& _state) : state(_state), target(_state){}
+		~UsageStateLock(){ target = state; }
+		UsageState state;
+		UsageState& target;
+	};
 	class Compiler
 	{
 	public:
@@ -35,17 +43,20 @@ namespace codeGen
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		void compileCode(par::ASTCode& _node);
-		void compileCall(par::ASTCall& _node, asmjit::Var* _dest = nullptr);
+		//@param _dest where the result should be stored
+		//@return the destination of the return
+		asmjit::Var* compileCall(par::ASTCall& _node, asmjit::Var* _dest = nullptr);
 		asmjit::Var* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
 		
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
-		asmjit::X86Mem getMemberAdr(par::ASTMember& _node);
+		asmjit::X86GpVar* compileMemberAdr(par::ASTMember& _node); // returns the var where the address is stored
+		asmjit::X86Mem getMemberAdr(par::ASTMember& _node, asmjit::X86GpVar& _var);
 		//load some member var into the given destination register
-		void compileMemberLd(par::ASTMember& _node, asmjit::X86GpVar& _destination);
-		void compileMemberLdF(par::ASTMember& _node, asmjit::X86XmmVar& _destination);
+		void compileMemberLd(par::ASTMember& _node, asmjit::X86GpVar& _var, asmjit::X86GpVar& _destination);
+		void compileMemberLdF(par::ASTMember& _node, asmjit::X86GpVar& _var,  asmjit::X86XmmVar& _destination);
 		//store result in a member var; not in use
 		void compileMemberStr(par::ASTMember& _node);
 		void compileBranch(par::ASTBranch& _node);
