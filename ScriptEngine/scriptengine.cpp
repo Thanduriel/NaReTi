@@ -82,13 +82,14 @@ namespace NaReTi
 
 	// ******************************************************* //
 
-	bool ScriptEngine::unloadModule(const std::string& _moduleName)
+	bool ScriptEngine::unloadModule(const std::string& _moduleName, bool _keepBinary)
 	{
 		for (auto i = m_modules.begin(); i != m_modules.end(); ++i)
 		{
 			Module& module = *(*i);
 			if (module.m_name == _moduleName)
 			{
+				if (!_keepBinary) m_compiler.release(module);
 				m_modules.erase(i);
 				return true;
 			}

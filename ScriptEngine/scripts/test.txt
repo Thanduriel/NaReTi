@@ -195,6 +195,7 @@ int test_performance()
 	test.y = 1.0
 	while(i < 1000000)
 	{
+		++i
 		test = test * 1.00001
 	}
 	return getTickCount() - tickCount

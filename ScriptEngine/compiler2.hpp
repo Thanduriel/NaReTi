@@ -26,6 +26,8 @@ namespace codeGen
 		Compiler();
 
 		void compile(NaReTi::Module& _module);
+		//releases all binary data owned by the symbol: functions, global vars
+		void release(NaReTi::Module& _module);
 		asmjit::JitRuntime& getRuntime() { return m_runtime; }
 	private:
 		// calculates the member offsets and alignment

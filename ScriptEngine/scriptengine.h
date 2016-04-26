@@ -20,7 +20,8 @@ namespace NaReTi{
 		bool loadModule(const std::string& _fileName);
 		// Removes a module with the given name and all it's symbols to release it's memory.
 		// This should only be used if no other module depends on the module.
-		bool unloadModule(const std::string& _moduleName);
+		// @param _keepBinary If true no compiled functions are removed
+		bool unloadModule(const std::string& _moduleName, bool _keepBinary = false);
 
 		//Creates a new and empty module to build extern.
 		Module& createModule(const std::string& _moduleName);

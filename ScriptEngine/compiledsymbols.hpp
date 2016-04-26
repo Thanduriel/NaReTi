@@ -16,7 +16,8 @@ namespace codeGen{
 	enum class OwnershipType
 	{
 		Stack,
-		Heap
+		Heap,
+		Module 
 	};
 
 	struct Ownership

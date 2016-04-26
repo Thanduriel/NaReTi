@@ -9,6 +9,8 @@ using namespace std;
 
 namespace par{
 
+//	Parser g_dynamicParser;
+
 	Parser::Parser():
 		m_semanticParser(),
 		m_grammar(m_semanticParser),

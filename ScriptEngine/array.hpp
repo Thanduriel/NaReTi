@@ -6,9 +6,19 @@ namespace lang{
 	class ArrayTypeGen
 	{
 	public:
-		//build array functions for the given type
+		/*build array functions for the given type
+		 * array layout: 
+		 * void* _data
+		 * dword capacity
+		 * dword size
+		 */
 		void build(par::ComplexType& _type);
-		//build array functions for a const array
+		/*build array functions for a const array
+		 * layout:
+		 * void* _data
+		 * other members are inlined by the optimizer
+		 * if no optimization takes place all arrays are dynamic
+		 */
 		void buildConst(par::ComplexType& _type);
 	private:
 		//creates a new module with the given name if it is not found in m_modules

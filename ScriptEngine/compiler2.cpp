@@ -46,6 +46,20 @@ namespace codeGen
 
 	// *************************************************** //
 
+	void Compiler::release(NaReTi::Module& _module)
+	{
+		for (auto& var : _module.m_text.m_variables)
+		{
+			m_runtime.release(var->ownership.rawPtr);
+		}
+		for (auto& function : _module.m_functions)
+		{
+			m_runtime.release(function->binary);
+		}
+	}
+
+	// *************************************************** //
+
 	void Compiler::compileType(ComplexType& _type)
 	{
 		int currentOffset = 0;
@@ -66,8 +80,8 @@ namespace codeGen
 
 	void Compiler::compileHeapVar(VarSymbol& _var, utils::StackAlloc& _allocator)
 	{
-		_var.ownership.rawPtr = _allocator.alloc(_var.typeInfo.type.size);
-		_var.ownership.ownerType = OwnershipType::Heap;
+		_var.ownership.rawPtr = m_runtime.getMemMgr()->alloc(_var.typeInfo.type.size);//_allocator.alloc(_var.typeInfo.type.size);
+		_var.ownership.ownerType = OwnershipType::Module;
 		_var.isPtr = true; 
 		_var.typeInfo.isReference = true;  // enforce reference assignment
 	}
@@ -265,7 +279,7 @@ namespace codeGen
 		//return values are part of the caller's scope
 		if (func.bHiddenParam)
 		{
-			if (_node.returnSub)
+			if (_node.returnSub) // optimization
 			{
 				_dest = _node.returnSub->compiledVar;
 				args.push_back(_node.returnSub->compiledVar);
@@ -281,14 +295,12 @@ namespace codeGen
 		if (!_dest) _dest = getUnusedVarAuto(func.returnTypeInfo);
 
 		UsageStateLock lock(m_usageState);
-		//UsageState preCallState = getUsageState();
 
-		int i = 0;
-		auto begin = _node.args.begin();
-		//make sure that all are located in virtual registers
-		for (; begin != _node.args.end(); ++begin)
+		int i = 0; //identify the first operand
+		//make sure that all arguments are located in virtual registers
+		for (auto& arg : _node.args)
 		{
-			auto& arg = *begin;
+		//	auto& arg = *begin;
 			switch (arg->type)
 			{
 			case ASTType::Leaf:
@@ -399,7 +411,6 @@ namespace codeGen
 			if(_dest) call->setRet(0, *_dest);
 		}
 
-	//	setUsageState(preCallState);
 		if (func.name == "breakpoint")
 			int uidae = 2l;
 
@@ -420,7 +431,6 @@ namespace codeGen
 		else if (_node.parType == ParamType::Float)
 		{
 			X86XmmVar& var = getUnusedFloat();
-		//	m_compiler.mov(*m_accumulator, imm_ptr(&_node.valFloat));
 			m_compiler.movss(var, m_compiler.newFloatConst(0, _node.valFloat));
 			return &var;
 		}
@@ -446,7 +456,7 @@ namespace codeGen
 			m_compiler.dec(*(X86GpVar*)_args[0]);
 			break;
 		case InstructionType::Neg:
-			m_compiler.mov(*(X86GpVar*)_args[1], *(X86GpVar*)_args[0]); //val is copied to not change the original
+			m_compiler.mov(*(X86GpVar*)_args[1], *(X86GpVar*)_args[0]); //val is copied to not change the original and to have the result in the right destination
 			m_compiler.neg(*(X86GpVar*)_args[1]);
 			break;
 		case InstructionType::Add:

@@ -6,6 +6,7 @@ namespace lang{
 	using namespace std;
 	void ArrayTypeGen::build(par::ComplexType& _type)
 	{
+		
 		m_currentModule = createModule("arrayType_" + _type.name);
 		if (!m_currentModule) return;
 
@@ -19,17 +20,6 @@ namespace lang{
 
 	void ArrayTypeGen::buildElemAccess()
 	{
-		m_currentModule->m_functions.emplace_back(new Function("[]", TypeInfo(*m_currentType, true)));
-	}
-
-	void ArrayTypeGen::buildConst(ComplexType& _type)
-	{
-		//already existing
-		if (std::find(m_buildConstTypes.begin(), m_buildConstTypes.end(), &_type) != m_buildConstTypes.end()) return;
-
-		m_currentModule = lang::g_module;
-		m_currentType = &_type;
-
 		m_currentModule->m_functions.emplace_back(new Function("[]", TypeInfo(*m_currentType, true, false, false)));
 		Function& func = *m_currentModule->m_functions.back();
 		auto& alloc = m_currentModule->getAllocator();
@@ -40,6 +30,18 @@ namespace lang{
 		func.bIntrinsic = true;
 		func.bInline = true;
 		func.intrinsicType = Function::TypeCast; //makes the compiler use _dest as arg
+	}
+
+	void ArrayTypeGen::buildConst(ComplexType& _type)
+	{
+		//already existing
+		if (std::find(m_buildConstTypes.begin(), m_buildConstTypes.end(), &_type) != m_buildConstTypes.end()) return;
+
+		m_currentModule = lang::g_module;
+		m_currentType = &_type;
+
+		//only index based access is required
+		buildElemAccess();
 
 		m_buildConstTypes.push_back(&_type);
 	}

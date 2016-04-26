@@ -51,7 +51,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	NaReTi::ScriptEngine scriptEngine;
 	NaReTi::Config& config = scriptEngine.config();
-	config.optimizationLvl = NaReTi::Basic;
+	config.optimizationLvl = NaReTi::None;
 	config.scriptLocation = "scripts/";
 
 	//test cases

@@ -7,6 +7,8 @@
 #include "preparser.hpp"
 
 namespace par{
+//	extern Parser g_dynamicParser; // parser to parse generated snippets
+
 	class Parser
 	{
 	public:
