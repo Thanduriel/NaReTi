@@ -11,6 +11,12 @@ namespace lang{
 		 * void* _data
 		 * dword capacity
 		 * dword size
+		 * build functions:
+		 * += append array
+		 * += append element
+		 * + combine two arrays
+		 * + combine array and element
+		 * -= remove last elements
 		 */
 		void build(par::ComplexType& _type);
 		/*build array functions for a const array

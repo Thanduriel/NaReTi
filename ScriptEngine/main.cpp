@@ -51,7 +51,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	NaReTi::ScriptEngine scriptEngine;
 	NaReTi::Config& config = scriptEngine.config();
-	config.optimizationLvl = NaReTi::None;
+	config.optimizationLvl = NaReTi::Basic;
 	config.scriptLocation = "scripts/";
 
 	//test cases
@@ -131,6 +131,10 @@ int _tmain(int argc, _TCHAR* argv[])
 		sum = 0;
 		for (int i = 0; i < 132; ++i) sum += scriptEngine.call<int>(hndlPerf);
 		cout << sum / 132 << " performance" << endl;
+
+		NaReTi::FunctionHandle hndlMain = scriptEngine.getFuncHndl("main");
+		scriptEngine.call<void>(hndlMain);
+
 	}
 
 	char tmp;

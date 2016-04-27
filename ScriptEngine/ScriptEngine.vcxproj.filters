@@ -210,6 +210,9 @@
     <ClInclude Include="array.hpp">
       <Filter>lang</Filter>
     </ClInclude>
+    <ClInclude Include="iterator.hpp">
+      <Filter>par\boost</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

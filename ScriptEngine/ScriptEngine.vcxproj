@@ -186,6 +186,7 @@
     <ClInclude Include="compiler2.hpp" />
     <ClInclude Include="enginetypes.hpp" />
     <ClInclude Include="instruction.hpp" />
+    <ClInclude Include="iterator.hpp" />
     <ClInclude Include="module.hpp" />
     <ClInclude Include="modulelib.hpp" />
     <ClInclude Include="optimizer.hpp" />

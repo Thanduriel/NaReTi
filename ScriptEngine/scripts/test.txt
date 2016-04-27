@@ -3,6 +3,7 @@ use math
 use random
 use externals
 use vector
+use array // highly expirimental
 
 //use this to get a breakpoint in the compiler
 void breakpoint()
@@ -171,7 +172,6 @@ int test_global()
 	
 	int[5] arrrrray
 	int i = 0
-//	arrrrray[0] = 0
 	while(i < 5)
 	{
 		(++i)
@@ -182,6 +182,7 @@ int test_global()
 	printI(i)
 	printI(++i)
 	printI(-arrrrray[3])
+	
 	return g_test_vec.y
 }
 
@@ -199,4 +200,10 @@ int test_performance()
 		test = test * 1.00001
 	}
 	return getTickCount() - tickCount
+}
+
+void main()
+{
+	initRandom(getTickCount())
+	printF(rand(30, 0))
 }

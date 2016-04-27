@@ -2,6 +2,7 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <string>
+#include "iterator.hpp"
 
 namespace par{
 	using namespace boost::spirit;
@@ -37,6 +38,5 @@ namespace par{
 		qi::rule<Iterator> VariableComment;
 	};
 
-
-	typedef CommentSkipper< std::string::const_iterator > NaReTiSkipper;
+	typedef CommentSkipper< pos_iterator_type > NaReTiSkipper;
 }

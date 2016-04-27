@@ -176,7 +176,7 @@ namespace par
 		{
 			Function* cast = typeCast(*node->typeInfo, TypeInfo(lang::g_module->getBasicType(BasicType::FlagBool)));
 
-			if (!cast) throw ParsingError("Cannon interpret " + node->typeInfo->type.name + " as bool.");
+			if (!cast) throw ParsingError("Can not interpret " + node->typeInfo->type.name + " as bool.");
 
 			ASTCall& call = *m_allocator->construct<ASTCall>();
 			call.function = cast;

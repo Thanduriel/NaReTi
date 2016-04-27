@@ -1,4 +1,5 @@
-#include <boost\spirit\home\classic.hpp>
+#include "iterator.hpp"
+//#include <boost/spirit/classic_position_iterator.hpp>
 
 #include "stdafx.h"
 #include "parser.hpp"
@@ -7,9 +8,9 @@
 
 using namespace std;
 
-namespace par{
+str_it g_lastIterator;
 
-//	Parser g_dynamicParser;
+namespace par{
 
 	Parser::Parser():
 		m_semanticParser(),
@@ -23,12 +24,12 @@ namespace par{
 	void Parser::preParse(const std::string& _text, NaReTi::Module& _module)
 	{
 		m_preParser.dependencies.clear();
-		std::string::const_iterator iter = _text.begin();
-		std::string::const_iterator end = _text.end();
 
-		using boost::spirit::ascii::space;
+		pos_iterator_type posIt(_text.begin());
+		pos_iterator_type posEnd(_text.end());
 
-		boost::spirit::qi::phrase_parse(iter, end, m_preParserGrammar, m_skipper);
+		g_lastIterator = _text.begin();
+		boost::spirit::qi::phrase_parse(posIt, posEnd, m_preParserGrammar, m_skipper);
 	}
 
 	// ************************************************** //
@@ -37,9 +38,11 @@ namespace par{
 	{
 		m_semanticParser.setModule(_module);
 
-		std::string::const_iterator iter = _text.begin();
-		std::string::const_iterator end = _text.end();
+		g_lastIterator = _text.begin();
 
+		pos_iterator_type posIt(_text.begin());
+		pos_iterator_type posEnd(_text.end(), true);
+		
 		using boost::spirit::ascii::space;
 
 		clock_t beginClock = clock();
@@ -47,11 +50,11 @@ namespace par{
 		bool b = false;
 		try
 		{
-			b = boost::spirit::qi::phrase_parse(iter, end, m_grammar, m_skipper);
+			b = boost::spirit::qi::phrase_parse(posIt, posEnd, m_grammar, m_skipper);
 		}
 		catch (ParsingError& _error)
 		{
-			cout << _error.message << endl;
+			logError(_text.begin(), g_lastIterator, _error.message);
 			return false;
 		}
 		catch (qi::expectation_failure<std::string::const_iterator>& e)
@@ -60,7 +63,7 @@ namespace par{
 		}
 
 		clock_t endClock = clock();
-		std::cout << endl << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
+		std::cout << endl << _module.m_name << " " << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
 
 		return b;
 	}

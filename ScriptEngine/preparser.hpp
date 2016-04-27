@@ -6,6 +6,7 @@
 #include "attributecasts.hpp"
 #include "semanticparser.hpp"
 #include "skipper.hpp"
+#include "iterator.hpp"
 
 namespace par
 {
@@ -40,6 +41,6 @@ namespace par
 		par::PreParser& m_parser;
 	};
 
-	typedef PreParserSyntax<std::string::const_iterator, NaReTiSkipper> PreParserGrammar;
+	typedef PreParserSyntax<pos_iterator_type, NaReTiSkipper> PreParserGrammar;
 
 }

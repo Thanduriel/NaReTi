@@ -204,7 +204,7 @@ namespace par
 
 		par::SemanticParser& m_semanticParser;
 	};
-
-	typedef NaReTiSyntax<std::string::const_iterator, NaReTiSkipper> NaReTiGrammar;
+	
+	typedef NaReTiSyntax<pos_iterator_type, NaReTiSkipper> NaReTiGrammar;
 
 }
