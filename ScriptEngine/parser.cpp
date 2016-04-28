@@ -5,6 +5,7 @@
 #include "parser.hpp"
 #include "parexception.hpp"
 #include "boostparser.hpp"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -52,7 +53,7 @@ namespace par{
 		{
 			b = boost::spirit::qi::phrase_parse(posIt, posEnd, m_grammar, m_skipper);
 		}
-		catch (ParsingError& _error)
+		catch (ParsingError& _error) //semantic errors
 		{
 			logError(_text.begin(), g_lastIterator, _error.message);
 			return false;
@@ -63,19 +64,30 @@ namespace par{
 		}
 
 		clock_t endClock = clock();
-		std::cout << endl << _module.m_name << " " << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
-
+	//	std::cout << "[Info]" << "Compiled " << _module.m_name << " in " << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
+		logging::log(logging::Info, "Compiled " + _module.m_name + " in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
 		return b;
 	}
 
-	void Parser::logError(std::string::const_iterator _begin, const std::string::const_iterator& _it, const std::string& _msg)
+	void Parser::logError(str_it _begin, const str_it& _it, const std::string& _msg)
 	{
 		int lineCount = 1; //lines are numbered beginning with 1
+		str_it lastLb;
 		while (_begin != _it)
 		{
-			if (*_begin == '\n') lineCount++;
+			if (*_begin == '\n')
+			{
+				lineCount++;
+				lastLb = _begin; //effectively the begin of the error line
+			}
 			_begin++;
 		}
-		std::cout << "[l." << lineCount << "] " << _msg << endl;
+		//look for the end of the current line
+		str_it nextLb(lastLb); //start at last endl because _it might be an '\n'
+		while (*++nextLb != '\n');
+
+		logging::log(logging::Error, "[l." + std::to_string(lineCount) + "] " + _msg + '\n' + string(++lastLb, nextLb));
+//		std::clog << "[error]" <<"[l." << lineCount << "] " << _msg << endl;
+//		std::clog << string(++lastLb, nextLb) << endl;
 	}
 }
