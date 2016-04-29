@@ -9,14 +9,23 @@ type array
 	int capacity;
 	int size;
 }*/
+/*
+//actual declaration: void& [0]
+type __Array
+{
+	void& data
+	int capacity
+	int size
+}
 
+void &[1] typecast(__Array _arr)
 
 //ensures that the array has atleast space for _size
-void expand(void &[0] _arr, int _size)
+void expand(__Array _arr, int _size)
 {
 	if(_size > _arr.capacity)
 	{	
-		void &[0] temp //make another array to allow access per []
+		__Array temp //make another array to allow access per []
 		temp.data = _arr.data
 		
 		_arr.capacity = 4 * _arr.capacity * 2 //growth factor, change to 1.5 when float -> int cast is enabled
@@ -31,10 +40,10 @@ void expand(void &[0] _arr, int _size)
 }
 
 //append copys of all elements of _oth to _slf
-void &[0] +=(void &[0] _slf, void &[0] _oth)
+__Array +=(__Array _slf, __Array _oth)
 {
 	int n = _slf.size
-	expand(_slf.size + _oth.size)
+	expand(_slf, _slf.size + _oth.size)
 	
 	int i = -1
 	while(++i < _oth.size)
@@ -42,4 +51,4 @@ void &[0] +=(void &[0] _slf, void &[0] _oth)
 		_slf[i + n] = _oth[i]
 	}
 	
-} 
+} */

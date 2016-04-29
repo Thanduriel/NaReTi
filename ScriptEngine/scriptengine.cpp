@@ -2,6 +2,7 @@
 #include <time.h>  //clock
 
 #include "scriptengine.h"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -62,8 +63,8 @@ namespace NaReTi
 			if (mod) module.m_dependencies.push_back(mod);
 			else
 			{
-				cout << "Could not load depended module: " << modName << endl;
-				break;
+				logging::log(logging::Warning, "Could not load depended module: " + modName);
+		//		break;
 			}
 		}
 		bool ret = m_parser.parse(fileContent, module);

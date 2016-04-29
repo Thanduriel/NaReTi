@@ -46,6 +46,18 @@ namespace lang{
 		m_buildConstTypes.push_back(&_type);
 	}
 
+	void ArrayTypeGen::buildDefault(NaReTi::Module& _module)
+	{
+	/*	auto& allocator = _module.getAllocator();
+		ComplexType* type = new ComplexType("__Array");
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("data", TypeInfo(g_module->getBasicType(Void), true)));
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("capacity", TypeInfo(g_module->getBasicType(Int))));
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("size", TypeInfo(g_module->getBasicType(Int))));
+
+		type->typeCasts.emplace_back(new Function(allocator, "", InstructionType::Nop, TypeInfo(g_module->getBasicType(Void), true, false, true), *type));*/
+		//_module.m_types
+	}
+
 	NaReTi::Module* ArrayTypeGen::createModule(string& _name)
 	{
 		//already exists

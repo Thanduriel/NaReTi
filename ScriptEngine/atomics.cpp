@@ -117,6 +117,8 @@ namespace lang
 		BASICOPERATIONEXT(">=", (InstrList{ fCmp, JB }), FlagBool, Float, Float);
 		BASICOPERATIONEXT("<=", (InstrList{ fCmp, JA }), FlagBool, Float, Float);
 
+		//references
+		BASICASSIGN("=", Void, InstructionType::Set); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true; m_functions.back()->scope.m_variables[1]->typeInfo.isReference = true;
 
 		//typecasts
 		BASICCAST(InstructionType::iTof, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[Float]));	// int -> float

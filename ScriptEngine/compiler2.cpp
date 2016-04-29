@@ -184,8 +184,6 @@ namespace codeGen
 	void Compiler::compileFuction(par::Function& _function)
 	{
 		m_function = &_function;
-		if (_function.name == "=" && _function.returnTypeInfo.type.basic == BasicType::Complex)
-			int stop = 2;
 
 		//setup signature
 		convertSignature(_function);
@@ -576,6 +574,9 @@ namespace codeGen
 		//typecasts
 		case InstructionType::iTof:
 			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
+			break;
+		case InstructionType::fToi:
+			m_compiler.cvtss2si(*(X86GpVar*)_args[1], *(X86XmmVar*)_args[0]);
 			break;
 		}
 	}

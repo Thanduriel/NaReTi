@@ -12,7 +12,7 @@ namespace par
 		m_moduleLib(*lang::g_module),
 		m_typeInfo(lang::g_module->getBasicType(BasicType::Void))
 	{
-
+		m_arrayTypeGen.buildConst(lang::g_module->getBasicType(BasicType::Void));
 	}
 
 	// ************************************************** //
@@ -131,6 +131,8 @@ namespace par
 			TypeInfo& t0 = *_node.args[i]->typeInfo;
 			TypeInfo& t1 = _func.scope.m_variables[i]->typeInfo;
 			if (t0 == t1) continue;
+			//right site of an assignment may not be casted
+			if (_func.intrinsicType == Function::Assignment && i == 0) return false;
 
 			casts[i] = typeCast(t0, t1);
 			if (!casts[i]) return false;
@@ -558,14 +560,17 @@ namespace par
 		ComplexType* type = m_moduleLib.getType(m_typeName);
 		if (!type) throw ParsingError("Unknown type: " + m_typeName);
 
-		auto typeInfo = TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
 
-		if (typeInfo.isArray)
+		if (m_typeInfo.isArray)
 		{
+			auto typeInfo = TypeInfo(m_typeInfo.arraySize ? *type : *m_moduleLib.getType("_Array"), m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
 			typeInfo.arraySize = m_typeInfo.arraySize;
+			
 			m_arrayTypeGen.buildConst(*type);
+
+			return typeInfo;
 		}
-		return typeInfo;
+		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);;
 	}
 
 	// ************************************************** //

@@ -26,6 +26,8 @@ namespace lang{
 		 * if no optimization takes place all arrays are dynamic
 		 */
 		void buildConst(par::ComplexType& _type);
+
+		void buildDefault(NaReTi::Module& _module);
 	private:
 		//creates a new module with the given name if it is not found in m_modules
 		//Returns nullptr if it was already created.
