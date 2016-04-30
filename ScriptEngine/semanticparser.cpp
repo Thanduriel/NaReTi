@@ -560,17 +560,16 @@ namespace par
 		ComplexType* type = m_moduleLib.getType(m_typeName);
 		if (!type) throw ParsingError("Unknown type: " + m_typeName);
 
+		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
+	}
 
-		if (m_typeInfo.isArray)
-		{
-			auto typeInfo = TypeInfo(m_typeInfo.arraySize ? *type : *m_moduleLib.getType("_Array"), m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
-			typeInfo.arraySize = m_typeInfo.arraySize;
-			
-			m_arrayTypeGen.buildConst(*type);
+	// ************************************************** //
 
-			return typeInfo;
-		}
-		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);;
+	void SemanticParser::makeArray()
+	 { 
+		 ComplexType& type = m_arrayTypeGen.buildType(buildTypeInfo(), *m_currentModule);
+
+		 newTypeInfo(type.name);
 	}
 
 	// ************************************************** //

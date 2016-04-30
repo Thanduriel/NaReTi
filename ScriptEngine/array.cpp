@@ -23,7 +23,7 @@ namespace lang{
 		m_currentModule->m_functions.emplace_back(new Function("[]", TypeInfo(*m_currentType, true, false, false)));
 		Function& func = *m_currentModule->m_functions.back();
 		auto& alloc = m_currentModule->getAllocator();
-		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", TypeInfo(*m_currentType, true, true, true)));
+		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", TypeInfo(*m_curArrayType)));
 		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_1", TypeInfo(lang::g_module->getBasicType(BasicType::Int))));
 		func.paramCount = 2;
 		func.scope.emplace_back(m_currentModule->getAllocator().construct<ASTOp>(InstructionType::LdO));
@@ -56,6 +56,29 @@ namespace lang{
 
 		type->typeCasts.emplace_back(new Function(allocator, "", InstructionType::Nop, TypeInfo(g_module->getBasicType(Void), true, false, true), *type));*/
 		//_module.m_types
+	}
+
+	par::ComplexType& ArrayTypeGen::buildType(par::TypeInfo& _info, NaReTi::Module& _module)
+	{
+		m_currentModule = &_module;
+
+		auto& allocator = _module.getAllocator();
+		string name = _info.type.name + (_info.isReference ? "&" : "") + "[]";
+		if (ComplexType* t = _module.getType(name)) return *t;
+
+		ComplexType* type = new ComplexType(name);
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("data", TypeInfo(g_module->getBasicType(Void), true)));
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("capacity", TypeInfo(g_module->getBasicType(Int))));
+		type->scope.m_variables.push_back(allocator.construct<VarSymbol>("size", TypeInfo(g_module->getBasicType(Int))));
+		m_curArrayType = type;
+
+		m_currentType = &_info.type;
+
+		buildElemAccess();
+
+		_module.m_types.emplace_back(type);
+
+		return *type;
 	}
 
 	NaReTi::Module* ArrayTypeGen::createModule(string& _name)

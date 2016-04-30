@@ -40,7 +40,7 @@ namespace par
 		void newTypeInfo(const std::string& _attr) { m_typeName = _attr; m_typeInfo.isReference = false; m_typeInfo.isConst = false; m_typeInfo.isArray = false; }
 		void makeReference() { m_typeInfo.isReference = true; }
 		void makeConst() { m_typeInfo.isConst = true; }
-		void makeArray() { m_typeInfo.isArray = true; }
+		void makeArray();
 		void setArraySize(int _val) { m_typeInfo.arraySize = _val; }
 		void makeExternal() { m_currentFunction->bExternal = true; }
 		void finishGeneralExpression();

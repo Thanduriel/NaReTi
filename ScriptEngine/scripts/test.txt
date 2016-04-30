@@ -176,6 +176,7 @@ int test_global()
 	{
 		(++i)
 		arrrrray[i] = i
+		printI(arrrrray[i])
 	}
 	
 	i = -i
