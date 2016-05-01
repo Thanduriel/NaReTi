@@ -1,7 +1,9 @@
 #include "compiler2.hpp"
 #include "ptr_stuff.hpp"
-#include <iostream> //temp
+#include "logger.hpp"
+
 #include <assert.h>
+#include <time.h>
 
 namespace codeGen
 {
@@ -28,6 +30,8 @@ namespace codeGen
 
 	void Compiler::compile(NaReTi::Module& _module)
 	{
+		clock_t beginClock = clock();
+
 		for (auto& type : _module.m_types)
 		{
 			compileType(*(ComplexType*)type.get());
@@ -42,6 +46,9 @@ namespace codeGen
 		{
 			compileFuction(*function);
 		}
+
+		clock_t endClock = clock();
+		logging::log(logging::Info1, "Compiled \"" + _module.m_name + "\" in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
 	}
 
 	// *************************************************** //

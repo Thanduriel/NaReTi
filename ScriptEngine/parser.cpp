@@ -58,14 +58,15 @@ namespace par{
 			logError(_text.begin(), g_lastIterator, _error.message);
 			return false;
 		}
-		catch (qi::expectation_failure<std::string::const_iterator>& e)
+		catch (qi::expectation_failure<pos_iterator_type>& e)
 		{
-			logError(_text.begin(), e.first, "syntax error");
+			logError(_text.begin(), e.first, string("Syntax error: did not expect \"") + *e.first + "\"");
+			return false;
 		}
 
 		clock_t endClock = clock();
 	//	std::cout << "[Info]" << "Compiled " << _module.m_name << " in " << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
-		logging::log(logging::Info, "Compiled " + _module.m_name + " in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
+		logging::log(logging::Info1, "Parsed \"" + _module.m_name + "\" in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
 		return b;
 	}
 

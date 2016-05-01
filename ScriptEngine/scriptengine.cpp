@@ -76,6 +76,7 @@ namespace NaReTi
 		else
 		{
 			m_modules.pop_back();
+			logging::log(logging::Error, "The module \"" + packageName + "\" could not be loaded due to a parsing error");
 		}
 
 		return ret;
