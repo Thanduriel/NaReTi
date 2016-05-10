@@ -33,7 +33,7 @@ namespace codeGen
 		// calculates the member offsets and alignment
 		void compileType(par::ComplexType& _type);
 		// allocates heap space for a local var and stores the address in _var
-		void compileHeapVar(par::VarSymbol& _var, utils::StackAlloc& _allocator);
+		void compileHeapVar(par::VarSymbol& _var, utils::DetorAlloc& _allocator);
 
 		// compiles and calls the module init function that contains assignments for global vars
 		void compileModuleInit(NaReTi::Module& _module);

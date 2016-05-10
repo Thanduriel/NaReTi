@@ -4,7 +4,7 @@
 
 #include "symbols.hpp"
 #include "instruction.hpp"
-#include "stackalloc.hpp"
+#include "complexalloc.hpp"
 
 namespace par{
 
@@ -27,7 +27,7 @@ namespace par{
 		String
 	};
 
-	struct ASTNode
+	struct ASTNode : public utils::DetorAlloc::Destructible
 	{
 		ASTType type;
 	};
@@ -62,11 +62,11 @@ namespace par{
 	{
 		//definitions can be found in "symbols.cpp"
 		// a binary function of the structure T x T -> T
-		Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
+		Function(utils::DetorAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr);
 		// general purpose T1 x T2 -> T0
-		Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
+		Function(utils::DetorAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
 		//typecast
-		Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1);
+		Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1);
 		//standard
 		Function(const std::string& _name, TypeInfo& _type) : Symbol(_name), returnTypeInfo(_type), bExternal(false), bHiddenParam(false), bInline(false), bIntrinsic(false){};
 

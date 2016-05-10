@@ -184,6 +184,7 @@
     <ClInclude Include="boostparser.hpp" />
     <ClInclude Include="compiledsymbols.hpp" />
     <ClInclude Include="compiler2.hpp" />
+    <ClInclude Include="complexalloc.hpp" />
     <ClInclude Include="enginetypes.hpp" />
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="iterator.hpp" />

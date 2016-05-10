@@ -206,10 +206,10 @@ int test_performance()
 void main()
 {
 	initRandom(getTickCount())
-	printF(rand(30, 0))
+	printF(rand(22, 0))
 	
 	int i = 4
 	i = 4 * 1.5
 	i = i * 1.5
-	printI(i)
+//	printI(i)
 }

@@ -216,6 +216,9 @@
     <ClInclude Include="logger.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="complexalloc.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

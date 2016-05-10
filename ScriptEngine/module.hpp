@@ -2,7 +2,6 @@
 
 #include "symbols.hpp"
 #include "ast.hpp"
-#include "stackalloc.hpp"
 #include <vector>
 #include <string>
 #include <memory>
@@ -47,7 +46,7 @@ namespace NaReTi{
 		// get a local var from this module
 		par::VarSymbol* getGlobalVar(const std::string& _name);
 
-		utils::StackAlloc& getAllocator() { return m_allocator; }
+		utils::DetorAlloc& getAllocator() { return m_allocator; }
 
 		//links an as external declared func symbol in this module to the given ptr.
 		bool linkExternal(const std::string& _name, void* _funcPtr);
@@ -64,6 +63,6 @@ namespace NaReTi{
 	protected:
 
 		// allocator for the ast-nodes
-		utils::StackAlloc m_allocator;
+		utils::DetorAlloc m_allocator;
 	};
 }

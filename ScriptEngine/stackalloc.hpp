@@ -21,11 +21,11 @@ namespace utils{
 		template< typename _T, typename... _Args>
 		_T* construct(_Args&&... _args)
 		{
-			//check whether enough space is avialable
+			//check whether enough space is available
 			if (sp - (char*)memBlocks[bp] + sizeof(_T) > _BlockSize) newBlock();
 
 			//call constructor
-			auto ptr = new(sp)_T(std::forward< _Args >(_args)...);
+			auto ptr = new(sp) (_T)( std::forward< _Args >(_args)...);
 			sp += sizeof(_T);
 			return ptr;
 		}

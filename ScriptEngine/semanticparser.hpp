@@ -107,7 +107,7 @@ namespace par
 		ASTCode* m_targetScope; // a scope that is to be entered
 
 		//the current module's allocator
-		utils::StackAlloc* m_allocator;
+		utils::DetorAlloc* m_allocator;
 	};
 	 // simple print for debugging
 	void testFunc();

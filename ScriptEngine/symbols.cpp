@@ -2,7 +2,7 @@
 #include "symbols.hpp"
 
 namespace par{
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr) : Function(_name, TypeInfo(_type))
+	Function::Function(utils::DetorAlloc& _alloc, const std::string& _name, ComplexType& _type, InstructionType _instr) : Function(_name, TypeInfo(_type))
 	{
 		bInline = true;
 		bIntrinsic = true;
@@ -18,7 +18,7 @@ namespace par{
 		scope.emplace_back(_alloc.construct<ASTOp>(_instr));
 	};
 
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2) : Function(_name, TypeInfo(_t0))
+	Function::Function(utils::DetorAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2) : Function(_name, TypeInfo(_t0))
 	{
 		bInline = true;
 		bIntrinsic = true;
@@ -37,7 +37,7 @@ namespace par{
 			scope.emplace_back(_alloc.construct<ASTOp>(instr));
 	};
 
-	Function::Function(utils::StackAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1)
+	Function::Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1)
 		: Function(_name, TypeInfo(_t0))
 	{
 		bInline = true;

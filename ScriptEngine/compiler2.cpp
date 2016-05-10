@@ -85,7 +85,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::compileHeapVar(VarSymbol& _var, utils::StackAlloc& _allocator)
+	void Compiler::compileHeapVar(VarSymbol& _var, utils::DetorAlloc& _allocator)
 	{
 		_var.ownership.rawPtr = m_runtime.getMemMgr()->alloc(_var.typeInfo.type.size);//_allocator.alloc(_var.typeInfo.type.size);
 		_var.ownership.ownerType = OwnershipType::Module;

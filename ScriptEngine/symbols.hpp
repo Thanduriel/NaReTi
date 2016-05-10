@@ -4,6 +4,7 @@
 #include <memory>
 #include "instruction.hpp"
 
+#include "complexalloc.hpp"
 #include "compiledsymbols.hpp"// for x86grpvar
 
 namespace par{
@@ -75,7 +76,7 @@ namespace par{
 		bool operator== (TypeInfo& oth);
 	};
 
-	struct VarSymbol : public Symbol, public codeGen::CVarSymbol
+	struct VarSymbol : public Symbol, public codeGen::CVarSymbol, public utils::DetorAlloc::Destructible
 	{
 		VarSymbol(const std::string& _name, TypeInfo& _typeInfo) :
 			Symbol(_name),
@@ -124,7 +125,7 @@ namespace par{
 		CodeScope scope;
 
 		// available casts for this type
-		std::vector< Function* > typeCasts;
+		std::vector< std::unique_ptr<Function> > typeCasts;
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;
