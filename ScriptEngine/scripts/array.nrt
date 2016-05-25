@@ -9,7 +9,23 @@ type array
 	int capacity;
 	int size;
 }*/
+
 /*
+//proposed generics
+type<T> array
+{
+//	T& data
+	int _capacity
+	int _size
+}*/
+
+
+/*
+void& [](__Array& arr, int i)
+{
+	return data[arr]
+}
+
 //actual declaration: void& [0]
 type __Array
 {

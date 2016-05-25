@@ -17,7 +17,9 @@ namespace NaReTi{
 		Module* getModule(const std::string& _name);
 		//compiles a given source file and adds the module
 		//the name is the file name without ending.
-		bool loadModule(const std::string& _fileName);
+		// @param _dest when provided symbols are added to this module
+		bool loadModule(const std::string& _fileName, NaReTi::Module* _dest = nullptr);
+
 		// Removes a module with the given name and all it's symbols to release it's memory.
 		// This should only be used if no other module depends on the module.
 		// @param _keepBinary If true no compiled functions are removed
@@ -48,6 +50,7 @@ namespace NaReTi{
 		std::string extractName(const std::string& _fullName);
 
 		lang::BasicModule m_basicModule;
+
 		par::Parser m_parser;
 		codeGen::Compiler m_compiler;
 		codeGen::Optimizer m_optimizer;

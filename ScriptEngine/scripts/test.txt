@@ -122,7 +122,7 @@ float [](Vec3& _vec, int _i)
 	else if(_i == 1){return _vec.y}
 	else if(_i == 2){return _vec.z}
 }
-
+float pi = 3.14159265
 int test_global()
 {
 	printStr("1 external")
@@ -137,10 +137,11 @@ int test_global()
 	printStr("---------------------- math tests ----------------------")
 	if(sin(0.25) > 0.247411 && sin(0.25) < 0.247413) { printStr("1 sin(0.25)")}
 	else {printStr("0 sin(0.25)")}
-	if(pow(2, 8) == 256){ printStr("1 pow(2,8)")}
+	if(2'8 == 256){ printStr("1 pow(2,8)")}
 	else {printStr("0 pow(2,8)")}
 	if(sqrt(765.34) > 27.6647 && sqrt(765.34) < 27.6649) {printStr("1 sqrt(765.34)")}
 	else {printStr("0 sqrt(765.34)")}
+	printF(sqrt(765.34))
 	
 	Vec3 loc
 	loc.x = 4.0
@@ -195,11 +196,14 @@ int test_performance()
 	Vec2 test
 	test.x = 2.0
 	test.y = 1.0
+	//vector calculation
 	while(i < 1000000)
 	{
 		++i
 		test = test * 1.00001
 	}
+	//math functions
+	
 	return getTickCount() - tickCount
 }
 
@@ -207,6 +211,8 @@ void main()
 {
 	initRandom(getTickCount())
 	printF(rand(22, 0))
+	
+	printF(2.0'13.2)
 	
 	int i = 4
 	i = 4 * 1.5

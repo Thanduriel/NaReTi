@@ -43,6 +43,9 @@
     <Filter Include="utils">
       <UniqueIdentifier>{5effdd4d-2015-4347-b062-9742fd97c3f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="par\generics">
+      <UniqueIdentifier>{a813ba71-950e-4ef9-8c8e-01fc69909c33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -219,6 +222,15 @@
     <ClInclude Include="complexalloc.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="generics.hpp">
+      <Filter>par\generics</Filter>
+    </ClInclude>
+    <ClInclude Include="mathlib.hpp">
+      <Filter>lang</Filter>
+    </ClInclude>
+    <ClInclude Include="defmacros.hpp">
+      <Filter>lang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -324,6 +336,12 @@
       <Filter>compiler</Filter>
     </ClCompile>
     <ClCompile Include="array.cpp">
+      <Filter>lang</Filter>
+    </ClCompile>
+    <ClCompile Include="generics.cpp">
+      <Filter>par\generics</Filter>
+    </ClCompile>
+    <ClCompile Include="mathlib.cpp">
       <Filter>lang</Filter>
     </ClCompile>
   </ItemGroup>

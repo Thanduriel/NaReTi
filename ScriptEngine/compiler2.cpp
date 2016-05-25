@@ -38,7 +38,7 @@ namespace codeGen
 		}
 		for (auto& var : _module.m_text.m_variables)
 		{
-			compileHeapVar(*var, _module.getAllocator());
+			compileHeapVar(*var);
 		}
 		compileModuleInit(_module);
 
@@ -55,10 +55,12 @@ namespace codeGen
 
 	void Compiler::release(NaReTi::Module& _module)
 	{
+		//globals
 		for (auto& var : _module.m_text.m_variables)
 		{
 			m_runtime.release(var->ownership.rawPtr);
 		}
+		//functions
 		for (auto& function : _module.m_functions)
 		{
 			m_runtime.release(function->binary);
@@ -85,9 +87,9 @@ namespace codeGen
 
 	// *************************************************** //
 
-	void Compiler::compileHeapVar(VarSymbol& _var, utils::DetorAlloc& _allocator)
+	void Compiler::compileHeapVar(VarSymbol& _var)
 	{
-		_var.ownership.rawPtr = m_runtime.getMemMgr()->alloc(_var.typeInfo.type.size);//_allocator.alloc(_var.typeInfo.type.size);
+		_var.ownership.rawPtr = m_runtime.getMemMgr()->alloc(_var.typeInfo.type.size);
 		_var.ownership.ownerType = OwnershipType::Module;
 		_var.isPtr = true; 
 		_var.typeInfo.isReference = true;  // enforce reference assignment
@@ -190,6 +192,9 @@ namespace codeGen
 
 	void Compiler::compileFuction(par::Function& _function)
 	{
+		//intrinsics are always inlined
+		if (_function.bIntrinsic) return;
+
 		m_function = &_function;
 
 		//setup signature
@@ -577,7 +582,11 @@ namespace codeGen
 		case fDiv:
 			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
-
+		case fNeg:
+			break;
+		case Sqrt:
+			m_compiler.sqrtss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
+			break;
 		//typecasts
 		case InstructionType::iTof:
 			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
@@ -690,21 +699,6 @@ namespace codeGen
 
 	X86Mem Compiler::getMemberAdr(ASTMember& _node, X86GpVar& _var)
 	{
-	/*	X86GpVar* gpVar;
-		switch (_node.instance->type)
-		{
-		case ASTType::Leaf:
-		{
-			//can only be a pointer
-			ASTLeaf& leaf = *(ASTLeaf*)_node.instance;
-			gpVar = (X86GpVar*)leaf.ptr->compiledVar;
-			break;
-		}
-		case ASTType::Call:
-			gpVar = m_accumulator;
-			break;
-		}*/
-
 		ComplexType& type = _node.instance->typeInfo->type;
 		return x86::dword_ptr(_var, type.displacement[_node.index]);//dword
 	}
@@ -736,7 +730,6 @@ namespace codeGen
 		Label& elseBranch = m_labelStack.back();
 		
 		compileCondExp(*(ASTCall*)_node.condition);
-	//	m_compiler.jnz(elseBranch);
 		compileCode(*_node.ifBody);
 		m_compiler.jmp(end);
 		m_compiler.bind(elseBranch);
@@ -842,7 +835,7 @@ namespace codeGen
 	// *************************************************** //
 
 	void Compiler::resetRegisters()
-	{
+	{ 
 		m_anonymousVars.clear();
 		m_anonymousVars.reserve(32); // make sure that no move will occur
 

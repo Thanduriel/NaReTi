@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/config/warning_disable.hpp>
 #include <boost/spirit/include/qi.hpp>
 
 namespace boost {

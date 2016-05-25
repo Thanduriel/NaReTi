@@ -63,6 +63,13 @@ namespace par{
 			isConst(_isConst),
 			isArray(_isArray){}
 
+		TypeInfo(ComplexType& _type, const TypeInfo& _parent)
+			: type(_type),
+			isReference(_parent.isReference),
+			isConst(_parent.isConst),
+			isArray(_parent.isArray)
+		{};
+
 		ComplexType& type;
 		bool isReference;
 		bool isConst;

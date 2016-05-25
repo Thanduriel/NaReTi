@@ -1,5 +1,6 @@
+#include <boost/config/warning_disable.hpp>
+
 #include "iterator.hpp"
-//#include <boost/spirit/classic_position_iterator.hpp>
 
 #include "stdafx.h"
 #include "parser.hpp"

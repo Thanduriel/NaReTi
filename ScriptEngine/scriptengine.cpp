@@ -3,6 +3,7 @@
 
 #include "scriptengine.h"
 #include "logger.hpp"
+#include "mathlib.hpp"
 
 using namespace std;
 
@@ -13,6 +14,9 @@ namespace NaReTi
 		m_basicModule(m_compiler.getRuntime()),
 		m_parser()
 	{
+		m_config.scriptLocation = "scripts/";
+		m_modules.emplace_back(new lang::MathModule());
+		loadModule("math.nrt", m_modules.back().get());
 	}
 
 	// ******************************************************* //
@@ -29,7 +33,7 @@ namespace NaReTi
 
 	// ******************************************************* //
 
-	bool ScriptEngine::loadModule(const string& _fileName)
+	bool ScriptEngine::loadModule(const string& _fileName, NaReTi::Module* _dest)
 	{
 		std::ifstream in((m_config.scriptLocation + _fileName).c_str(), std::ios::in | std::ios::binary);
 
@@ -51,8 +55,9 @@ namespace NaReTi
 
 		//use it without the file ending as name for the module
 		string packageName = extractName(_fileName);
-		m_modules.emplace_back(new NaReTi::Module(packageName));
-		NaReTi::Module& module = *m_modules.back();
+		if (!_dest)
+			m_modules.emplace_back(new NaReTi::Module(packageName));
+		NaReTi::Module& module = _dest ? *_dest : *m_modules.back();
 
 		//look for dependencies
 		m_parser.preParse(fileContent, module);

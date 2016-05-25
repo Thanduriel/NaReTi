@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "scriptengine.h"
 #include <iostream>
+#include <chrono>
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -53,17 +54,11 @@ struct iVec2
 	int y;
 };
 
-struct AllocTest : public utils::DetorAlloc::Destructible
-{
-	AllocTest(const std::string& _str) : str(_str){}
-	std::string str;
-};
-
 int _tmain(int argc, _TCHAR* argv[])
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 //	_CrtSetBreakAlloc(810);
-	new iVec2();
+
 	NaReTi::ScriptEngine scriptEngine;
 	NaReTi::Config& config = scriptEngine.config();
 	config.optimizationLvl = NaReTi::Basic;
@@ -151,10 +146,6 @@ int _tmain(int argc, _TCHAR* argv[])
 		scriptEngine.call<void>(hndlMain);
 
 	}
-
-	//allocator test
-//	utils::DetorAlloc allocator;
-//	allocator.construct<AllocTest>("test");
 
 	char tmp;
 	std::cin >> tmp;

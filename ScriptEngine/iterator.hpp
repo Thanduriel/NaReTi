@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost\spirit\home\classic.hpp>
 #include <string>
 
 //typedef boost::spirit::classic::position_iterator<std::string::const_iterator> pos_iterator_type;

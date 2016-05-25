@@ -1,10 +1,12 @@
 #pragma once
 
 #include "symbols.hpp"
+#include "generics.hpp"
 #include "ast.hpp"
 #include <vector>
 #include <string>
 #include <memory>
+#include <asmjit.h>
 
 namespace NaReTi{
 
@@ -52,8 +54,9 @@ namespace NaReTi{
 		bool linkExternal(const std::string& _name, void* _funcPtr);
 
 		//their lifetime equals the module's
-		//use a stack allocator
+		//use a stack allocator for all related buffers if possible
 		std::vector < std::unique_ptr<par::ComplexType> > m_types;
+		std::vector < std::unique_ptr <par::GenericType> > m_genericTypes;
 		std::vector < std::unique_ptr<par::Function> > m_functions;
 		par::ASTCode m_text;
 

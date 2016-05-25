@@ -185,10 +185,13 @@
     <ClInclude Include="compiledsymbols.hpp" />
     <ClInclude Include="compiler2.hpp" />
     <ClInclude Include="complexalloc.hpp" />
+    <ClInclude Include="defmacros.hpp" />
     <ClInclude Include="enginetypes.hpp" />
+    <ClInclude Include="generics.hpp" />
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="iterator.hpp" />
     <ClInclude Include="logger.hpp" />
+    <ClInclude Include="mathlib.hpp" />
     <ClInclude Include="module.hpp" />
     <ClInclude Include="modulelib.hpp" />
     <ClInclude Include="optimizer.hpp" />
@@ -231,7 +234,9 @@
     <ClCompile Include="array.cpp" />
     <ClCompile Include="atomics.cpp" />
     <ClCompile Include="compiler2.cpp" />
+    <ClCompile Include="generics.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mathlib.cpp" />
     <ClCompile Include="module.cpp" />
     <ClCompile Include="modulelib.cpp" />
     <ClCompile Include="optimizer.cpp" />

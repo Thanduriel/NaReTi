@@ -138,6 +138,5 @@ namespace par{
 		
 		ASTExpNode* instance;
 		size_t index;
-	//	ASTUnlinkedSym* member;
 	};
 }

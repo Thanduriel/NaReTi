@@ -1,11 +1,6 @@
 #include "atomics.hpp"
 #include "symbols.hpp"
-
-#define BASICASSIGN(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, *m_types[ T ], Instr)); m_functions.back()->scope.m_variables[0]->typeInfo.isConst = false; m_functions.back()->intrinsicType = Function::Assignment;
-#define BASICOPERATION(X, Y, Z) m_functions.emplace_back(new Function( m_allocator, X, *m_types[ Y ], Z));
-#define BASICOPERATIONEXT(Name, InstrList, T0, T1, T2) m_functions.emplace_back(new Function( m_allocator, Name, InstrList, *m_types[ T0 ], m_types[ T1 ].get(), m_types[ T2 ].get()));
-#define BASICCAST(Instr, T0, T1) T0.type.typeCasts.emplace_back(new Function( m_allocator, "", Instr, T1, T0));
-#define UNARYOPERATION(Name, T, Instr) m_functions.emplace_back(new Function( m_allocator, Name, Instr, T, T));
+#include "defmacros.hpp"
 
 namespace lang
 {
@@ -81,6 +76,7 @@ namespace lang
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
 		UNARYOPERATION("-", TypeInfo(*m_types[Int]), InstructionType::Neg);
+		//type = assignment because the original value is changed
 		UNARYOPERATION("++", TypeInfo(*m_types[Int]), InstructionType::Inc); m_functions.back()->intrinsicType = Function::Assignment;
 		UNARYOPERATION("--", TypeInfo(*m_types[Int]), InstructionType::Dec); m_functions.back()->intrinsicType = Function::Assignment;
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
@@ -108,7 +104,7 @@ namespace lang
 		BASICOPERATION("/", Float, InstructionType::fDiv);
 		BASICASSIGN("=", Float, InstructionType::fSet);
 		BASICASSIGN("=", Float, InstructionType::fSet); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true;
-
+		UNARYOPERATION("-", TypeInfo(*m_types[Float]), InstructionType::fNeg);
 		//comparison
 		BASICOPERATIONEXT("==", (InstrList{ fCmp, JNE }), FlagBool, Float, Float);
 		BASICOPERATIONEXT("!=", (InstrList{ fCmp, JE }), FlagBool, Float, Float);

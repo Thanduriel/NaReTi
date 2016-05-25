@@ -211,23 +211,35 @@ namespace par
 	{
 		auto typeInfo = buildTypeInfo();
 		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>(_attr, typeInfo));
-		//	std::cout << "var declaration" << _attr.m0 << " " << _attr.m1 << endl;
 	}
 
 	void SemanticParser::pushLatestVar()
 	{
 		pushSymbol(m_currentScope->m_variables.back()->name);
-/*		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(m_currentScope->m_variables.back());
-		leaf->typeInfo = &leaf->ptr->typeInfo;
-		m_stack.push_back(leaf);*/
 	}
 
 	// ************************************************** //
 
 	void SemanticParser::typeDeclaration(std::string& _attr)
 	{
-		m_currentModule->m_types.emplace_back(new ComplexType(_attr));
-		m_currentScope = &m_currentModule->m_types.back()->scope;
+		if (m_genericTypeParams.size())
+		{
+			m_currentModule->m_genericTypes.emplace_back(new GenericType(_attr, m_genericTypeParams));
+			m_currentScope = &m_currentModule->m_genericTypes.back()->scope;
+			m_genericTypeParams.clear();
+		}
+		else
+		{
+			m_currentModule->m_types.emplace_back(new ComplexType(_attr));
+			m_currentScope = &m_currentModule->m_types.back()->scope;
+		}
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::genericTypePar(std::string& _attr)
+	{
+		m_genericTypeParams.push_back(_attr);
 	}
 
 	// ************************************************** //

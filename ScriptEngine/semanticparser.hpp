@@ -32,6 +32,7 @@ namespace par
 		void varDeclaration(std::string& _attr);
 		void pushLatestVar();
 		void typeDeclaration(std::string& _attr);
+		void genericTypePar(std::string& _attr);
 		void useStatement(std::string& _attr);
 		void finishTypeDec();
 		void funcDeclaration(std::string& _attr);
@@ -64,7 +65,7 @@ namespace par
 		void term(const std::string& _operator);
 		void unaryTerm(const boost::optional<std::string>& _str);
 		void call(std::string& _name);
-		void argSeperator();
+		void argSeperator(); // ","
 
 		void lockLatestNode();
 		//looks in the tree with the given node as root for the right position of the top level on the stack.
@@ -72,7 +73,7 @@ namespace par
 	private:
 		//take a expression node from the stack and link the containing functions
 		ASTExpNode* popNode() { ASTExpNode* ptr = m_stack.back(); m_stack.pop_back(); if (ptr->type == ASTType::Call || ptr->type == ASTType::Member){ linkCall(*(ASTCall*)ptr); } return ptr; };
-		//pop a conditional node and verify that it is boolean
+		//pop a conditional node and verify that it is boolean or can be implicitly casted
 		ASTExpNode* popCondNode();
 
 		void linkCall(ASTCall& _node);
@@ -96,6 +97,7 @@ namespace par
 		std::vector < ASTExpNode* > m_stack;
 		TypeInfo m_typeInfo;
 		std::string m_typeName;
+		std::vector < std::string> m_genericTypeParams;
 
 		std::vector<NaReTi::Module::FuncMatch> m_funcQuery;
 

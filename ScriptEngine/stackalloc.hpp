@@ -62,5 +62,5 @@ namespace utils{
 		std::vector< void* > memBlocks;
 	};
 
-	typedef utils::StackAllocator<1024> StackAlloc;
+	typedef utils::StackAllocator<4096> StackAlloc; //try 8192?
 }

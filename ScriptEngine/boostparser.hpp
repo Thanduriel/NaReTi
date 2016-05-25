@@ -1,6 +1,5 @@
 #pragma once
 
-#include <boost/config/warning_disable.hpp>
 #include <boost/bind.hpp>
 
 #include "attributecasts.hpp"
@@ -38,7 +37,7 @@ namespace par
 				;
 
 			TypeDeclaration = 
-				("type" >> Symbol)[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
+				("type" >> -GenericTypeParam >> Symbol)[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
 				'{' >> 
 				*VarDeclaration >> 
 				lit('}')[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
@@ -59,6 +58,13 @@ namespace par
 				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
 				(lit("external")[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
 				| CodeScope)
+				;
+
+			GenericTypeParam =
+				'<' >>
+				-Symbol[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
+				*(Symbol >> lit(','))[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
+				'>'
 				;
 
 			TypeInformation =
@@ -125,15 +131,6 @@ namespace par
 				CodeScope
 				;
 
-	/*		Conditional =
-				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
-				CodeScope >>
-				*((lit("else if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::elseifConditional, &m_semanticParser)] >>
-				CodeScope) >>
-				-(lit("else")[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
-				CodeScope)
-				;*/
-
 			Call =
 				(Symbol >>
 				'(')[boost::bind(&SemanticParser::call, &m_semanticParser, ::_1)] >>
@@ -159,7 +156,7 @@ namespace par
 
 			// match any special char that can be used as an operator
 			//pay attention that '-' needs to be the last char so that it is not interpreted as range
-			Operator = lexeme[+char_("?+*/<>=|^%~!&.-")];
+			Operator = lexeme[+char_("?'+*/<>=|^%~!&.-")];
 			
 
 			Integer = 
@@ -185,6 +182,7 @@ namespace par
 
 		qi::rule<Iterator, Skipper> TypeInformation;
 		qi::rule<Iterator, Skipper> TypeAttr;
+		qi::rule<Iterator, Skipper> GenericTypeParam;
 
 		qi::rule<Iterator, Skipper> Expression;
 		qi::rule<Iterator, Skipper> GeneralExpression;

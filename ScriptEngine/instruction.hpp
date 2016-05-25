@@ -6,7 +6,7 @@ namespace par
 	//not all of this are in use or even make sense in the current implementation
 	enum InstructionType
 	{
-		Nop,
+		Nop, //this instruction will not result into any output
 		//arithmetical operations
 		Add,
 		Sub,
@@ -22,6 +22,7 @@ namespace par
 		fMul,
 		fDiv,
 		fMod,
+		fNeg,
 		//logical operations
 		Not,
 		ShL,
@@ -54,7 +55,11 @@ namespace par
 		Call, // call subroutine
 		// type casts and which argument to take
 		iTof,
-		fToi
+		fToi,
+		//advanced mathematical functions
+		Sqrt,
+		Sin,
+		Cos
 	};
 
 	//predeclarations

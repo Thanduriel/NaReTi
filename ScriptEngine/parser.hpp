@@ -3,6 +3,7 @@
 #include "module.hpp"
 #include "symbols.hpp"
 
+#include <boost/config/warning_disable.hpp>
 #include "boostparser.hpp"
 #include "preparser.hpp"
 

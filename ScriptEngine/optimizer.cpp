@@ -102,7 +102,9 @@ namespace codeGen{
 	{
 		m_callCount++;
 
-		int stackLabel = m_usageStack.size();
+		int stackLabel = (int)m_usageStack.size();
+
+		//trace arg nodes
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
 			auto& arg = _node.args[i];

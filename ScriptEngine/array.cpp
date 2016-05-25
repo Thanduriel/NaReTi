@@ -26,7 +26,7 @@ namespace lang{
 		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", TypeInfo(*m_curArrayType)));
 		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_1", TypeInfo(lang::g_module->getBasicType(BasicType::Int))));
 		func.paramCount = 2;
-		func.scope.emplace_back(m_currentModule->getAllocator().construct<ASTOp>(InstructionType::LdO));
+		func.scope.emplace_back(alloc.construct<ASTOp>(InstructionType::LdO));
 		func.bIntrinsic = true;
 		func.bInline = true;
 		func.intrinsicType = Function::TypeCast; //makes the compiler use _dest as arg
