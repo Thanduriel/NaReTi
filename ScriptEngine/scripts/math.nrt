@@ -14,6 +14,9 @@ float abs(float val)
 	else {return val}
 }
  
+//power
+float '(float x, float y) external
+
 int '(int x, int y)
 {
 	if(y < 0)
@@ -56,7 +59,7 @@ float sqrt_test(float x)
 }
 
 float _4_pi = 4.0/pi
-float _m4_pi2 = 0.0-4.0/(pi*pi)
+float _m4_pi2 = -4.0/(pi*pi)
 float _q = 0.775
 float _p = 0.225
 
@@ -77,3 +80,12 @@ float sin(float x)
 	
 	return s
 }
+//precise sin, works for every float
+// ~3x slower then sin
+float sinp(float x) external
+float cosp(float x) external
+float tanp(float x) external
+
+float sinh(float x) external
+float cosh(float x) external
+float tanh(float x) external

@@ -202,7 +202,15 @@ int test_performance()
 		++i
 		test = test * 1.00001
 	}
+	i = 0
+	float f = 0.0
+	
 	//math functions
+	while(i < 326000)
+	{
+		++i
+		f = cosp(f)
+	}
 	
 	return getTickCount() - tickCount
 }

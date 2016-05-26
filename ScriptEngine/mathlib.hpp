@@ -10,6 +10,8 @@ namespace lang{
 	struct MathModule : public NaReTi::Module
 	{
 		MathModule();
+
+		void linkExternals();
 	private:
 	};
 }

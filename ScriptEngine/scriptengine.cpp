@@ -15,8 +15,12 @@ namespace NaReTi
 		m_parser()
 	{
 		m_config.scriptLocation = "scripts/";
-		m_modules.emplace_back(new lang::MathModule());
-		loadModule("math.nrt", m_modules.back().get());
+
+		//setup std math lib
+		lang::MathModule* module = new lang::MathModule();
+		loadModule("math.nrt", module);
+		module->linkExternals();
+		m_modules.emplace_back(module);
 	}
 
 	// ******************************************************* //

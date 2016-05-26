@@ -50,11 +50,11 @@ namespace NaReTi
 		return nullptr;
 	}
 
-	Function* Module::getFunction(const std::string& _name)
+	Function* Module::getFunction(const std::string& _name, bool _external)
 	{
 		for (auto& func : m_functions)
 		{
-			if (func->name == _name) return func.get();
+			if (func->name == _name && (!_external || func->bExternal == _external)) return func.get();
 		}
 		return nullptr;
 	}
@@ -72,7 +72,7 @@ namespace NaReTi
 
 	bool Module::linkExternal(const string& _name, void* _funcPtr)
 	{
-		Function* func = getFunction(_name);
+		Function* func = getFunction(_name, true);
 		if (!func) return false;
 
 		func->binary = _funcPtr;

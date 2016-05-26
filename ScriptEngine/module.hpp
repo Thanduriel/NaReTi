@@ -43,7 +43,7 @@ namespace NaReTi{
 			std::vector<FuncMatch>& _funcQuery);
 
 		// simpler function search that will return the first name match
-		par::Function* getFunction(const std::string& _name);
+		par::Function* getFunction(const std::string& _name, bool _external = false);
 
 		// get a local var from this module
 		par::VarSymbol* getGlobalVar(const std::string& _name);
