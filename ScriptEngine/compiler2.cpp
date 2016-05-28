@@ -223,6 +223,8 @@ namespace codeGen
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
 
+		if (_function.name == "bigFunction")
+			int brk = 1234;
 		//code
 		compileCode(_function.scope);
 		
@@ -313,6 +315,9 @@ namespace codeGen
 		//	auto& arg = *begin;
 			switch (arg->type)
 			{
+			case ASTType::LeafInt:
+			case ASTType::LeafFloat:
+			case ASTType::LeafSym:
 			case ASTType::Leaf:
 				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
 				args.push_back(compileLeaf(*leaf, &indirect));
@@ -432,22 +437,22 @@ namespace codeGen
 	asmjit::Var* Compiler::compileLeaf(par::ASTLeaf& _node, bool* _indirect)
 	{
 		//immediate val
-		if (_node.parType == ParamType::Int)
+		if (_node.type == ASTType::LeafInt)
 		{
 			X86GpVar& var = getUnusedVar32();
-			m_compiler.mov(var, Imm(_node.val));
+			m_compiler.mov(var, Imm(((ASTLeafInt*)&_node)->value));
 			return &var;
 		}
-		else if (_node.parType == ParamType::Float)
+		else if (_node.type == ASTType::LeafFloat)
 		{
 			X86XmmVar& var = getUnusedFloat();
-			m_compiler.movss(var, m_compiler.newFloatConst(0, _node.valFloat));
+			m_compiler.movss(var, m_compiler.newFloatConst(0, ((ASTLeafFloat*)&_node)->value));
 			return &var;
 		}
-		else if (_node.parType == ParamType::Ptr)
+		else if (_node.type == ASTType::LeafSym)
 		{
-			if (_indirect && _node.ptr->isPtr) *_indirect = true;
-			return _node.ptr->compiledVar;
+			if (_indirect && ((ASTLeafSym*)&_node)->value->isPtr) *_indirect = true;
+			return ((ASTLeafSym*)&_node)->value->compiledVar;
 		}
 		return nullptr;
 	}
@@ -456,7 +461,6 @@ namespace codeGen
 
 	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args)
 	{
-		
 		switch (_instr)
 		{
 		case InstructionType::Inc:
@@ -582,8 +586,11 @@ namespace codeGen
 		case fDiv:
 			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
-		case fNeg:
-			break;
+		case fNeg:{
+			auto zeroConst = m_compiler.newFloatConst(0, 0.f); //todo: allocate this cost just once
+			m_compiler.movss(*(X86XmmVar*)_args[1], zeroConst); 
+			m_compiler.subss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
+			break; }
 		case Sqrt:
 			m_compiler.sqrtss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
 			break;
@@ -614,7 +621,7 @@ namespace codeGen
 			var = &getUnusedVar();
 			compileMemberLd(member, *compileMemberAdr(member), *var);
 		}
-		else if (_node.body->type == ASTType::Leaf)
+		else if ((int)_node.body->type >= (int)ASTType::Leaf)
 		{
 			var = (X86GpVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
@@ -653,7 +660,7 @@ namespace codeGen
 			var = &getUnusedFloat();
 			compileMemberLdF(member, *compileMemberAdr(member), *var);
 		}
-		else if (_node.body->type == ASTType::Leaf)
+		else if ((int)_node.body->type >= (int)ASTType::Leaf)
 		{
 			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
@@ -688,8 +695,8 @@ namespace codeGen
 			baseVar = (X86GpVar*)compileCall(*(ASTCall*)_node.instance); // take a var that has a higher lifespan that is still valid in getMemberAdr
 		else
 		{
-			ASTLeaf& leaf = *(ASTLeaf*)_node.instance;
-			baseVar = (X86GpVar*)leaf.ptr->compiledVar;
+			ASTLeafSym& leaf = *(ASTLeafSym*)_node.instance;
+			baseVar = (X86GpVar*)leaf.value->compiledVar;
 		}
 
 		return baseVar;

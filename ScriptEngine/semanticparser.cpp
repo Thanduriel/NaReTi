@@ -258,11 +258,11 @@ namespace par
 		func.scope.m_variables.reserve(2); // prevent moves
 		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("slf", typeInfo));
 		VarSymbol& slf = *func.scope.m_variables.back();
-		ASTLeaf& slfInst = *m_allocator->construct<ASTLeaf>(&slf);
+		ASTLeafSym& slfInst = *m_allocator->construct<ASTLeafSym>(&slf);
 		slfInst.typeInfo = &slf.typeInfo;
 		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("oth", typeInfo));
 		VarSymbol& oth = *func.scope.m_variables.back();
-		ASTLeaf& othInst = *m_allocator->construct<ASTLeaf>(&oth);
+		ASTLeafSym& othInst = *m_allocator->construct<ASTLeafSym>(&oth);
 		othInst.typeInfo = &oth.typeInfo;
 
 		func.paramCount = 2;
@@ -433,19 +433,18 @@ namespace par
 		if (!_str.is_initialized()) return;
 
 		ASTExpNode* arg = m_stack.back();
-		if (arg->type == ASTType::Leaf)
+		
+		if (arg->type == ASTType::LeafInt)
 		{
-			ASTLeaf* leaf = (ASTLeaf*)arg;
-			if (leaf->parType == ParamType::Int)
-			{
-				leaf->val = -leaf->val;
-				return;
-			}
-			else if (leaf->parType == ParamType::Float)
-			{
-				leaf->valFloat = -leaf->valFloat;
-				return;
-			}
+			ASTLeafInt& leaf = *(ASTLeafInt*)arg;
+			leaf.value = -leaf.value;
+			return;
+		}
+		else if (arg->type == ASTType::LeafFloat)
+		{
+			ASTLeafFloat& leaf = *(ASTLeafFloat*)arg;
+			leaf.value = -leaf.value;
+			return;
 		}
 
 		//only take the arg of the stack when a new one is going to be added
@@ -506,7 +505,7 @@ namespace par
 			return;
 		}
 		
-		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(var);
+		ASTLeafSym* leaf = m_allocator->construct<ASTLeafSym>(var);
 		leaf->typeInfo = &var->typeInfo;
 		m_stack.push_back(leaf);
 //		cout << _name << endl;
@@ -514,7 +513,7 @@ namespace par
 
 	void SemanticParser::pushFloat(double _val)
 	{
-		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>((float)_val);
+		ASTLeafFloat* leaf = m_allocator->construct<ASTLeafFloat>((float)_val);
 		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::Float));
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
@@ -522,7 +521,7 @@ namespace par
 
 	void SemanticParser::pushInt(int _val)
 	{
-		ASTLeaf* leaf = m_allocator->construct<ASTLeaf>(_val);
+		ASTLeafInt* leaf = m_allocator->construct<ASTLeafInt>(_val);
 		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::Int));
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
@@ -559,6 +558,9 @@ namespace par
 			}
 			break;
 		}
+		case ASTType::LeafInt:
+		case ASTType::LeafFloat:
+		case ASTType::LeafSym:
 		case ASTType::Leaf:
 			return _tree;
 		}
@@ -567,12 +569,39 @@ namespace par
 
 	// ************************************************** //
 
+	ComplexType& SemanticParser::getType(const std::string& _name)
+	{
+		ComplexType* type = m_moduleLib.getType(_name);
+		if (!type) throw ParsingError("Unknown type: " + _name);
+
+		return *type;
+	}
+
+	// ************************************************** //
+
 	TypeInfo SemanticParser::buildTypeInfo()
 	{
-		ComplexType* type = m_moduleLib.getType(m_typeName);
-		if (!type) throw ParsingError("Unknown type: " + m_typeName);
+		ComplexType& type = getType(m_typeName);
 
-		return TypeInfo(*type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
+		if (m_genericTypeParams.size())
+		{
+			ComplexType* params[8];
+			for (int i = 0; i < (int)m_genericTypeParams.size(); ++i)
+			{
+				params[i] = &getType(m_genericTypeParams[i]);
+			}
+
+			GenericType* gType = (GenericType*)&type;
+			m_typeName = gType->mangledName(params[0]);
+			ComplexType* type = m_moduleLib.getType(m_typeName);
+
+			if (!type)
+			{
+				type = gType->makeSpecialisation(m_typeName, params[0]);
+			}
+		}
+
+		return TypeInfo(type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
 	}
 
 	// ************************************************** //

@@ -91,6 +91,9 @@ namespace par
 		 * and resets the parser state.
 		 */
 		TypeInfo buildTypeInfo();
+		//looks for the given typename in the current modulelib
+		//throws an error when a type is not found
+		ComplexType& getType(const std::string& _name);
 
 		lang::ArrayTypeGen m_arrayTypeGen;
 

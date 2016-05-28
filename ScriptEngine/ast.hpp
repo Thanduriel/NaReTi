@@ -14,17 +14,21 @@ namespace par{
 	// ************************************* //
 
 	//Any node has to be casted to its specific type
-	enum class ASTType
+	
+	enum struct ASTType
 	{
 		Code,
 		Branch,
 		Call,
-		Leaf,
 		Loop,
 		Ret,
 		BinOp,
 		Member,
-		String
+		String,
+		Leaf,
+		LeafInt,
+		LeafSym,
+		LeafFloat
 	};
 
 	struct ASTNode : public utils::DetorAlloc::Destructible
@@ -112,13 +116,25 @@ namespace par{
 		ASTExpNode* body;
 	};
 
-	struct ASTLeaf : public ASTExpNode, public Parameter
+	//just additional typesafety
+	struct ASTLeaf : public ASTExpNode
+	{};
+
+	template < typename _T, ASTType _astType>
+	struct ASTLeafT : public ASTExpNode
 	{
-		ASTLeaf() { type = ASTType::Leaf; }
-		ASTLeaf(VarSymbol* _val) : Parameter(_val){ type = ASTType::Leaf; }
-		ASTLeaf(int _val) : Parameter(_val){ type = ASTType::Leaf; }
-		ASTLeaf(float _val) : Parameter(_val){ type = ASTType::Leaf; }
+		ASTLeafT(_T _value) : value(_value)
+		{ 
+			static_assert((int)_astType > (int)ASTType::Leaf, "Leaf types have to be at the end of the type enum.");
+			type = _astType;
+		}		
+		
+		_T value;
 	};
+
+	typedef ASTLeafT<int, ASTType::LeafInt> ASTLeafInt;
+	typedef ASTLeafT<float, ASTType::LeafFloat> ASTLeafFloat;
+	typedef ASTLeafT<VarSymbol*, ASTType::LeafSym> ASTLeafSym;
 
 	struct ASTUnlinkedSym : public ASTExpNode
 	{

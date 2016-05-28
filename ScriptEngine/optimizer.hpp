@@ -22,7 +22,7 @@ namespace codeGen{
 		void traceCall(par::ASTCall& _node);
 		void traceReturn(par::ASTReturn& _node);
 		void traceMember(par::ASTMember& _node);
-		void traceLeaf(par::ASTLeaf& _node);
+		void traceLeaf(par::ASTLeafSym& _node);
 
 		//try to substitute _target with _sub in the current frame(all previous occurrences)
 		void trySubstitution(par::VarSymbol& _target, par::VarSymbol& _sub);

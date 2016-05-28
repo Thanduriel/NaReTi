@@ -70,6 +70,7 @@ namespace par
 			TypeInformation =
 			//	*TypeAttr >>
 				Symbol[boost::bind(&SemanticParser::newTypeInfo, &m_semanticParser, ::_1)] >>
+				-GenericTypeParam >>
 				*TypeAttr
 				;
 

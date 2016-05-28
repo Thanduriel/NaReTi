@@ -1,6 +1,7 @@
 #pragma once
 
 #include "symbols.hpp"
+#include <unordered_map>
 
 namespace par{
 	/*the plan
@@ -20,11 +21,15 @@ namespace par{
 
 		size_t getParamCount() const { return m_typeParams.size(); }
 
-		/* creates a specialised type in the given module with the given param types
+		ComplexType* getSpecialization(ComplexType* _params);
+		std::string mangledName(ComplexType* _params);
+
+
+		/* creates a specialized type in the given module with the given param types
 		 * Does not perform a test whether the supplied amount is correct,
 		 * use getParamCount() before to ensure this.
 		 */
-		ComplexType* makeSpecialisation(ComplexType* _params);
+		ComplexType* makeSpecialisation(const std::string& _name, ComplexType* _params);
 	private:
 		std::vector< std::unique_ptr<ComplexType> > m_typeParams; // generic params 
 	};

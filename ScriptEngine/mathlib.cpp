@@ -18,6 +18,7 @@ namespace lang{
 	void MathModule::linkExternals()
 	{
 		bool fail;
+		//cast are necessary to determine the right overload
 		fail = !linkExternal("'", static_cast<float(*)(float, float)>(pow));
 		fail |= !linkExternal("sinp", static_cast<float(*)(float)>(sin));
 		fail |= !linkExternal("cosp", static_cast<float(*)(float)>(cos));

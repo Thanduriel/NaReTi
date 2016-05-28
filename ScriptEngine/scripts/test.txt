@@ -4,6 +4,7 @@ use random
 use externals
 use vector
 use array // highly expirimental
+use perfTest
 
 //use this to get a breakpoint in the compiler
 void breakpoint()
@@ -209,7 +210,7 @@ int test_performance()
 	while(i < 326000)
 	{
 		++i
-		f = cosp(f)
+	//	f = cosp(f)
 	}
 	
 	return getTickCount() - tickCount
@@ -225,5 +226,10 @@ void main()
 	int i = 4
 	i = 4 * 1.5
 	i = i * 1.5
+	
+	float f = 3.0
+	printF(f)
+	f = -f
+	printF(f)
 //	printI(i)
 }

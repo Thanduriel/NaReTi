@@ -8,10 +8,14 @@ namespace NaReTi
 
 	par::ComplexType* Module::getType(const std::string& _name)
 	{
-		for (auto& type : m_types)
+		auto it = std::find_if(m_types.begin(), m_types.end(), 
+			[&](const std::unique_ptr<ComplexType>& _t){ return _t->name == _name; });
+
+		return it == m_types.end() ? nullptr : (*it).get();
+/*		for (auto& type : m_types)
 			if (type->name == _name) return type.get();
 
-		return nullptr;
+		return nullptr;*/
 	}
 
 	par::Function* Module::getFunction(const std::string& _name,
@@ -52,19 +56,35 @@ namespace NaReTi
 
 	Function* Module::getFunction(const std::string& _name, bool _external)
 	{
-		for (auto& func : m_functions)
+		auto it = std::find_if(m_functions.begin(), m_functions.end(),
+			[&](const std::unique_ptr<Function>& _f)
+		{ 
+			return _f->name == _name && (!_external || _f->bExternal == _external); 
+		});
+
+		return it == m_functions.end() ? nullptr : (*it).get();
+	/*	for (auto& func : m_functions)
 		{
 			if (func->name == _name && (!_external || func->bExternal == _external)) return func.get();
 		}
-		return nullptr;
+		return nullptr;*/
 	}
 
 	VarSymbol* Module::getGlobalVar(const std::string& _name)
 	{
+		auto it = std::find_if(m_text.m_variables.begin(), m_text.m_variables.end(),
+			[&](const VarSymbol* _v)
+		{
+			return _v->name == _name;
+		});
+
+		return it == m_text.m_variables.end() ? nullptr : (*it);
+
+		/*
 		for (auto& var : m_text.m_variables)
 		{
 			if (_name == var->name) return var;
-		}
+		}*/
 		return nullptr;
 	}
 

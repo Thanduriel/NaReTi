@@ -13,14 +13,36 @@ namespace par{
 		}
 	}
 
-	ComplexType* GenericType::makeSpecialisation(ComplexType* _params)
+	// ***************************************************************** //
+
+	ComplexType* GenericType::getSpecialization(ComplexType* _params)
 	{
 		//construct name
 		string newName = name + "<";
 		for (int i = 0; i < (int)m_typeParams.size(); ++i)
 			newName += _params[i].name + ",";
 
-		ComplexType& type = *new ComplexType(newName);
+/*		auto it = m_specializations.find(newName);
+
+		if (it == m_specializations.end()) m_specializations.emplace(newName, makeSpecialisation(newName, _params));
+
+		return m_specializations[newName].get();*/
+		return nullptr;
+	}
+
+	std::string GenericType::mangledName(ComplexType* _params)
+	{
+		string mangled = name + "<";
+		for (int i = 0; i < (int)m_typeParams.size(); ++i)
+			mangled += _params[i].name + ",";
+		name += ">";
+
+		return name;
+	}
+
+	ComplexType* GenericType::makeSpecialisation(const std::string& _name, ComplexType* _params)
+	{
+		ComplexType& type = *new ComplexType(_name);
 
 		for (auto& var : scope.m_variables)
 		{

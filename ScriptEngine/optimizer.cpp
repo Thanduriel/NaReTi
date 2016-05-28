@@ -71,8 +71,8 @@ namespace codeGen{
 		case ASTType::Member:
 			traceMember(*(ASTMember*)_node);
 			break;
-		case ASTType::Leaf:
-			traceLeaf(*(ASTLeaf*)_node);
+		case ASTType::LeafSym:
+			traceLeaf(*(ASTLeafSym*)_node);
 			break;
 		}
 	}
@@ -110,13 +110,13 @@ namespace codeGen{
 			auto& arg = _node.args[i];
 			traceNode(arg);
 			// discard const qualifier when a call requires a non const arg
-			if (arg->type == ASTType::Leaf && ((ASTLeaf*)arg)->parType == ParamType::Ptr && !_node.function->scope.m_variables[i]->typeInfo.isConst)
-				((ASTLeaf*)arg)->ptr->typeInfo.isConst = false;
+			if (arg->type == ASTType::LeafSym && !_node.function->scope.m_variables[i]->typeInfo.isConst)
+				((ASTLeafSym*)arg)->value->typeInfo.isConst = false;
 		}
 		// expressions of the form: a = foo()
-		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::Leaf)
+		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::LeafSym)
 		{
-			VarSymbol* sym = ((ASTLeaf*)_node.args[0])->ptr;
+			VarSymbol* sym = ((ASTLeafSym*)_node.args[0])->value;
 
 			stackLabel++; //left site operand of "=" is of course the var itself
 			//if the var is given as param it may still be used in it's original form
@@ -128,7 +128,7 @@ namespace codeGen{
 			{
 				//the assignment is replaced with the right site call 
 				// and the var destination is given as return sub
-				_node.returnSub = ((ASTLeaf*)_node.args[0])->ptr;
+				_node.returnSub = ((ASTLeafSym*)_node.args[0])->value;
 				_node.function = rCall->function;
 				_node.name = rCall->name;
 				_node.args = rCall->args;
@@ -156,10 +156,9 @@ namespace codeGen{
 		traceNode(_node.instance);
 	}
 
-	void Optimizer::traceLeaf(ASTLeaf& _node)
+	void Optimizer::traceLeaf(ASTLeafSym& _node)
 	{
-		if (_node.parType == ParamType::Ptr)
-			m_usageStack.push_back(&_node.ptr);
+		m_usageStack.push_back(&_node.value);
 	}
 
 	// ****************************************************** //
