@@ -1,4 +1,5 @@
 #include "optimizer.hpp"
+#include <assert.h>
 
 namespace codeGen{
 	using namespace par;
@@ -13,6 +14,7 @@ namespace codeGen{
 
 	void Optimizer::optimize(NaReTi::Module& _module)
 	{
+		m_module = &_module;
 		for (auto& func : _module.m_functions)
 			optimizeFunction(*func);
 	}
@@ -49,7 +51,7 @@ namespace codeGen{
 
 	// ****************************************************** //
 
-	void Optimizer::traceNode(ASTNode* _node)
+	void Optimizer::traceNode(ASTNode* _node, ASTExpNode** _dest)
 	{
 		switch (_node->type)
 		{
@@ -63,7 +65,7 @@ namespace codeGen{
 			traceLoop(*(ASTLoop*)_node);
 			break;
 		case ASTType::Call:
-			traceCall(*(ASTCall*)_node);
+			traceCall(*(ASTCall*)_node, _dest);
 			break;
 		case ASTType::Ret:
 			traceReturn(*(ASTReturn*)_node);
@@ -81,24 +83,26 @@ namespace codeGen{
 	{
 		for (auto& subNode : _node)
 		{
-			traceNode(subNode);
+			traceNode(subNode, (ASTExpNode**)&subNode);
 		}
 	}
 
 	void Optimizer::traceBranch(ASTBranch& _node)
 	{
-		traceCall(*(ASTCall*)_node.condition);
+		traceCall(*(ASTCall*)_node.condition, &_node.condition);
 		traceCode(*_node.ifBody);
 		if (_node.elseBody) traceCode(*_node.elseBody);
 	}
 
 	void Optimizer::traceLoop(ASTLoop& _node)
 	{
-		traceCall(*(ASTCall*)_node.condition);
+		traceCall(*(ASTCall*)_node.condition, &_node.condition);
 		traceNode(_node.body);
 	}
 
-	void Optimizer::traceCall(ASTCall& _node)
+	// ****************************************************** //
+
+	void Optimizer::traceCall(ASTCall& _node, ASTExpNode** _dest)
 	{
 		m_callCount++;
 
@@ -108,11 +112,13 @@ namespace codeGen{
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
 			auto& arg = _node.args[i];
-			traceNode(arg);
+			traceNode(arg, &arg);
 			// discard const qualifier when a call requires a non const arg
 			if (arg->type == ASTType::LeafSym && !_node.function->scope.m_variables[i]->typeInfo.isConst)
 				((ASTLeafSym*)arg)->value->typeInfo.isConst = false;
 		}
+		tryConstFold(_node, _dest);
+
 		// expressions of the form: a = foo()
 		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::LeafSym)
 		{
@@ -137,9 +143,11 @@ namespace codeGen{
 		}
 	}
 
+	// ****************************************************** //
+
 	void Optimizer::traceReturn(ASTReturn& _node)
 	{
-		traceNode(_node.body);
+		traceNode(_node.body, &_node.body);
 		
 		if (m_function->bHiddenParam)
 		{
@@ -159,6 +167,41 @@ namespace codeGen{
 	void Optimizer::traceLeaf(ASTLeafSym& _node)
 	{
 		m_usageStack.push_back(&_node.value);
+	}
+
+	// ****************************************************** //
+
+	void Optimizer::tryConstFold(ASTCall& _node, ASTExpNode** _dest)
+	{
+		assert(_dest != nullptr);
+
+		if (!_node.function->bIntrinsic) return;
+		for (auto& arg : _node.args) if (arg->type != ASTType::LeafInt && arg->type != ASTType::LeafFloat) return;
+
+		for (auto node : _node.function->scope)
+		{
+			ASTOp& op = *(ASTOp*)node;
+			switch (op.instruction)
+			{
+			case Add:
+				((ASTLeafInt*)_node.args[0])->value += ((ASTLeafInt*)_node.args[1])->value;
+				*_dest = _node.args[0];
+				break;
+			case Sub:
+				((ASTLeafInt*)_node.args[0])->value -= ((ASTLeafInt*)_node.args[1])->value;
+				*_dest = _node.args[0];
+				break;
+			case iTof:
+				*_dest = m_module->getAllocator().construct < ASTLeafFloat >((float)((ASTLeafInt*)_node.args[0])->value);
+				break;
+			case fToi:
+				*_dest = m_module->getAllocator().construct < ASTLeafInt >((int)((ASTLeafFloat*)_node.args[0])->value);
+				break;
+			default:
+				return; // non implemented instructions -> not folded
+			}
+			(*_dest)->typeInfo = _node.typeInfo;
+		}
 	}
 
 	// ****************************************************** //

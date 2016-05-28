@@ -265,7 +265,7 @@ namespace codeGen
 				compileLoop(*(ASTLoop*)subNode);
 				break;
 			case ASTType::Call:
-				compileCall(*(ASTCall*)subNode);
+				compileCall(*(ASTCall*)subNode, false);
 				break;
 			case ASTType::Ret:
 				ASTReturn* retNode = (ASTReturn*)subNode;
@@ -279,7 +279,7 @@ namespace codeGen
 
 	// *************************************************** //
 
-	Var* Compiler::compileCall(ASTCall& _node, asmjit::Var* _dest)
+	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
 
@@ -304,9 +304,12 @@ namespace codeGen
 				args.push_back(func.scope.m_variables[0]->compiledVar);
 			}
 		}
-		if (!_dest) _dest = getUnusedVarAuto(func.returnTypeInfo);
 
 		UsageStateLock lock(m_usageState);
+
+		if (!_dest) _dest = getUnusedVarAuto(func.returnTypeInfo);
+
+		if (_keepRet) lock.reset();
 
 		int i = 0; //identify the first operand
 		//make sure that all arguments are located in virtual registers
@@ -787,7 +790,7 @@ namespace codeGen
 			compileCondExp(*(ASTCall*)_node.args[0]);
 			compileCondExp(*(ASTCall*)_node.args[1]);
 		}
-		else compileCall(_node);
+		else compileCall(_node, false);
 	}
 
 	// *************************************************** //

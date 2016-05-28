@@ -105,7 +105,7 @@ namespace par{
 	{
 		ASTLoop() { type = ASTType::Loop; }
 
-		ASTNode* condition;
+		ASTExpNode* condition;
 		ASTCode* body;
 	};
 

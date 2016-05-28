@@ -48,7 +48,7 @@ void bigFunction()
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64
-	_gint = _gint + _gint * _gint - 64 /*
+	_gint = _gint + _gint * _gint - 64 
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64 
@@ -2876,5 +2876,5 @@ void bigFunction()
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64
 	_gint = _gint + _gint * _gint - 64
-	_gint = _gint + _gint * _gint - 64 */
+	_gint = _gint + _gint * _gint - 64
 }

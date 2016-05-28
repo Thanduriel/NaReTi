@@ -17,6 +17,8 @@ namespace codeGen
 	{
 		UsageStateLock(UsageState& _state) : state(_state), target(_state){}
 		~UsageStateLock(){ target = state; }
+		void reset(){ state = target; }
+
 		UsageState state;
 		UsageState& target;
 	};
@@ -47,7 +49,7 @@ namespace codeGen
 		void compileCode(par::ASTCode& _node);
 		//@param _dest where the result should be stored
 		//@return the destination of the return
-		asmjit::Var* compileCall(par::ASTCall& _node, asmjit::Var* _dest = nullptr);
+		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);
 		asmjit::Var* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
 		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args);
 		void compileRet(par::ASTReturn& _node);
