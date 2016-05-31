@@ -28,8 +28,8 @@ namespace par
 			// by default declarations go to the global scope
 			BaseExpression = 
 				*UseStatement >>
-				*((TypeDeclaration | FuncDeclaration)[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
-				| VarDeclaration[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]) >
+				*((TypeDeclaration | FuncDeclaration)	[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
+				| VarDeclaration						[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]) >
 				qi::eoi;
 
 			UseStatement =
@@ -37,61 +37,63 @@ namespace par
 				;
 
 			TypeDeclaration = 
-				("type" >> -GenericTypeParam >> Symbol)[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
+				("type" >> -GenericTypeParam >> Symbol)	[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
 				'{' >> 
 				*VarDeclaration >> 
-				lit('}')[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
+				lit('}')								[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
 			//var declaration with optional init: int a = 10
 			VarDeclaration = 
 				(TypeInformation >>
-				Symbol)[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
-				-(lit("=")[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
-				Expression)[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))];
+				Symbol)									[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
+				-(lit("=")								[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
+				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))];
 			
 			//func declaration including overloaded operators with keywords
 			FuncDeclaration = 
-				(TypeInformation >> (Symbol | Operator | qi::string("[]")) >> 
-				'(')[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
+				(TypeInformation >> 
+				(Symbol | Operator | qi::string("[]")) >> 
+				'(')									[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
 				-VarDeclaration >> 
 				*(',' > VarDeclaration) >> 
-				lit(')')[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
-				(lit("external")[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
+				lit(')')								[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
+				(lit("external")						[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
 				| CodeScope)
 				;
 
 			GenericTypeParam =
 				'<' >>
-				-Symbol[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
-				*(Symbol >> lit(','))[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
+				-Symbol									[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
+				*(Symbol >> lit(','))					[boost::bind(&SemanticParser::genericTypePar, &m_semanticParser, ::_1)] >>
 				'>'
 				;
 
 			TypeInformation =
 			//	*TypeAttr >>
-				Symbol[boost::bind(&SemanticParser::newTypeInfo, &m_semanticParser, ::_1)] >>
+				Symbol									[boost::bind(&SemanticParser::newTypeInfo, &m_semanticParser, ::_1)] >>
 				-GenericTypeParam >>
 				*TypeAttr
 				;
 
 			TypeAttr =
-				lit("const")[boost::bind(&SemanticParser::makeConst, &m_semanticParser)]
-				| lit('&')[boost::bind(&SemanticParser::makeReference, &m_semanticParser)]
+				lit("const")							[boost::bind(&SemanticParser::makeConst, &m_semanticParser)]
+				| lit('&')								[boost::bind(&SemanticParser::makeReference, &m_semanticParser)]
 				| lit('[') >>
-				Integer[boost::bind(&SemanticParser::setArraySize, &m_semanticParser, ::_1)] >>
-				lit(']')[boost::bind(&SemanticParser::makeArray, &m_semanticParser)]
+				Integer									[boost::bind(&SemanticParser::setArraySize, &m_semanticParser, ::_1)] >>
+				lit(']')								[boost::bind(&SemanticParser::makeArray, &m_semanticParser)]
 				;
 
 			GeneralExpression = 
-				(("return" >> Expression)[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
+				(("return" >> Expression)				[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
 				| Conditional
 				| Loop
 				| VarDeclaration
 				| Expression
-				)[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
+				)										[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
 				;
 
-			//mathematical terms including brackets"()"; function calls: foo(args); square bracket: a[]
+			//mathematical terms including brackets"()"; 
+			//function calls: foo(args); square bracket: a[]
 			Expression = 
 				LExpression >
 				-RExpression
@@ -99,52 +101,54 @@ namespace par
 
 			LExpression =
 				(-Operator >>
-				(('(' >> Expression >> ')')[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
+				(('(' >> Expression >> ')')				[boost::bind(&SemanticParser::lockLatestNode, &m_semanticParser)]
 				| Operand) >> 
-				(-('[' >> Expression >> ']')[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))])
-				)[boost::bind(&SemanticParser::unaryTerm, &m_semanticParser, ::_1)]
+				(-('[' >> Expression >> ']')			[boost::bind(&SemanticParser::term, &m_semanticParser, string("[]"))])
+				)										[boost::bind(&SemanticParser::unaryTerm, &m_semanticParser, ::_1)]
 				;
 
 			//operator and operand
 			RExpression =
 				((Operator >
-				LExpression)[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)]) >>
+				LExpression)							[boost::bind(&SemanticParser::term, &m_semanticParser, ::_1)]) >>
 				-RExpression
 				;
 
 			CodeScope =
-				lit('{')[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >
+				lit('{')								[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >
 				*(GeneralExpression) >
-				lit('}')[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
+				lit('}')								[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
 				;
 
 			//classic if / if else / else
 			//the "else" scope is created manually because logically an "else if" is an if inside the outer else
 			Conditional =
-				(lit("if") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
+				(lit("if") >> '(' >> Expression >> ')')	[boost::bind(&SemanticParser::ifConditional, &m_semanticParser)] >>
 				CodeScope >>
-				-(lit("else")[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
-				(Conditional | CodeScope)[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)])
+				-(lit("else")							[boost::bind(&SemanticParser::elseConditional, &m_semanticParser)] >>
+				(Conditional | CodeScope)				[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)])
 				;
 
 			Loop =
-				(lit("while") >> '(' >> Expression >> ')')[boost::bind(&SemanticParser::loop, &m_semanticParser)] >>
+				(lit("while") >> 
+				'(' >> Expression >> ')')				[boost::bind(&SemanticParser::loop, &m_semanticParser)] >>
 				CodeScope
 				;
 
 			Call =
 				(Symbol >>
-				'(')[boost::bind(&SemanticParser::call, &m_semanticParser, ::_1)] >>
-				-(Expression[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)] >> *(',' >> Expression[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)])) >>
+				'(')									[boost::bind(&SemanticParser::call, &m_semanticParser, ::_1)] >>
+				-(Expression							[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)] >> 
+				*(',' >> Expression						[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)])) >>
 				')'
 				;
 
 			Operand = 
 				Call
-				| Symbol[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
-				| Integer[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
-				| Float[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
-				| ConstString[boost::bind(&SemanticParser::pushString, &m_semanticParser, ::_1)]
+				| Symbol								[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
+				| Integer								[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
+				| Float									[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
+				| ConstString							[boost::bind(&SemanticParser::pushString, &m_semanticParser, ::_1)]
 				;
 
 			//lexer definitions

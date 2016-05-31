@@ -29,14 +29,16 @@ namespace NaReTi{
 		Module& createModule(const std::string& _moduleName);
 
 		//returns a handle to the function with the given name if existent
-		FunctionHandle getFuncHndl(const std::string& _name);
+		FunctionHandle getFuncHndl(const std::string& _name) const;
 
 		//call without template params(just for convenience)
-		void call(FunctionHandle _hndl);
+		void call(FunctionHandle _hndl) const;
 		
 		template< typename _Ret, typename... _Args>
-		_Ret call(FunctionHandle _hndl, _Args... _args)
+		_Ret call(FunctionHandle _hndl, _Args... _args) const
 		{
+			assert((bool)_hndl);
+
 			//magic typecasting to the given function type
 			auto func = (_Ret (*) (_Args...))_hndl.ptr;
 			//the call

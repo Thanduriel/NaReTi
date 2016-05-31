@@ -1,9 +1,20 @@
 #pragma once
 
-#include "symbols.hpp"
+#include "ast.hpp"
 #include <unordered_map>
 
 namespace par{
+
+	class GenericTrait
+	{
+	public:
+		GenericTrait(const std::vector<std::string>& _params);
+	protected:
+		// generic params
+		// the index is encoded in ComplexType::size
+		std::vector< std::unique_ptr<ComplexType> > m_typeParams;
+	};
+
 	/*the plan
 	 * when a template param is specified a genericType is created
 	 * as well as types with the corresponding name
@@ -12,7 +23,7 @@ namespace par{
 	 * linking takes place
 	 * the new code can be added to the current module
 	 */
-	class GenericType : public ComplexType
+	class GenericType : public ComplexType, public GenericTrait
 	{
 	public:
 		GenericType(const std::string& _name, const std::vector<std::string>& _params);
@@ -31,6 +42,18 @@ namespace par{
 		 */
 		ComplexType* makeSpecialisation(const std::string& _name, ComplexType* _params);
 	private:
-		std::vector< std::unique_ptr<ComplexType> > m_typeParams; // generic params 
+	};
+
+
+
+	class GenericFunction : public Function, public GenericTrait
+	{
+	public:
+		GenericFunction(const std::string& _name, TypeInfo& _info, const std::vector<std::string>& _params);
+
+		Function* makeSpecialisation(const std::string& _name, ComplexType* _params);
+	private:
+		//make a deep copy of an ast
+		ASTNode* copyTree(ASTNode* _node, utils::DetorAlloc& _alloc);
 	};
 }

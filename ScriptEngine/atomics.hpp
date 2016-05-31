@@ -9,7 +9,7 @@ namespace lang
 
 	// the module that is always included by default
 	// providing basic types, intrinsics (float and int operations)
-	struct BasicModule: public NaReTi::Module
+	struct BasicModule : public NaReTi::Module
 	{
 		BasicModule(asmjit::JitRuntime& _runtime);
 

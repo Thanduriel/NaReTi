@@ -110,19 +110,21 @@ namespace NaReTi
 
 	// ******************************************************* //
 
-	FunctionHandle ScriptEngine::getFuncHndl(const std::string& _name)
+	FunctionHandle ScriptEngine::getFuncHndl(const std::string& _name) const
 	{
 		for (auto& module : m_modules)
 			for (auto& func : module->m_functions)
 				if (func->name == _name) return FunctionHandle(func->binary);
 
-		return FunctionHandle();
+		return FunctionHandle(); // an null handle
 	}
 
 	// ******************************************************* //
 
-	void ScriptEngine::call(FunctionHandle _hndl)
+	void ScriptEngine::call(FunctionHandle _hndl) const
 	{
+		assert((bool)_hndl); // not a valid handle
+
 		((basicFunc*)_hndl.ptr)();
 	}
 

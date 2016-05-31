@@ -16,7 +16,7 @@ namespace NaReTi{
 	{
 		friend class ScriptEngine;
 
-		FunctionHandle() = default;
+		FunctionHandle() : ptr(nullptr){}
 
 		FunctionHandle(basicFunc* _ptr)
 		{
@@ -44,6 +44,7 @@ namespace NaReTi{
 	enum OptimizationLvl
 	{
 		None,
+		//const folding, var substitution, inlining
 		Basic
 	};
 

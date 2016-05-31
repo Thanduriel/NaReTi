@@ -1,6 +1,8 @@
 #include "optimizer.hpp"
 #include <assert.h>
 
+#define FOLDCONST(type, op) ((type*)_node.args[0])->value op ((type*)_node.args[1])->value; *_dest = _node.args[0]; break;
+
 namespace codeGen{
 	using namespace par;
 
@@ -173,6 +175,7 @@ namespace codeGen{
 
 	void Optimizer::tryConstFold(ASTCall& _node, ASTExpNode** _dest)
 	{
+		//requires a destination to place the new node in
 		assert(_dest != nullptr);
 
 		if (!_node.function->bIntrinsic) return;
@@ -183,14 +186,20 @@ namespace codeGen{
 			ASTOp& op = *(ASTOp*)node;
 			switch (op.instruction)
 			{
-			case Add:
-				((ASTLeafInt*)_node.args[0])->value += ((ASTLeafInt*)_node.args[1])->value;
-				*_dest = _node.args[0];
-				break;
-			case Sub:
-				((ASTLeafInt*)_node.args[0])->value -= ((ASTLeafInt*)_node.args[1])->value;
-				*_dest = _node.args[0];
-				break;
+			case Add:	FOLDCONST(ASTLeafInt, += );
+			case Sub:	FOLDCONST(ASTLeafInt, -= );
+			case Mul:	FOLDCONST(ASTLeafInt, *= );
+			case Div:	FOLDCONST(ASTLeafInt, /= );
+			case Mod:	FOLDCONST(ASTLeafInt, %= );
+			case ShL:	FOLDCONST(ASTLeafInt, <<= );
+			case ShR:	FOLDCONST(ASTLeafInt, >>= );
+			case Xor:	FOLDCONST(ASTLeafInt, ^= );
+			case Or:	FOLDCONST(ASTLeafInt, |= );
+			case And:	FOLDCONST(ASTLeafInt, &= );
+			case fAdd:	FOLDCONST(ASTLeafFloat, += );
+			case fSub:	FOLDCONST(ASTLeafFloat, -= );
+			case fMul:	FOLDCONST(ASTLeafFloat, *= );
+			case fDiv:	FOLDCONST(ASTLeafFloat, /= );
 			case iTof:
 				*_dest = m_module->getAllocator().construct < ASTLeafFloat >((float)((ASTLeafInt*)_node.args[0])->value);
 				break;

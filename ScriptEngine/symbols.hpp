@@ -126,8 +126,14 @@ namespace par{
 
 	struct ComplexType : public Type
 	{
+		//the type has not been compiled yet
+		//necessary for generic specializations
+		static const size_t UndefSize = 0xFFFFFF;
+
 		ComplexType(){};
-		ComplexType(const std::string& _name, BasicType _basicType = Complex) : Type(_name, _basicType)
+		ComplexType(const std::string& _name, BasicType _basicType = Complex) : 
+			Type(_name, _basicType),
+			size(UndefSize)
 		{}
 		CodeScope scope;
 
