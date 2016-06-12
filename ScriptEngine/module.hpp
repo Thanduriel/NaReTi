@@ -1,19 +1,20 @@
 #pragma once
 
-#include "symbols.hpp"
-#include "generics.hpp"
-#include "ast.hpp"
+
+#include "parpredecs.hpp"
+#include "complexalloc.hpp"
+
 #include <vector>
 #include <string>
 #include <memory>
-#include <asmjit.h>
 
 namespace NaReTi{
 
 	class Module
 	{
 	public:
-		Module(const std::string& _name) : m_name(_name){};
+		Module(const std::string& _name);
+		~Module();
 
 		par::ComplexType* getType(const std::string& _name);
 		
@@ -55,10 +56,10 @@ namespace NaReTi{
 
 		//their lifetime equals the module's
 		//use a stack allocator for all related buffers if possible
-		std::vector < std::unique_ptr<par::ComplexType> > m_types;
-		std::vector < std::unique_ptr <par::GenericType> > m_genericTypes;
-		std::vector < std::unique_ptr<par::Function> > m_functions;
-		par::ASTCode m_text;
+		std::vector < par::ComplexType* > m_types;
+		std::vector < par::GenericType* > m_genericTypes;
+		std::vector < par::Function* > m_functions;
+		par::ASTCode* m_text;
 
 		std::string m_name;
 

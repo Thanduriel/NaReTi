@@ -1,6 +1,11 @@
 #pragma once
 
-#include "module.hpp"
+#include <vector>
+#include "parpredecs.hpp"
+
+namespace NaReTi{
+	class Module;
+}
 
 namespace codeGen{
 	class Optimizer
@@ -22,7 +27,7 @@ namespace codeGen{
 		void traceCall(par::ASTCall& _node, par::ASTExpNode** _dest);
 		void traceReturn(par::ASTReturn& _node);
 		void traceMember(par::ASTMember& _node);
-		void traceLeaf(par::ASTLeafSym& _node);
+		void traceLeaf(par::ASTExpNode& _node); // is an ASTLeafSym
 
 		void tryConstFold(par::ASTCall& _node, par::ASTExpNode** _dest);
 

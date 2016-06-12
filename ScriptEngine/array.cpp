@@ -1,5 +1,7 @@
 #include "array.hpp"
 #include "atomics.hpp"
+#include "symbols.hpp"
+#include "ast.hpp"
 
 namespace lang{
 	using namespace par;

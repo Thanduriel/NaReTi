@@ -1,4 +1,5 @@
 #include "modulelib.hpp"
+#include "ast.hpp"
 
 //#define ALLSUBMODULES (name) for (auto& module : m_modules){ Type* type = module->getType(_name); if (type) return type; } return nullptr;
 

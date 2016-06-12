@@ -1,12 +1,13 @@
 #include "compiler2.hpp"
 #include "ptr_stuff.hpp"
 #include "logger.hpp"
+#include "ast.hpp"
+#include "symbols.hpp"
 
 #include <assert.h>
 #include <time.h>
 
-namespace codeGen
-{
+namespace codeGen{
 	using namespace asmjit;
 	using namespace par;
 
@@ -34,9 +35,9 @@ namespace codeGen
 
 		for (auto& type : _module.m_types)
 		{
-			compileType(*(ComplexType*)type.get());
+			compileType(*(ComplexType*)type);
 		}
-		for (auto& var : _module.m_text.m_variables)
+		for (auto& var : _module.m_text->m_variables)
 		{
 			compileHeapVar(*var);
 		}
@@ -56,7 +57,7 @@ namespace codeGen
 	void Compiler::release(NaReTi::Module& _module)
 	{
 		//globals
-		for (auto& var : _module.m_text.m_variables)
+		for (auto& var : _module.m_text->m_variables)
 		{
 			m_runtime.release(var->ownership.rawPtr);
 		}
@@ -99,11 +100,11 @@ namespace codeGen
 
 	void Compiler::compileModuleInit(NaReTi::Module& _module)
 	{
-		if (_module.m_text.size() == 0) return;
+		if (_module.m_text->size() == 0) return;
 		
 		m_compiler.addFunc(FuncBuilder0<void>());
 		resetRegisters();
-		compileCode(_module.m_text);
+		compileCode(*_module.m_text);
 
 		m_compiler.endFunc();
 		m_compiler.finalize();
@@ -735,8 +736,8 @@ namespace codeGen
 
 	void Compiler::compileBranch(ASTBranch& _node)
 	{
-		Label end(m_compiler);
-		m_labelStack.emplace_back(m_compiler);
+		Label end(m_compiler.newLabel());
+		m_labelStack.emplace_back(m_compiler.newLabel());
 		Label& elseBranch = m_labelStack.back();
 		
 		compileCondExp(*(ASTCall*)_node.condition);
@@ -754,9 +755,9 @@ namespace codeGen
 
 	void Compiler::compileLoop(ASTLoop& _node)
 	{
-		Label begin(m_compiler);
+		Label begin(m_compiler.newLabel());
 
-		m_labelStack.emplace_back(m_compiler);
+		m_labelStack.emplace_back(m_compiler.newLabel());
 		Label& end = m_labelStack.back();
 
 		m_compiler.bind(begin);
@@ -773,9 +774,9 @@ namespace codeGen
 	{
 		if (_node.function->name == "||")
 		{
-			m_labelStack.emplace_back(m_compiler);
+			m_labelStack.emplace_back(m_compiler.newLabel());
 			Label& end = m_labelStack.back();
-			Label postOr(m_compiler);
+			Label postOr(m_compiler.newLabel());
 
 			compileCondExp(*(ASTCall*)_node.args[0]);
 			m_compiler.jmp(postOr); //on success the Or statement is true

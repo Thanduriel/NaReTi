@@ -2,23 +2,23 @@
 //
 
 #include "stdafx.h"
-#include "scriptengine.h"
+#include "../ScriptEngine/scriptengine.h"
 #include <iostream>
 #include <chrono>
-#include <windows.h>
+#include <Windows.h>
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 
-#include "complexalloc.hpp"
+#include "../ScriptEngine/complexalloc.hpp"
 
 using namespace std;
 
 int foo(int i)
 {
 	std::cout << "foo got called with arg: " << i << std::endl;
-	return i+2;
+	return i + 2;
 }
 
 void printI(int num)
@@ -58,12 +58,12 @@ struct iVec2
 int _tmain(int argc, _TCHAR* argv[])
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-//	_CrtSetBreakAlloc(810);
+	//	_CrtSetBreakAlloc(810);
 
 	NaReTi::ScriptEngine scriptEngine;
 	NaReTi::Config& config = scriptEngine.config();
 	config.optimizationLvl = NaReTi::Basic;
-	config.scriptLocation = "scripts/";
+	config.scriptLocation = "../scripts/";
 
 	//test cases
 
@@ -112,7 +112,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		NaReTi::FunctionHandle hndlBranch = scriptEngine.getFuncHndl("test_branch");
 		cout << (scriptEngine.call<int, int>(hndlBranch, 10) == 10 &&
-			scriptEngine.call<int, int>(hndlBranch, 11) == 11 && 
+			scriptEngine.call<int, int>(hndlBranch, 11) == 11 &&
 			scriptEngine.call<int, int>(hndlBranch, 5) == 2) << " branch" << endl;
 
 		NaReTi::FunctionHandle hndlBool = scriptEngine.getFuncHndl("test_boolean");

@@ -1,6 +1,10 @@
+#include <asmjit.h>
+
 #include "atomics.hpp"
 #include "symbols.hpp"
 #include "defmacros.hpp"
+#include "symbols.hpp"
+#include "ast.hpp"
 
 namespace lang
 {
@@ -56,12 +60,12 @@ namespace lang
 
 		m_types.resize(6);
 		//basic types
-		m_types[BasicType::Int] = std::unique_ptr<ComplexType>(new ComplexType("int", BasicType::Int)); m_types[BasicType::Int]->size = 4; m_types[BasicType::Int]->alignment = 16;
-		m_types[BasicType::Float] = std::unique_ptr<ComplexType>(new ComplexType("float", BasicType::Float)); m_types[BasicType::Float]->size = 4;
-		m_types[BasicType::String] = std::unique_ptr<ComplexType>(new ComplexType("string", BasicType::String));
-		m_types[BasicType::Void] = std::unique_ptr<ComplexType>(new ComplexType("void", BasicType::Void));
-		m_types[BasicType::Bool] = std::unique_ptr<ComplexType>(new ComplexType("bool", BasicType::Bool)); m_types[BasicType::Bool]->size = 4;
-		m_types[BasicType::FlagBool] = std::unique_ptr<ComplexType>(new ComplexType("flagBool", BasicType::FlagBool)); m_types[BasicType::FlagBool]->size = 4;
+		m_types[BasicType::Int] = new ComplexType("int", BasicType::Int); m_types[BasicType::Int]->size = 4; m_types[BasicType::Int]->alignment = 16;
+		m_types[BasicType::Float] = new ComplexType("float", BasicType::Float); m_types[BasicType::Float]->size = 4;
+		m_types[BasicType::String] = new ComplexType("string", BasicType::String);
+		m_types[BasicType::Void] = new ComplexType("void", BasicType::Void);
+		m_types[BasicType::Bool] = new ComplexType("bool", BasicType::Bool); m_types[BasicType::Bool]->size = 4;
+		m_types[BasicType::FlagBool] = new ComplexType("flagBool", BasicType::FlagBool); m_types[BasicType::FlagBool]->size = 4;
 
 		//operators
 		//logical -----------------------------------------------------
@@ -160,8 +164,8 @@ namespace lang
 
 	void BasicModule::makeConstant(const std::string& _name, int _val)
 	{
-		m_text.m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], true, true)));
-		VarSymbol& var = *m_text.m_variables.back();
+		m_text->m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], true, true)));
+		VarSymbol& var = *m_text->m_variables.back();
 		var.ownership.rawPtr = m_allocator.alloc(var.typeInfo.type.size);
 		var.ownership.ownerType = codeGen::OwnershipType::Heap;
 		var.isPtr = true;

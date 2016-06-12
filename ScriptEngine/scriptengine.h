@@ -1,10 +1,21 @@
 #include "enginetypes.hpp"
-#include "parser.hpp"
-#include "compiler2.hpp"
 #include "optimizer.hpp"
-#include "atomics.hpp"
+#include "module.hpp"
+#include <assert.h>
 
 #pragma once
+
+namespace codeGen{
+	class Compiler;
+}
+namespace par{
+	class Parser;
+}
+
+namespace lang{
+	struct BasicModule;
+}
+
 
 namespace NaReTi{
 
@@ -12,6 +23,7 @@ namespace NaReTi{
 	{
 	public:
 		ScriptEngine();
+		~ScriptEngine();
 
 		// Loads the module if it is not found.
 		Module* getModule(const std::string& _name);
@@ -51,10 +63,10 @@ namespace NaReTi{
 
 		std::string extractName(const std::string& _fullName);
 
-		lang::BasicModule m_basicModule;
+		lang::BasicModule* m_basicModule;
 
-		par::Parser m_parser;
-		codeGen::Compiler m_compiler;
+		par::Parser* m_parser;
+		codeGen::Compiler* m_compiler;
 		codeGen::Optimizer m_optimizer;
 
 		std::vector< FunctionHandle > m_nativeFunctions;

@@ -1,8 +1,16 @@
 #pragma once
 #include "module.hpp"
-#include <asmjit.h>
+
 #include <array>
 #include <functional>
+
+namespace asmjit{
+	struct JitRuntime;
+}
+
+namespace par{
+	enum BasicType;
+}
 
 namespace lang
 {

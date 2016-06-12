@@ -3,6 +3,7 @@
 #include "atomics.hpp"
 #include <math.h>
 #include "logger.hpp"
+#include "ast.hpp"
 
 namespace lang{
 

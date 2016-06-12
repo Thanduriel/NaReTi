@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "parexception.hpp"
+#include "generics.hpp"
 
 using namespace std;
 
@@ -296,7 +297,7 @@ namespace par
 	{
 		m_currentModule->m_functions.emplace_back(new Function(_attr, buildTypeInfo()));
 
-		m_currentFunction = m_currentModule->m_functions.back().get();
+		m_currentFunction = m_currentModule->m_functions.back();
 
 		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex)
 		{

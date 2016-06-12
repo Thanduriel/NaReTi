@@ -28,18 +28,6 @@
     <Filter Include="compiler">
       <UniqueIdentifier>{6062f48e-12ee-4f84-a5cc-6ac779e09d57}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dependencies">
-      <UniqueIdentifier>{f74c3d49-dbbd-4ac5-8cab-f72bf6c7f62d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dependencies\asmjit">
-      <UniqueIdentifier>{af4e4a7e-6851-4263-8918-10322f3a47cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dependencies\asmjit\base">
-      <UniqueIdentifier>{beb411af-999c-42a2-915d-e58dd8ca094d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dependencies\asmjit\x86">
-      <UniqueIdentifier>{0a724b43-f414-4f31-abeb-f775da765883}</UniqueIdentifier>
-    </Filter>
     <Filter Include="utils">
       <UniqueIdentifier>{5effdd4d-2015-4347-b062-9742fd97c3f6}</UniqueIdentifier>
     </Filter>
@@ -96,99 +84,6 @@
     <ClInclude Include="instruction.hpp">
       <Filter>par</Filter>
     </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\apibegin.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\apiend.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\asmjit.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\build.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\host.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86.h">
-      <Filter>dependencies\asmjit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\assembler.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\compiler.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\compilercontext_p.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\compilerfunc.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\constpool.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\containers.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\cpuinfo.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\globals.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\hlstream.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\logger.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\operand.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\runtime.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\utils.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\vectypes.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\vmem.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\base\zone.h">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86assembler.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86compiler.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86compilercontext_p.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86compilerfunc.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86cpuinfo.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86inst.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86operand.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dependencies\asmjit\src\asmjit\x86\x86scheduler_p.h">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClInclude>
     <ClInclude Include="compiler2.hpp">
       <Filter>compiler</Filter>
     </ClInclude>
@@ -231,6 +126,9 @@
     <ClInclude Include="defmacros.hpp">
       <Filter>lang</Filter>
     </ClInclude>
+    <ClInclude Include="parpredecs.hpp">
+      <Filter>par</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -256,75 +154,6 @@
     </ClCompile>
     <ClCompile Include="scriptengine.cpp">
       <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\assembler.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\compiler.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\compilercontext.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\constpool.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\containers.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\cpuinfo.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\globals.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\hlstream.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\logger.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\operand.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\runtime.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\utils.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\vmem.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\base\zone.cpp">
-      <Filter>dependencies\asmjit\base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86assembler.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86compiler.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86compilercontext.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86compilerfunc.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86cpuinfo.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86inst.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86operand.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86operand_regs.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dependencies\asmjit\src\asmjit\x86\x86scheduler.cpp">
-      <Filter>dependencies\asmjit\x86</Filter>
     </ClCompile>
     <ClCompile Include="compiler2.cpp">
       <Filter>compiler</Filter>

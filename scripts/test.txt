@@ -219,7 +219,7 @@ int test_performance()
 void main()
 {
 	initRandom(getTickCount())
-	printF(rand(22, 0))
+	printF(rand(15, 0))
 	
 	printF(2.0'13.2)
 	

@@ -1,26 +1,36 @@
 #include <fstream>
 #include <time.h>  //clock
 
+#include "compiler2.hpp"
 #include "scriptengine.h"
 #include "logger.hpp"
 #include "mathlib.hpp"
+#include "atomics.hpp"
+#include "parser.hpp"
 
 using namespace std;
 
 namespace NaReTi
 {
 	ScriptEngine::ScriptEngine():
-		m_compiler(),
-		m_basicModule(m_compiler.getRuntime()),
-		m_parser()
+		m_compiler(new codeGen::Compiler()),
+		m_basicModule(new lang::BasicModule(m_compiler->getRuntime())),
+		m_parser(new par::Parser())
 	{
-		m_config.scriptLocation = "scripts/";
+		m_config.scriptLocation = "../scripts/";
 
 		//setup std math lib
 		lang::MathModule* module = new lang::MathModule();
 		loadModule("math.nrt", module);
 		module->linkExternals();
 		m_modules.emplace_back(module);
+	}
+
+	ScriptEngine::~ScriptEngine()
+	{
+		delete m_compiler;
+		delete m_parser;
+		delete m_basicModule;
 	}
 
 	// ******************************************************* //
@@ -64,8 +74,8 @@ namespace NaReTi
 		NaReTi::Module& module = _dest ? *_dest : *m_modules.back();
 
 		//look for dependencies
-		m_parser.preParse(fileContent, module);
-		auto dep = m_parser.getDependencies();
+		m_parser->preParse(fileContent, module);
+		auto dep = m_parser->getDependencies();
 		for (auto& modName : dep)
 		{
 			Module* mod = getModule(modName + ".nrt");
@@ -76,11 +86,11 @@ namespace NaReTi
 		//		break;
 			}
 		}
-		bool ret = m_parser.parse(fileContent, module);
+		bool ret = m_parser->parse(fileContent, module);
 		if (ret)
 		{
 			if(m_config.optimizationLvl > None) m_optimizer.optimize(module);
-			m_compiler.compile(module);
+			m_compiler->compile(module);
 		}
 		else
 		{
@@ -100,7 +110,7 @@ namespace NaReTi
 			Module& module = *(*i);
 			if (module.m_name == _moduleName)
 			{
-				if (!_keepBinary) m_compiler.release(module);
+				if (!_keepBinary) m_compiler->release(module);
 				m_modules.erase(i);
 				return true;
 			}

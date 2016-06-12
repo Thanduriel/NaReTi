@@ -3,6 +3,7 @@
 #include "module.hpp"
 #include <asmjit.h>
 #include "enginetypes.hpp"
+#include "ast.hpp"
 
 namespace codeGen
 {

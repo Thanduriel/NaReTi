@@ -1,4 +1,6 @@
 #include "optimizer.hpp"
+#include "module.hpp"
+#include "ast.hpp"
 #include <assert.h>
 
 #define FOLDCONST(type, op) ((type*)_node.args[0])->value op ((type*)_node.args[1])->value; *_dest = _node.args[0]; break;
@@ -166,9 +168,9 @@ namespace codeGen{
 		traceNode(_node.instance);
 	}
 
-	void Optimizer::traceLeaf(ASTLeafSym& _node)
+	void Optimizer::traceLeaf(ASTExpNode& _node)
 	{
-		m_usageStack.push_back(&_node.value);
+		m_usageStack.push_back(&((ASTLeafSym*)&_node)->value);
 	}
 
 	// ****************************************************** //

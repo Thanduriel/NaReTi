@@ -27,7 +27,7 @@ namespace par
 		void setModule(NaReTi::Module& _module);
 
 		//set the scope back to the default scope of the module
-		void resetScope() { m_currentCode = &m_currentModule->m_text; m_currentScope = &m_currentModule->m_text; };
+		void resetScope() { m_currentCode = m_currentModule->m_text; m_currentScope = m_currentModule->m_text; };
 
 		void varDeclaration(std::string& _attr);
 		void pushLatestVar();
