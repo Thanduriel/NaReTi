@@ -391,6 +391,19 @@ namespace par
 		if (m_currentFunction->returnTypeInfo.type.basic != BasicType::Void)
 		{
 			retNode.body = popNode();
+
+			//types do not match
+			//todo: make typechecking same for functions and return
+			if (*retNode.body->typeInfo != m_currentFunction->returnTypeInfo)
+			{
+				auto cast = typeCast(*retNode.body->typeInfo, m_currentFunction->returnTypeInfo);
+				if (!cast) throw ParsingError("Type mismatch...");
+				ASTCall& call = *m_allocator->construct<ASTCall>();
+				call.function = cast;
+				call.args.push_back(retNode.body);
+				call.typeInfo = &cast->returnTypeInfo;
+				retNode.body = &call;
+			}
 		}
 	}
 

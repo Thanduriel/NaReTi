@@ -44,20 +44,6 @@ int '(int x, int y)
 	return x * z
 }
 
-// simple and slow, but with decent precision
-//see https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method
-float sqrt_test(float x)
-{
-	float n = x / 2.0
-	float lstX = 0.0 
-	while(n != lstX)
-	{
-		lstX = n
-		n = (n + x/n) / 2.0
-	}
-	return n
-}
-
 float _4_pi = 4.0/pi
 float _m4_pi2 = -4.0/(pi*pi)
 float _q = 0.775

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptEngine", "ScriptEngine\ScriptEngine.vcxproj", "{A09169AB-78D8-4CB1-9563-646342766D0C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{FCCB9542-2081-4A25-96AB-5B070E2F1D09}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A09169AB-78D8-4CB1-9563-646342766D0C} = {A09169AB-78D8-4CB1-9563-646342766D0C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,7 @@ Global
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Debug|Win32.ActiveCfg = Debug|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Debug|Win32.Build.0 = Debug|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Debug|x64.ActiveCfg = Debug|x64
+		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Debug|x64.Build.0 = Debug|x64
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|Mixed Platforms.ActiveCfg = Release|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|Win32.ActiveCfg = Release|Win32

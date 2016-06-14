@@ -247,7 +247,7 @@ namespace codeGen{
 		//imported heap vars
 		for (auto& var : _node.m_importedVars)
 		{
-			X86GpVar& gpVar = getUnusedVar();
+			X86GpVar& gpVar = getUnusedVar(); //is always a ptr
 			var->compiledVar = &gpVar;
 			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
 		}
@@ -458,6 +458,7 @@ namespace codeGen{
 			if (_indirect && ((ASTLeafSym*)&_node)->value->isPtr) *_indirect = true;
 			return ((ASTLeafSym*)&_node)->value->compiledVar;
 		}
+		assert(false); // could not compile leaf
 		return nullptr;
 	}
 

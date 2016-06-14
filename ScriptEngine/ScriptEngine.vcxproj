@@ -73,6 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files\boost\boost_1_60_0\stage\lib;$(SolutionDir)\dependencies\asmjit\Debug;$(LibraryPath)</LibraryPath>
+    <TargetName>nareti</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -82,6 +83,7 @@
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);C:\Program Files\boost\boost_1_60_0\stage\lib;$(SolutionDir)\dependencies\asmjit\Release;$(LibraryPath)</LibraryPath>
     <TargetExt>.lib</TargetExt>
+    <TargetName>nareti</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

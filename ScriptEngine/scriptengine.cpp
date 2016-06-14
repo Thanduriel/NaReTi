@@ -120,6 +120,13 @@ namespace NaReTi
 
 	// ******************************************************* //
 
+	bool ScriptEngine::reloadModule(const std::string& _moduleName)
+	{
+		return unloadModule(_moduleName, false) && loadModule(_moduleName+".nrt");
+	}
+
+	// ******************************************************* //
+
 	FunctionHandle ScriptEngine::getFuncHndl(const std::string& _name) const
 	{
 		for (auto& module : m_modules)

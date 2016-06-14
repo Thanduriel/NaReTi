@@ -85,6 +85,7 @@ namespace par
 		 */
 		bool tryArgCasts(ASTCall& _node, Function& _func);
 		//Try a cast between the given _node's type and _type.
+		// Returns a nullptr if none is found.
 		Function* typeCast(TypeInfo& _t0, TypeInfo& _t1);
 
 		/* Constructs a typeinfo from the previously parsed declaration

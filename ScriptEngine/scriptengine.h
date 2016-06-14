@@ -37,6 +37,8 @@ namespace NaReTi{
 		// @param _keepBinary If true no compiled functions are removed
 		bool unloadModule(const std::string& _moduleName, bool _keepBinary = false);
 
+		bool reloadModule(const std::string& _moduleName);
+
 		//Creates a new and empty module to build extern.
 		Module& createModule(const std::string& _moduleName);
 
