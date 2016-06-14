@@ -87,6 +87,7 @@ namespace par
 		//Try a cast between the given _node's type and _type.
 		// Returns a nullptr if none is found.
 		Function* typeCast(TypeInfo& _t0, TypeInfo& _t1);
+		std::string buildTypeInfoString(const TypeInfo& _t);
 
 		/* Constructs a typeinfo from the previously parsed declaration
 		 * and resets the parser state.

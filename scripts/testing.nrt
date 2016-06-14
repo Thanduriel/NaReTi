@@ -1,0 +1,171 @@
+
+use math
+use random
+use externals
+use vector
+use array // highly expirimental
+//use perfTest
+
+//use this to get a breakpoint in the compiler
+void breakpoint()
+{
+}
+
+type iVec2
+{
+	int x
+	int y
+}
+
+iVec2 g_test_vec
+
+void test_globalInit()
+{
+	g_test_vec.x = 11
+	g_test_vec.y = 9
+}
+
+iVec2 addiVec(int x0, int y0, int x1, int y1 )
+{
+	iVec2 res
+	res.x = x0 + x1
+	res.y = y0 + y1
+	
+	return res
+}
+
+iVec2 +(iVec2& slf, iVec2& oth)
+{
+	iVec2 res
+	res.x = slf.x + oth.x
+	res.y = slf.y + oth.y
+	
+	return res
+}
+
+void printVec3(Vec3& _vec)
+{
+	printF(_vec.x)
+	printF(_vec.y)
+	printF(_vec.z)
+}
+
+float [](Vec3& _vec, int _i)
+{
+	if(_i == 0){return _vec.x}
+	else if(_i == 1){return _vec.y}
+	else if(_i == 2){return _vec.z}
+}
+float pi = 3.14159265
+int test_global()
+{
+/*	printStr("1 external")
+	iVec2 stackVec = addiVec(2, 3, 8, 9)
+	printI(stackVec.x)
+	printI(stackVec.y)
+	printI(stackVec.x + stackVec.y)
+	if(stackVec.x == 10 && stackVec.y == 12) {printStr("1 val ret")}
+	else {printStr("0 val ret")}
+
+	
+	printStr("---------------------- math tests ----------------------")
+	if(sin(0.25) > 0.247411 && sin(0.25) < 0.247413) { printStr("1 sin(0.25)")}
+	else {printStr("0 sin(0.25)")}
+	if(2'8 == 256){ printStr("1 pow(2,8)")}
+	else {printStr("0 pow(2,8)")}
+	if(sqrt(765.34) > 27.6647 && sqrt(765.34) < 27.6649) {printStr("1 sqrt(765.34)")}
+	else {printStr("0 sqrt(765.34)")}
+	printF(sqrt(765.34))*/
+	
+	Vec3 loc
+	loc.x = 4.0
+	loc.y = 2.0
+	loc.z = 1.0
+
+	if(3.0 > 4.0){printStr("3.0 > 4.0")}
+	if(3.0 < 4.0){printStr("3.0 < 4.0")}
+	if(4.0 > 3.0){printStr("4.0 > 3.0")}
+	if(4.0 < 3.0){printStr("4.0 < 3.0")}
+	
+	printVec3(loc)
+//	float f = loc[0]
+	printF(loc[0])
+	printF(loc[1])
+	printF(loc[2])
+	
+	printF(loc * loc)
+	Vec3 loc2 = loc
+	loc2.y = 7.0
+	printF(len(loc))
+	loc = loc + 2.0 * loc
+	printF(len(loc))
+	
+	int trueVal = false
+	printI(trueVal)
+	
+	printF(pi)
+	
+	int[5] arrrrray
+	int i = 0
+	while(i < 5)
+	{
+		(++i)
+		arrrrray[i] = i
+		printI(arrrrray[i])
+	}
+	
+	i = -i
+	printI(i)
+	printI(++i)
+	printI(-arrrrray[3])
+	
+	return g_test_vec.y
+}
+
+int test_performance()
+{
+	int tickCount = getTickCount()
+
+	int i = 0
+	Vec2 test
+	test.x = 2.0
+	test.y = 1.0
+	//vector calculation
+	while(i < 1000000)
+	{
+		++i
+		test = test * 1.00001
+	}
+	i = 0
+	float f = 0.0
+	
+	//math functions
+	while(i < 326000)
+	{
+		++i
+	//	f = cosp(f)
+	}
+	
+	return getTickCount() - tickCount
+}
+
+void main()
+{
+	initRandom(getTickCount())
+	printF(rand(15, 0))
+	
+	printF(2.0'13.2)
+	
+	int i = 4
+	i = 4 * 1.5
+	i = i * 1.5
+	//printI(i)
+	
+	printI(i)
+	
+	float f = 3 - 1
+	printF(f)
+	f = -f
+	printF(f)
+//	printI(i)
+}

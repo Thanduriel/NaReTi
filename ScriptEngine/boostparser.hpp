@@ -115,9 +115,10 @@ namespace par
 				;
 
 			CodeScope =
-				lit('{')								[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >
+				(lit('{')								[boost::bind(&SemanticParser::beginCodeScope, &m_semanticParser)] >
 				*(GeneralExpression) >
 				lit('}')								[boost::bind(&SemanticParser::finishCodeScope, &m_semanticParser)]
+				) | GeneralExpression
 				;
 
 			//classic if / if else / else

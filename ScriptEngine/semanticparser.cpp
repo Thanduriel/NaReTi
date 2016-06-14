@@ -81,10 +81,7 @@ namespace par
 				string args;
 				for (auto& arg : _node.args)
 				{
-					args += arg->typeInfo->type.name + (arg->typeInfo->isConst ? " const" : "")
-						+ (arg->typeInfo->isArray ? "[]" : "")
-						+ (arg->typeInfo->isReference ? "&" : "")
-						+ ',';
+					args += buildTypeInfoString(*arg->typeInfo) + ',';
 				}
 				args.resize(args.size() - 1); //remove final comma; a function without args should not land here
 				throw ParsingError("No function with the given signature found: " + _node.name + '(' + args + ')');
@@ -167,6 +164,15 @@ namespace par
 		}
 
 		return nullptr;
+	}
+
+	// ************************************************** //
+
+	std::string SemanticParser::buildTypeInfoString(const TypeInfo& _t)
+	{
+		return _t.type.name + (_t.isConst ? " const" : "")
+			+ (_t.isArray ? "[]" : "")
+			+ (_t.isReference ? "&" : "");
 	}
 
 	// ************************************************** //
@@ -397,7 +403,10 @@ namespace par
 			if (*retNode.body->typeInfo != m_currentFunction->returnTypeInfo)
 			{
 				auto cast = typeCast(*retNode.body->typeInfo, m_currentFunction->returnTypeInfo);
-				if (!cast) throw ParsingError("Type mismatch...");
+				if (!cast) throw ParsingError("Type mismatch found \"" 
+					+ buildTypeInfoString(*retNode.body->typeInfo)
+					+ "\" but expected \""
+					+ buildTypeInfoString(m_currentFunction->returnTypeInfo) + "\"");
 				ASTCall& call = *m_allocator->construct<ASTCall>();
 				call.function = cast;
 				call.args.push_back(retNode.body);

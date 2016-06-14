@@ -1,0 +1,202 @@
+
+use math
+use random
+use externals
+use vector
+
+//use this to get a breakpoint in the compiler
+void breakpoint()
+{
+}
+
+int sum(int arg0, int arg1)
+{
+	return arg0 + arg1
+}
+
+float fsum(float f0, float f1)
+{
+	return f0 + f1
+}
+
+float castTest(int arg0, float arg1)
+{
+	return arg0 + arg1
+}
+
+type iVec2
+{
+	int x
+	int y
+}
+
+float memberAccess(Vec2& _vec)
+{
+	return _vec.y
+}
+
+void test_memberAssign(iVec2& _vec)
+{
+	_vec.x = 42
+}
+
+int precedence(int a, int b)
+{
+	return 3 + a * (b + 3) * a + b
+}
+
+int test_localVar(int a, int b)
+{
+	int x
+	x = a + b
+	
+	return x
+}
+
+int test_branch(int a)
+{
+	if(a == 10)
+	{
+		return 10
+	}
+	else if(a == 11)
+	{
+		return 11
+	}
+	else {return 2}
+}
+
+int test_boolean(int a, int b)
+{
+	if((a == 0 && b == 1) || b == 0 || a == b){ return 1}
+	
+	return 0
+}
+
+int test_loop(int a, int b)
+{
+	while(0 < a && b < 57)
+	{
+		b = b + a
+	}
+	return b
+}
+
+int test_external(int i)
+{
+	(++i)
+	return fooAdd2(i)
+}
+
+// *********************************************** //
+
+float test_sin(float x)
+{
+	float xx = x * x
+	float s = x + (x * xx) * (-0.16612511580269618 + xx * (0.0080394356072977748 + xx * (-0.000149414020045938777495)))
+	
+	return s
+}
+
+float test_sqrt(float x)
+{
+	float n = x / 2.0
+	float lstX = 0.0 
+	while(n != lstX)
+	{
+		lstX = n
+		n = (n + x/n) / 2.0
+	}
+	return n
+}
+
+// ******************************************** //
+
+iVec2 addiVec(int x0, int y0, int x1, int y1 )
+{
+	iVec2 res
+	res.x = x0 + x1
+	res.y = y0 + y1
+	
+	return res
+}
+
+
+int test_optimRetVal()
+{
+	iVec2 stackVec = addiVec(2, 3, 8, 9)
+	if(stackVec.x == 10 && stackVec.y == 12) { return true}
+	return false
+}
+iVec2 g_test_vec
+
+void test_globalInit()
+{
+	g_test_vec.x = 11
+	g_test_vec.y = 9
+}
+
+iVec2 addiVec(int x0, int y0, int x1, int y1 )
+{
+	iVec2 res
+	res.x = x0 + x1
+	res.y = y0 + y1
+	
+	return res
+}
+
+iVec2 +(iVec2& slf, iVec2& oth)
+{
+	iVec2 res
+	res.x = slf.x + oth.x
+	res.y = slf.y + oth.y
+	
+	return res
+}
+
+void printVec3(Vec3& _vec)
+{
+	printF(_vec.x)
+	printF(_vec.y)
+	printF(_vec.z)
+}
+
+float [](Vec3& _vec, int _i)
+{
+	if(_i == 0){return _vec.x}
+	else if(_i == 1){return _vec.y}
+	else if(_i == 2){return _vec.z}
+}
+float pi = 3.14159265
+int test_global()
+{
+	
+	return g_test_vec.y
+}
+
+int test_performance()
+{
+	int tickCount = getTickCount()
+
+	int i = 0
+	Vec2 test
+	test.x = 2.0
+	test.y = 1.0
+	//vector calculation
+	while(i < 1000000)
+	{
+		++i
+		test = test * 1.00001
+	}
+	i = 0
+	float f = 0.0
+	
+	//math functions
+	while(i < 326000)
+	{
+		++i
+	//	f = cosp(f)
+	}
+	
+	return getTickCount() - tickCount
+}
