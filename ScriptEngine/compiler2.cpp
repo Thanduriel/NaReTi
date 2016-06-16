@@ -49,7 +49,7 @@ namespace codeGen{
 		}
 
 		clock_t endClock = clock();
-		logging::log(logging::Info1, "Compiled \"" + _module.m_name + "\" in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
+		LOG(Info1, "Compiled \"" << _module.m_name << "\" in " << (double(endClock - beginClock) / CLOCKS_PER_SEC) << "sec");
 	}
 
 	// *************************************************** //

@@ -56,22 +56,22 @@ namespace par{
 		}
 		catch (ParsingError& _error) //semantic errors
 		{
-			logError(_text.begin(), g_lastIterator, _error.message);
+			parsingError(_text.begin(), g_lastIterator, _error.message);
 			return false;
 		}
-		catch (qi::expectation_failure<pos_iterator_type>& e)
+		catch (qi::expectation_failure<pos_iterator_type>& e) //syntax errors
 		{
-			logError(_text.begin(), e.first, string("Syntax error: did not expect \"") + *e.first + "\"");
+			parsingError(_text.begin(), e.first, string("Syntax error: did not expect \"") + *e.first + "\"");
 			return false;
 		}
 
 		clock_t endClock = clock();
 	//	std::cout << "[Info]" << "Compiled " << _module.m_name << " in " << double(endClock - beginClock) / CLOCKS_PER_SEC << "sec" << endl;
-		logging::log(logging::Info1, "Parsed \"" + _module.m_name + "\" in " + std::to_string(double(endClock - beginClock) / CLOCKS_PER_SEC) + "sec");
+		LOG(Info1, "Parsed \"" << _module.m_name << "\" in " << (double(endClock - beginClock) / CLOCKS_PER_SEC) << "sec");
 		return b;
 	}
 
-	void Parser::logError(str_it _begin, const str_it& _it, const std::string& _msg)
+	void Parser::parsingError(str_it _begin, const str_it& _it, const std::string& _msg)
 	{
 		int lineCount = 1; //lines are numbered beginning with 1
 		str_it lastLb;
@@ -88,8 +88,6 @@ namespace par{
 		str_it nextLb(lastLb); //start at last endl because _it might be an '\n'
 		while (*++nextLb != '\n');
 
-		logging::log(logging::Error, "[l." + std::to_string(lineCount) + "] " + _msg + '\n' + string(++lastLb, nextLb));
-//		std::clog << "[error]" <<"[l." << lineCount << "] " << _msg << endl;
-//		std::clog << string(++lastLb, nextLb) << endl;
+		LOG(Error, "[l." << lineCount << "] " << _msg << '\n' << string(++lastLb, nextLb));
 	}
 }

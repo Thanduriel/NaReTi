@@ -32,7 +32,7 @@ namespace lang
 			pair<string, int>("++", 2),
 			pair<string, int>("--", 2),
 			pair<string, int>(".", 2),
-			pair<string, int>("-", 3),
+	//		pair<string, int>("-", 3), //actually unary minus but can not be differentiated
 			pair<string, int>("*", 5),
 			pair<string, int>("%", 5),
 			pair<string, int>("/", 5),

@@ -2,10 +2,16 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #define LOGLVL 0xFF
 
+#define LOG(lvl, msg) do{std::ostringstream stream; \
+ stream << "[" << logging::LogLvlNames[logging::lvl] << "] " << msg << std::endl; \
+ logging::log(logging::lvl, stream.str());} while(false)
+
 namespace logging{
+
 	enum LogLvl
 	{
 		Error,
@@ -22,6 +28,6 @@ namespace logging{
 
 		if ((int)_log >= LOGLVL) return; // log level is to low
 
-		clog << "[" << LogLvlNames[_log] << "] " << _msg << endl;
+		clog << _msg;
 	}
 }

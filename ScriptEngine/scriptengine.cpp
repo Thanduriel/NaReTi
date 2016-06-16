@@ -82,7 +82,7 @@ namespace NaReTi
 			if (mod) module.m_dependencies.push_back(mod);
 			else
 			{
-				logging::log(logging::Warning, "Could not load depended module: " + modName);
+				LOG(Warning, "Could not load depended module: " << modName);
 		//		break;
 			}
 		}
