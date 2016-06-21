@@ -10,6 +10,8 @@
 
 namespace NaReTi{
 
+	typedef std::pair<std::string, par::ComplexType*> TypeAlias;
+
 	class Module
 	{
 	public:
@@ -17,6 +19,7 @@ namespace NaReTi{
 		~Module();
 
 		par::ComplexType* getType(const std::string& _name);
+		TypeAlias& getTypeAlias(const std::string& _name);
 		
 		/* Structure that holds function querys.
 		 */
@@ -59,6 +62,7 @@ namespace NaReTi{
 		std::vector < par::ComplexType* > m_types;
 		std::vector < par::GenericType* > m_genericTypes;
 		std::vector < par::Function* > m_functions;
+		std::vector < TypeAlias > m_typeAlias;
 		par::ASTCode* m_text;
 
 		std::string m_name;

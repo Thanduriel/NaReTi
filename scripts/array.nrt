@@ -10,14 +10,14 @@ type array
 	int size;
 }*/
 
-/*
+
 //proposed generics
 type<T> array
 {
-//	T& data
+	T data //T&
 	int _capacity
 	int _size
-}*/
+}
 
 
 /*

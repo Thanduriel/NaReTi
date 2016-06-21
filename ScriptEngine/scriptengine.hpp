@@ -1,6 +1,7 @@
 #include "enginetypes.hpp"
 #include "optimizer.hpp"
 #include "module.hpp"
+#include "moduleloader.hpp"
 #include <assert.h>
 
 #pragma once
@@ -10,6 +11,7 @@ namespace codeGen{
 }
 namespace par{
 	class Parser;
+	class GenericsParser;
 }
 
 namespace lang{
@@ -62,12 +64,15 @@ namespace NaReTi{
 		Config& config() { return m_config; }
 	private:
 		Config m_config;
+		ModuleLoader m_moduleLoader;
 
 		std::string extractName(const std::string& _fullName);
 
 		lang::BasicModule* m_basicModule;
 
 		par::Parser* m_parser;
+		par::GenericsParser* m_genericsParser;
+
 		codeGen::Compiler* m_compiler;
 		codeGen::Optimizer m_optimizer;
 

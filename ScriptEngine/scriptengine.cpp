@@ -2,11 +2,12 @@
 #include <time.h>  //clock
 
 #include "compiler2.hpp"
-#include "scriptengine.h"
+#include "scriptengine.hpp"
 #include "logger.hpp"
 #include "mathlib.hpp"
 #include "atomics.hpp"
 #include "parser.hpp"
+#include "generics.hpp"
 
 using namespace std;
 
@@ -15,19 +16,28 @@ namespace NaReTi
 	ScriptEngine::ScriptEngine():
 		m_compiler(new codeGen::Compiler()),
 		m_basicModule(new lang::BasicModule(m_compiler->getRuntime())),
-		m_parser(new par::Parser())
+		m_parser(new par::Parser()),
+		m_moduleLoader(m_config)
 	{
 		m_config.scriptLocation = "../scripts/";
+		//init globals
+		//the initialization order follows the dependencies and should not be changed
+	//	par::g_genericsParser = new par::GenericsParser();
+		m_genericsParser = new par::GenericsParser(m_moduleLoader);
+		par::g_genericsParser = m_genericsParser;
+		//g_module is set in BasicModule::BasicModule
 
 		//setup std math lib
 		lang::MathModule* module = new lang::MathModule();
-		loadModule("math.nrt", module);
+		loadModule("math", module);
 		module->linkExternals();
 		m_modules.emplace_back(module);
 	}
 
 	ScriptEngine::~ScriptEngine()
 	{
+		delete par::g_genericsParser;
+
 		delete m_compiler;
 		delete m_parser;
 		delete m_basicModule;
@@ -37,35 +47,20 @@ namespace NaReTi
 
 	Module* ScriptEngine::getModule(const string& _name)
 	{
-		string name = extractName(_name);
 		for (auto& mod : m_modules)
 		{
-			if (mod->m_name == name) return mod.get();
+			if (mod->m_name == _name) return mod.get();
 		}
-		return loadModule(_name) ? getModule(name) : nullptr;
+		return loadModule(_name) ? getModule(_name) : nullptr;
 	}
 
 	// ******************************************************* //
 
 	bool ScriptEngine::loadModule(const string& _fileName, NaReTi::Module* _dest)
 	{
-		std::ifstream in((m_config.scriptLocation + _fileName).c_str(), std::ios::in | std::ios::binary);
+		string fileContent = m_moduleLoader.load(_fileName);
+		if (fileContent == "#") return false;
 
-		//check if file is valid
-		if (!in)
-		{
-			cout << "Could not open File " << _fileName;
-			return false;
-		}
-
-		string fileContent;
-
-		// put filecontent into a string
-		in.seekg(0, std::ios::end);
-		fileContent.reserve(in.tellg());
-		in.seekg(0, std::ios::beg);
-
-		fileContent.assign((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 
 		//use it without the file ending as name for the module
 		string packageName = extractName(_fileName);
@@ -78,12 +73,11 @@ namespace NaReTi
 		auto dep = m_parser->getDependencies();
 		for (auto& modName : dep)
 		{
-			Module* mod = getModule(modName + ".nrt");
+			Module* mod = getModule(modName);
 			if (mod) module.m_dependencies.push_back(mod);
 			else
 			{
 				LOG(Warning, "Could not load depended module: " << modName);
-		//		break;
 			}
 		}
 		bool ret = m_parser->parse(fileContent, module);
@@ -95,7 +89,7 @@ namespace NaReTi
 		else
 		{
 			m_modules.pop_back();
-			logging::log(logging::Error, "The module \"" + packageName + "\" could not be loaded due to a parsing error");
+			LOG(Error, "The module \"" << packageName << "\" could not be loaded due to a parsing error");
 		}
 
 		return ret;
@@ -122,7 +116,7 @@ namespace NaReTi
 
 	bool ScriptEngine::reloadModule(const std::string& _moduleName)
 	{
-		return unloadModule(_moduleName, false) && loadModule(_moduleName+".nrt");
+		return unloadModule(_moduleName, false) && loadModule(_moduleName);
 	}
 
 	// ******************************************************* //

@@ -14,9 +14,14 @@ str_it g_lastIterator;
 
 namespace par{
 
-	Parser::Parser():
+	BasicParser::BasicParser():
 		m_semanticParser(),
-		m_grammar(m_semanticParser),
+		m_grammar(m_semanticParser)
+	{
+	}
+
+	Parser::Parser():
+		BasicParser(),
 		m_preParserGrammar(m_preParser)
 	{
 	}
@@ -36,7 +41,7 @@ namespace par{
 
 	// ************************************************** //
 
-	bool Parser::parse(const std::string& _text, NaReTi::Module& _module)
+	bool BasicParser::parse(const std::string& _text, NaReTi::Module& _module)
 	{
 		m_semanticParser.setModule(_module);
 
@@ -71,7 +76,7 @@ namespace par{
 		return b;
 	}
 
-	void Parser::parsingError(str_it _begin, const str_it& _it, const std::string& _msg)
+	void BasicParser::parsingError(str_it _begin, const str_it& _it, const std::string& _msg)
 	{
 		int lineCount = 1; //lines are numbered beginning with 1
 		str_it lastLb;

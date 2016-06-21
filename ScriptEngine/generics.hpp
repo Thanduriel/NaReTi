@@ -2,8 +2,28 @@
 
 #include "ast.hpp"
 #include <unordered_map>
+#include "parser.hpp"
+#include "moduleloader.hpp"
 
 namespace par{
+
+	class GenericsParser : public BasicParser
+	{
+	public:
+		GenericsParser(NaReTi::ModuleLoader& _loader) : m_targetModule(nullptr), m_loader(_loader){}
+
+		//returns the mangled name a type with the given name and arguments would have
+		std::string mangledName(const std::string& _name, const std::vector<std::string>& _args );
+		void parseType(const std::string& _name, int _argCount, ComplexType* _args);
+
+		//todo: generics remain in their own modules managed by the GenericsParser
+		void setModule(NaReTi::Module* _module) { m_targetModule = _module; }
+	private:
+		NaReTi::Module* m_targetModule;
+		NaReTi::ModuleLoader& m_loader;
+	};
+
+	extern GenericsParser* g_genericsParser;
 
 	class GenericTrait
 	{

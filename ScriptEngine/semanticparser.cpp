@@ -231,15 +231,24 @@ namespace par
 	{
 		if (m_genericTypeParams.size())
 		{
-			m_currentModule->m_genericTypes.emplace_back(new GenericType(_attr, m_genericTypeParams));
-			m_currentScope = &m_currentModule->m_genericTypes.back()->scope;
+			g_genericsParser->setModule(m_currentModule);
+			std::vector< string > realNames; 
+			realNames.reserve(m_genericTypeParams.size());
+			for (int i = 0; i < m_genericTypeParams.size(); ++i)
+			{
+				auto& alias = m_currentModule->getTypeAlias("__T_" + std::to_string(i));
+				alias.first = m_genericTypeParams[i];
+				realNames.push_back(alias.second->name);
+			}
+			string name = g_genericsParser->mangledName(_attr, realNames);
+			m_currentModule->m_types.emplace_back(new ComplexType(name));
 			m_genericTypeParams.clear();
 		}
 		else
 		{
 			m_currentModule->m_types.emplace_back(new ComplexType(_attr));
-			m_currentScope = &m_currentModule->m_types.back()->scope;
 		}
+		m_currentScope = &m_currentModule->m_types.back()->scope;
 	}
 
 	// ************************************************** //
@@ -604,25 +613,25 @@ namespace par
 
 	TypeInfo SemanticParser::buildTypeInfo()
 	{
-		ComplexType& type = getType(m_typeName);
-
 		if (m_genericTypeParams.size())
 		{
-			ComplexType* params[8];
-			for (int i = 0; i < (int)m_genericTypeParams.size(); ++i)
-			{
-				params[i] = &getType(m_genericTypeParams[i]);
-			}
+			g_genericsParser->setModule(m_currentModule);
 
-			GenericType* gType = (GenericType*)&type;
-			m_typeName = gType->mangledName(params[0]);
-			ComplexType* type = m_moduleLib.getType(m_typeName);
+			m_typeName = g_genericsParser->mangledName(m_typeName, m_genericTypeParams);
 
-			if (!type)
+			if (!m_currentModule->getType(m_typeName))
 			{
-				type = gType->makeSpecialisation(m_typeName, params[0]);
+				ComplexType* params[8];
+				for (int i = 0; i < (int)m_genericTypeParams.size(); ++i)
+				{
+					params[i] = &getType(m_genericTypeParams[i]);
+				}
+				g_genericsParser->parseType("array", m_genericTypeParams.size(), params[0]);
 			}
+			m_genericTypeParams.clear(); //clear afterwards
 		}
+
+		ComplexType& type = getType(m_typeName);
 
 		return TypeInfo(type, m_typeInfo.isReference, m_typeInfo.isConst, m_typeInfo.isArray);
 	}

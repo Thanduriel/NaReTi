@@ -1,9 +1,46 @@
 #include "generics.hpp"
 #include "module.hpp"
+#include <fstream>
+#include <assert.h>
 
 namespace par{
 	using namespace std;
 
+	GenericsParser* g_genericsParser;
+
+	std::string GenericsParser::mangledName(const std::string& _name, const std::vector<std::string>& _args)
+	{
+		string mangled = _name + "<";
+		for (auto& argName : _args)
+			mangled += argName + ",";
+		mangled += ">";
+
+		return std::move(mangled);
+	}
+
+	void GenericsParser::parseType(const std::string& _name, int _argCount, ComplexType* _args)
+	{
+		assert(m_targetModule);
+
+		for (int i = 0; i < _argCount; ++i)
+		{
+			string name = "__T_" + std::to_string(i);
+
+			m_targetModule->m_typeAlias.emplace_back(name, &_args[i]);
+			//give it a name which the semantic parser will find
+		}
+
+		string fileContent = m_loader.load(_name);
+
+		//since parsing happens in the middle of a different file
+		auto restoreIt = g_lastIterator;
+
+		parse(fileContent, *m_targetModule);
+
+		g_lastIterator = restoreIt;
+	}
+
+	// ***************************************************************** //
 
 	GenericTrait::GenericTrait(const std::vector<std::string>& _params)
 	{
@@ -83,6 +120,7 @@ namespace par{
 		{
 			ASTCode& node = *(ASTCode*)_node;
 			ASTCode* newNode = _alloc.construct< ASTCode >(node);
+
 			for (int i = 0; i < (int)node.size(); ++i)
 			{
 				(*newNode)[i] = copyTree(node[i], _alloc);

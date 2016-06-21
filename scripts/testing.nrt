@@ -3,8 +3,6 @@ use math
 use random
 use externals
 use vector
-use array // highly expirimental
-//use perfTest
 
 //use this to get a breakpoint in the compiler
 void breakpoint()
@@ -58,25 +56,7 @@ float [](Vec3& _vec, int _i)
 }
 float pi = 3.14159265
 int test_global()
-{
-/*	printStr("1 external")
-	iVec2 stackVec = addiVec(2, 3, 8, 9)
-	printI(stackVec.x)
-	printI(stackVec.y)
-	printI(stackVec.x + stackVec.y)
-	if(stackVec.x == 10 && stackVec.y == 12) {printStr("1 val ret")}
-	else {printStr("0 val ret")}
-
-	
-	printStr("---------------------- math tests ----------------------")
-	if(sin(0.25) > 0.247411 && sin(0.25) < 0.247413) { printStr("1 sin(0.25)")}
-	else {printStr("0 sin(0.25)")}
-	if(2'8 == 256){ printStr("1 pow(2,8)")}
-	else {printStr("0 pow(2,8)")}
-	if(sqrt(765.34) > 27.6647 && sqrt(765.34) < 27.6649) {printStr("1 sqrt(765.34)")}
-	else {printStr("0 sqrt(765.34)")}
-	printF(sqrt(765.34))*/
-	
+{	
 	Vec3 loc
 	loc.x = 4.0
 	loc.y = 2.0
@@ -153,6 +133,10 @@ void main()
 {
 	initRandom(getTickCount())
 	printF(rand(15, 0))
+	
+	array<int> vector
+	vector.data = 1234
+	printI(vector.data)
 	
 	printF(2.0'13.2)
 	

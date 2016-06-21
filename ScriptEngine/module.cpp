@@ -25,14 +25,19 @@ namespace NaReTi{
 
 	par::ComplexType* Module::getType(const std::string& _name)
 	{
-		auto it = std::find_if(m_types.begin(), m_types.end(), 
-			[&](const ComplexType* _t){ return _t->name == _name; });
+		for (auto& type : m_types)
+			if (type->name == _name) return type;
 
-		return it == m_types.end() ? nullptr : (*it);
-/*		for (auto& type : m_types)
-			if (type->name == _name) return type.get();
+		for (auto& alias : m_typeAlias)
+			if (alias.first == _name) return alias.second;
 
-		return nullptr;*/
+		return nullptr;
+	}
+
+	TypeAlias& Module::getTypeAlias(const std::string& _name)
+	{
+		for (auto& alias : m_typeAlias)
+			if (alias.first == _name) return alias;
 	}
 
 	par::Function* Module::getFunction(const std::string& _name,

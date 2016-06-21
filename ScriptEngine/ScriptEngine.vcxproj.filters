@@ -54,9 +54,6 @@
     <ClInclude Include="enginetypes.hpp">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="scriptengine.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="module.hpp">
       <Filter>engine</Filter>
     </ClInclude>
@@ -129,6 +126,12 @@
     <ClInclude Include="boostparser.hpp">
       <Filter>par\boost</Filter>
     </ClInclude>
+    <ClInclude Include="scriptengine.hpp">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="moduleloader.hpp">
+      <Filter>engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -172,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="mathlib.cpp">
       <Filter>lang</Filter>
+    </ClCompile>
+    <ClCompile Include="moduleloader.cpp">
+      <Filter>engine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

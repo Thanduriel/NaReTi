@@ -1,17 +1,17 @@
 // ScriptEngine.cpp : Defines the entry point for the console application.
 //
 
-#define TEST(expression, message)      \
-    if( !(expression) )                \
-	    {                                  \
-        std::cerr << "failed at:" << message << '\n';  \
-        result = false;                \
+#define TEST(expression, message)						\
+    if( !(expression) )									\
+	    {												\
+        std::cerr << "failed at:" << message << '\n';	\
+        result = false;									\
 	    }
 
 #define FUNCHNDL(str) (scriptEngine.getFuncHndl(str))
 
 #include "stdafx.h"
-#include "../ScriptEngine/scriptengine.h"
+#include "../ScriptEngine/scriptengine.hpp"
 #include <iostream>
 #include <chrono>
 #include <Windows.h>
@@ -133,14 +133,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	TEST((scriptEngine.call<int, int>(hndl, 5) == 7), "native call with handle");
 
 	//link externals
-	NaReTi::Module* externals = scriptEngine.getModule("externals.nrt");
+	NaReTi::Module* externals = scriptEngine.getModule("externals");
 	externals->linkExternal("printI", &printI);
 	externals->linkExternal("printF", &printF);
 	externals->linkExternal("printStr", &printStr);
 	externals->linkExternal("getTickCount", &GetTickCount);
 	externals->linkExternal("fooAdd2", &foo);
 
-	bool success = scriptEngine.loadModule("unittest.nrt");
+	bool success = scriptEngine.loadModule("unittest");
 	if (!success) cout << "ERROR: Could not load unittest.nrt";
 	else
 	{
@@ -156,7 +156,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		else cout << "Unit tests with optimization level basic completed: " << testRun(scriptEngine) << endl;
 	}
 
-	scriptEngine.loadModule("testing.nrt");
+	scriptEngine.loadModule("testing");
 
 	//script functions
 	NaReTi::FunctionHandle hndlGlobal = scriptEngine.getFuncHndl("test_global");

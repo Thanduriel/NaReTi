@@ -43,6 +43,7 @@ Global
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|Win32.ActiveCfg = Release|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|Win32.Build.0 = Release|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|x64.ActiveCfg = Release|x64
+		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

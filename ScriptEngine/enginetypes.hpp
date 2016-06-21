@@ -48,11 +48,14 @@ namespace NaReTi{
 		Basic
 	};
 
-	struct Config
+	struct LoaderConfig
 	{
-		OptimizationLvl optimizationLvl;
-
 		//path where the script files are found
 		std::string scriptLocation;
+	};
+
+	struct Config : public LoaderConfig
+	{
+		OptimizationLvl optimizationLvl;
 	};
 }

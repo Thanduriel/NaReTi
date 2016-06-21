@@ -173,13 +173,14 @@
     <ClInclude Include="mathlib.hpp" />
     <ClInclude Include="module.hpp" />
     <ClInclude Include="modulelib.hpp" />
+    <ClInclude Include="moduleloader.hpp" />
     <ClInclude Include="optimizer.hpp" />
     <ClInclude Include="parexception.hpp" />
     <ClInclude Include="parpredecs.hpp" />
     <ClInclude Include="parser.hpp" />
     <ClInclude Include="preparser.hpp" />
     <ClInclude Include="ptr_stuff.hpp" />
-    <ClInclude Include="scriptengine.h" />
+    <ClInclude Include="scriptengine.hpp" />
     <ClInclude Include="semanticparser.hpp" />
     <ClInclude Include="skipper.hpp" />
     <ClInclude Include="stackalloc.hpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="mathlib.cpp" />
     <ClCompile Include="module.cpp" />
     <ClCompile Include="modulelib.cpp" />
+    <ClCompile Include="moduleloader.cpp" />
     <ClCompile Include="optimizer.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="scriptengine.cpp" />

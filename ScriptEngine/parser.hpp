@@ -8,29 +8,35 @@
 #include "preparser.hpp"
 
 namespace par{
-//	extern Parser g_dynamicParser; // parser to parse generated snippets
 
-	class Parser
+	class BasicParser
 	{
 	public:
-		Parser();
+		BasicParser();
 		bool parse(const std::string& _text, NaReTi::Module& _module);
-		void preParse(const std::string& _text, NaReTi::Module& _module);
-
-		//per cpy
-		std::vector<std::string> getDependencies() { return m_preParser.dependencies; }
-	private:
+	protected:
 		//writes an formated error message to the log including the line number and a snippet of the faulty code
 		//@param _begin begin iterator to the text
 		//@param _it iterator of where the error appeared
 		void parsingError(str_it _begin, const str_it& _it, const std::string& _msg);
 
-		//parsing pipeline
 		par::SemanticParser m_semanticParser;
 		par::NaReTiGrammar m_grammar;
+		par::NaReTiSkipper m_skipper;
+	};
+
+	class Parser : public BasicParser
+	{
+	public:
+		Parser();
+		void preParse(const std::string& _text, NaReTi::Module& _module);
+
+		//per cpy
+		std::vector<std::string> getDependencies() { return m_preParser.dependencies; }
+	private:
+		
 		par::PreParserGrammar m_preParserGrammar;
 		PreParser m_preParser;
-		par::NaReTiSkipper m_skipper;
 	};
 
 }
