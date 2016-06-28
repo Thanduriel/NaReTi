@@ -236,7 +236,8 @@ namespace par
 			realNames.reserve(m_genericTypeParams.size());
 			for (int i = 0; i < m_genericTypeParams.size(); ++i)
 			{
-				auto& alias = m_currentModule->getTypeAlias("__T_" + std::to_string(i));
+				//since these are auto generated they should always be found
+				auto& alias = *m_currentModule->getTypeAlias("__T_" + std::to_string(i));
 				alias.first = m_genericTypeParams[i];
 				realNames.push_back(alias.second->name);
 			}
@@ -263,47 +264,8 @@ namespace par
 	void SemanticParser::finishTypeDec()
 	{
 		ComplexType& type = *m_currentModule->m_types.back();
-		TypeInfo typeInfo = TypeInfo(type, true);
 
-		// generate default assignment
-		m_currentModule->m_functions.emplace_back(new Function("=", typeInfo));
-		Function& func = *m_currentModule->m_functions.back();
-		func.returnTypeInfo.isReference = true;
-
-		// =(Type& slf, Type& oth)
-		func.scope.m_variables.reserve(2); // prevent moves
-		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("slf", typeInfo));
-		VarSymbol& slf = *func.scope.m_variables.back();
-		ASTLeafSym& slfInst = *m_allocator->construct<ASTLeafSym>(&slf);
-		slfInst.typeInfo = &slf.typeInfo;
-		func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("oth", typeInfo));
-		VarSymbol& oth = *func.scope.m_variables.back();
-		ASTLeafSym& othInst = *m_allocator->construct<ASTLeafSym>(&oth);
-		othInst.typeInfo = &oth.typeInfo;
-
-		func.paramCount = 2;
-
-		//code scope
-		for (int i = 0; i < (int)type.scope.m_variables.size(); ++i)
-		{
-			//slf.x = oth.x
-			VarSymbol& member = *type.scope.m_variables[i];
-			ASTMember& memberSlf = *m_allocator->construct<ASTMember>();
-			memberSlf.instance = &slfInst;
-			memberSlf.index = i;
-			memberSlf.typeInfo = &member.typeInfo;
-			ASTMember& memberOth = *m_allocator->construct<ASTMember>();
-			memberOth.instance = &othInst;
-			memberOth.index = i;
-			memberOth.typeInfo = &member.typeInfo;
-			ASTCall& call = *m_allocator->construct<ASTCall>();
-			call.args.push_back(&memberSlf);
-			call.args.push_back(&memberOth);
-			call.name = "=";
-			call.typeInfo = &func.returnTypeInfo;
-			call.function = m_moduleLib.getFunction(call.name, call.args.begin(), call.args.end(), m_funcQuery);
-			func.scope.push_back(&call);
-		}
+		m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
 	}
 
 	// ************************************************** //
@@ -640,9 +602,10 @@ namespace par
 
 	void SemanticParser::makeArray()
 	 { 
-		 ComplexType& type = m_arrayTypeGen.buildType(buildTypeInfo(), *m_currentModule);
-
-		 newTypeInfo(type.name);
+		 //translate T[] to array<T>
+		 m_genericTypeParams.push_back(m_typeName);
+		 m_typeName = "array";
+	//	 newTypeInfo(type.name);
 	}
 
 	// ************************************************** //

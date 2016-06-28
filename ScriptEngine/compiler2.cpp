@@ -48,6 +48,8 @@ namespace codeGen{
 			compileFuction(*function);
 		}
 
+		_module.setChanged(false); // is compiled up to date
+
 		clock_t endClock = clock();
 		LOG(Info1, "Compiled \"" << _module.m_name << "\" in " << (double(endClock - beginClock) / CLOCKS_PER_SEC) << "sec");
 	}

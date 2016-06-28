@@ -19,7 +19,7 @@ namespace NaReTi{
 		~Module();
 
 		par::ComplexType* getType(const std::string& _name);
-		TypeAlias& getTypeAlias(const std::string& _name);
+		TypeAlias* getTypeAlias(const std::string& _name);
 		
 		/* Structure that holds function querys.
 		 */
@@ -57,6 +57,9 @@ namespace NaReTi{
 		//links an as external declared func symbol in this module to the given ptr.
 		bool linkExternal(const std::string& _name, void* _funcPtr);
 
+		void setChanged(bool _b){ m_hasChanged = _b; }
+		bool hasChanged() { return m_hasChanged; }
+
 		//their lifetime equals the module's
 		//use a stack allocator for all related buffers if possible
 		std::vector < par::ComplexType* > m_types;
@@ -69,6 +72,7 @@ namespace NaReTi{
 
 		std::vector < Module* > m_dependencies;
 	protected:
+		bool m_hasChanged; // needs a recompile
 
 		// allocator for the ast-nodes
 		utils::DetorAlloc m_allocator;

@@ -44,6 +44,8 @@ namespace par{
 	bool BasicParser::parse(const std::string& _text, NaReTi::Module& _module)
 	{
 		m_semanticParser.setModule(_module);
+		//when a module is parsed we assume that the binary is not up to date
+		_module.setChanged(true);
 
 		g_lastIterator = _text.begin();
 

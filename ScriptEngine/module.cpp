@@ -34,10 +34,12 @@ namespace NaReTi{
 		return nullptr;
 	}
 
-	TypeAlias& Module::getTypeAlias(const std::string& _name)
+	TypeAlias* Module::getTypeAlias(const std::string& _name)
 	{
 		for (auto& alias : m_typeAlias)
-			if (alias.first == _name) return alias;
+			if (alias.first == _name) return &alias;
+
+		return nullptr;
 	}
 
 	par::Function* Module::getFunction(const std::string& _name,

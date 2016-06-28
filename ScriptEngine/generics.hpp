@@ -19,10 +19,13 @@ namespace par{
 		//todo: generics remain in their own modules managed by the GenericsParser
 		void setModule(NaReTi::Module* _module) { m_targetModule = _module; }
 	private:
+		std::vector< NaReTi::Module* > m_specialisations;
+
 		NaReTi::Module* m_targetModule;
 		NaReTi::ModuleLoader& m_loader;
 	};
 
+	//owned by the scriptEngine
 	extern GenericsParser* g_genericsParser;
 
 	class GenericTrait

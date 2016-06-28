@@ -132,6 +132,9 @@
     <ClInclude Include="moduleloader.hpp">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="typedefault.hpp">
+      <Filter>lang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="moduleloader.cpp">
       <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="typedefault.cpp">
+      <Filter>lang</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

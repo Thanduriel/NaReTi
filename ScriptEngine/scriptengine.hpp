@@ -33,13 +33,17 @@ namespace NaReTi{
 		//the name is the file name without ending.
 		// @param _dest when provided symbols are added to this module
 		bool loadModule(const std::string& _fileName, NaReTi::Module* _dest = nullptr);
+		bool loadModule(NaReTi::Module* _module);
 
 		// Removes a module with the given name and all it's symbols to release it's memory.
 		// This should only be used if no other module depends on the module.
 		// @param _keepBinary If true no compiled functions are removed
 		bool unloadModule(const std::string& _moduleName, bool _keepBinary = false);
 
+		// Deletes and loads a module.
+		// Use this function if you want to recompile a module.
 		bool reloadModule(const std::string& _moduleName);
+		bool reloadModule(NaReTi::Module* _module);
 
 		//Creates a new and empty module to build extern.
 		Module& createModule(const std::string& _moduleName);

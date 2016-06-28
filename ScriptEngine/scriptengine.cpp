@@ -83,6 +83,9 @@ namespace NaReTi
 		bool ret = m_parser->parse(fileContent, module);
 		if (ret)
 		{
+			//check dependencies again(generics can produce code)
+		//	for (auto dep : module.m_dependencies)
+		//		if (dep->hasChanged()) reloadModule(dep);
 			if(m_config.optimizationLvl > None) m_optimizer.optimize(module);
 			m_compiler->compile(module);
 		}
@@ -94,6 +97,12 @@ namespace NaReTi
 
 		return ret;
 	}
+
+	bool ScriptEngine::loadModule(NaReTi::Module* _module)
+	{
+		return loadModule(_module->m_name, _module);
+	}
+
 
 	// ******************************************************* //
 
@@ -116,7 +125,17 @@ namespace NaReTi
 
 	bool ScriptEngine::reloadModule(const std::string& _moduleName)
 	{
+
 		return unloadModule(_moduleName, false) && loadModule(_moduleName);
+	}
+
+	bool ScriptEngine::reloadModule(NaReTi::Module* _module)
+	{
+		//dirty hack to keep pointers valid
+		string name = _module->m_name;
+		(*_module).~Module();
+		new (_module)Module(name);
+		return loadModule(_module);
 	}
 
 	// ******************************************************* //

@@ -85,19 +85,19 @@ int test_global()
 	
 	printF(pi)
 	
-	int[5] arrrrray
+//	int[5] arrrrray
 	int i = 0
 	while(i < 5)
 	{
 		(++i)
-		arrrrray[i] = i
-		printI(arrrrray[i])
+//		arrrrray[i] = i
+//		printI(arrrrray[i])
 	}
 	
 	i = -i
 	printI(i)
 	printI(++i)
-	printI(-arrrrray[3])
+//	printI(-arrrrray[3])
 	
 	return g_test_vec.y
 }
@@ -134,7 +134,8 @@ void main()
 	initRandom(getTickCount())
 	printF(rand(15, 0))
 	
-	array<int> vector
+	//array<int> vector
+	int[0] vector
 	vector.data = 1234
 	printI(vector.data)
 	

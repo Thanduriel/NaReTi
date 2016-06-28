@@ -9,6 +9,7 @@
 #include "ast.hpp"
 #include "stackalloc.hpp"
 #include "array.hpp"
+#include "typedefault.hpp"
 
 namespace par
 {
@@ -98,6 +99,7 @@ namespace par
 		ComplexType& getType(const std::string& _name);
 
 		lang::ArrayTypeGen m_arrayTypeGen;
+		lang::TypeDefaultGen m_typeDefaultGen;
 
 		std::vector < ASTExpNode* > m_stack;
 		TypeInfo m_typeInfo;
