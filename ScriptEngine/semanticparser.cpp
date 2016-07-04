@@ -266,6 +266,7 @@ namespace par
 		ComplexType& type = *m_currentModule->m_types.back();
 
 		m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
+		m_typeDefaultGen.buildElemAccess(type, *m_currentModule);
 	}
 
 	// ************************************************** //
@@ -368,6 +369,7 @@ namespace par
 		if (m_currentFunction->returnTypeInfo.type.basic != BasicType::Void)
 		{
 			retNode.body = popNode();
+			assert(retNode.body->typeInfo);
 
 			//types do not match
 			//todo: make typechecking same for functions and return
@@ -579,17 +581,17 @@ namespace par
 		{
 			g_genericsParser->setModule(m_currentModule);
 
+			ComplexType* params[8];
+			for (int i = 0; i < (int)m_genericTypeParams.size(); ++i)
+			{
+				params[i] = &getType(m_genericTypeParams[i]);
+				m_genericTypeParams[i] = params[i]->name; // aliases do not have the correct type
+			}
+
 			m_typeName = g_genericsParser->mangledName(m_typeName, m_genericTypeParams);
 
 			if (!m_currentModule->getType(m_typeName))
-			{
-				ComplexType* params[8];
-				for (int i = 0; i < (int)m_genericTypeParams.size(); ++i)
-				{
-					params[i] = &getType(m_genericTypeParams[i]);
-				}
 				g_genericsParser->parseType("array", m_genericTypeParams.size(), params[0]);
-			}
 			m_genericTypeParams.clear(); //clear afterwards
 		}
 

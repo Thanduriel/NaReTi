@@ -14,25 +14,19 @@ type array
 //proposed generics
 type<T> array
 {
-	T data //T&
+	T& data
 	int _capacity
 	int _size
 }
 
 
-/*
-void& [](__Array& arr, int i)
+
+T& [](array<T>& arr, int i)
 {
-	return data[arr]
+	return __off(arr.data, i)
 }
 
-//actual declaration: void& [0]
-type __Array
-{
-	void& data
-	int capacity
-	int size
-}
+/*
 
 void &[1] typecast(__Array _arr)
 

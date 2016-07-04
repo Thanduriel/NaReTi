@@ -9,7 +9,7 @@ namespace lang{
 
 	void TypeDefaultGen::buildElemAccess(par::ComplexType& _type, NaReTi::Module& _module)
 	{
-		_module.m_functions.emplace_back(new Function("[]", TypeInfo(_type, true, false, false)));
+		_module.m_functions.emplace_back(new Function("__off", TypeInfo(_type, true, false, false)));
 		Function& func = *_module.m_functions.back();
 		auto& alloc = _module.getAllocator();
 		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", TypeInfo(_type)));

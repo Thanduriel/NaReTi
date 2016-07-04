@@ -153,7 +153,8 @@ namespace codeGen{
 	{
 		traceNode(_node.body, &_node.body);
 		
-		if (m_function->bHiddenParam)
+		//only when a local var is returned substitution may take place
+		if (m_function->bHiddenParam && _node.body->type == ASTType::LeafSym)
 		{
 			trySubstitution(**m_usageStack.back(), *m_function->scope.m_variables[0]);
 
