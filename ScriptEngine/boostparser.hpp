@@ -162,7 +162,7 @@ namespace par
 
 			// match any special char that can be used as an operator
 			//pay attention that '-' needs to be the last char so that it is not interpreted as range
-			Operator = lexeme[+char_("?'+*/<>=|^%~!&.-")];
+			Operator = lexeme[+char_("?:'+*/<>=|^%~!&.-")];
 			
 
 			Integer = 

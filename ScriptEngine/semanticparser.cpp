@@ -267,6 +267,7 @@ namespace par
 
 		m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
 		m_typeDefaultGen.buildElemAccess(type, *m_currentModule);
+		m_typeDefaultGen.buildRefAssignment(type, *m_currentModule);
 	}
 
 	// ************************************************** //

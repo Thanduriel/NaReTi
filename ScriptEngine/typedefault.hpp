@@ -14,6 +14,7 @@ namespace lang{
 		void buildElemAccess(par::ComplexType& _type, NaReTi::Module& _module);
 
 		void buildDefaultAssignment(par::ComplexType& _type, NaReTi::Module& _module, par::ModuleLibrary& _lib);
+		void buildRefAssignment(par::ComplexType& _type, NaReTi::Module& _module);
 	private:
 		std::vector<NaReTi::Module::FuncMatch> m_funcQuery;
 	};

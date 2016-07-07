@@ -470,23 +470,23 @@ namespace codeGen{
 	{
 		switch (_instr)
 		{
-		case InstructionType::Inc:
+		case Inc:
 			m_compiler.inc(*(X86GpVar*)_args[0]);
 			break;
-		case InstructionType::Dec:
+		case Dec:
 			m_compiler.dec(*(X86GpVar*)_args[0]);
 			break;
-		case InstructionType::Neg:
+		case Neg:
 			m_compiler.mov(*(X86GpVar*)_args[1], *(X86GpVar*)_args[0]); //val is copied to not change the original and to have the result in the right destination
 			m_compiler.neg(*(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Add:
+		case Add:
 			m_compiler.add(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Sub:
+		case Sub:
 			m_compiler.sub(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Mul:
+		case Mul:
 			m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case Mod:
@@ -519,26 +519,29 @@ namespace codeGen{
 		case Or:
 			m_compiler.or_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::Set:
+		case Mov:
+			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			break;
+		case Set:
 			if (m_isRefSet) {
 				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
 			} else
 				m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
-		case InstructionType::fSet:
+		case fSet:
 			if (m_isRefSet) {
 				m_compiler.movss(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86XmmVar*)_args[1]); m_isRefSet = false;
 			}
 			else
 				m_compiler.movss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
-		case InstructionType::Ld:
+		case Ld:
 			m_compiler.mov(*(X86GpVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
 			break;
-		case InstructionType::fLd:
+		case fLd:
 			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
 			break;
-		case InstructionType::LdO:
+		case LdO:
 			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 2)); //2
 			break;
 		case Cmp:
@@ -581,7 +584,7 @@ namespace codeGen{
 			m_compiler.ja(m_labelStack.back());
 			break;
 		//float instructions
-		case InstructionType::fAdd:
+		case fAdd:
 			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
 			break;
 		case fSub:
@@ -602,10 +605,10 @@ namespace codeGen{
 			m_compiler.sqrtss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
 			break;
 		//typecasts
-		case InstructionType::iTof:
+		case iTof:
 			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
 			break;
-		case InstructionType::fToi:
+		case fToi:
 			m_compiler.cvtss2si(*(X86GpVar*)_args[1], *(X86XmmVar*)_args[0]);
 			break;
 		}

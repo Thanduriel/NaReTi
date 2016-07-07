@@ -67,4 +67,18 @@ namespace lang{
 		}
 	}
 
+	void TypeDefaultGen::buildRefAssignment(par::ComplexType& _type, NaReTi::Module& _module)
+	{
+		TypeInfo typeInfo(_type, true);
+		_module.m_functions.emplace_back(new Function(":=", typeInfo));
+		Function& func = *_module.m_functions.back();
+		auto& alloc = _module.getAllocator();
+		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", typeInfo));
+		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_1", typeInfo));
+		func.paramCount = 2;
+		func.scope.emplace_back(alloc.construct<ASTOp>(InstructionType::Mov));
+		func.bIntrinsic = true;
+		func.bInline = true;
+	}
+
 }

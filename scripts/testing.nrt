@@ -134,10 +134,21 @@ void main()
 	initRandom(getTickCount())
 	printF(rand(15, 0))
 	
-	//array<int> vector
-	Vec2[0] vector
+/*	Vec2[0] array
+	array.capacity = 0
+	array.size = 0
+	resize(array, 2)*/
 //	vector.data = 1234
 //	printI(vector.data)
+	
+	Vec2 v1 = Vec2(124.0, 987.0)
+	Vec2 v3 = Vec2(5.0, 66.0)
+	printF(v3.y)
+	v3 := v1
+	printF(v3.y)
+	v3.y = 59
+	
+	printF(v1.y)
 	
 	printF(2.0'13.2)
 	

@@ -31,7 +31,8 @@ namespace par
 		And,
 		Or,
 		//assign
-		Set, 
+		Mov, //simple mov reg,reg
+		Set, // uses first reg as address depending on the argument input
 		fSet,
 		//load value from adr
 		Ld,

@@ -2,7 +2,7 @@
 // NaReTi - vector library                   //
 //-------------------------------------------//
 
-/* This library contains 2d and 3d vector types and usefull operations.
+/* This library contains 2d and 3d vector types and there comon operations.
  *
  */
  
@@ -19,6 +19,16 @@ type Vec3
 	float x
 	float y
 	float z
+}
+
+// constructors
+Vec2 Vec2(float _x, float _y)
+{
+	Vec2 res
+	res.x = _x
+	res.y = _y
+	
+	return res
 }
 
 // basic operations

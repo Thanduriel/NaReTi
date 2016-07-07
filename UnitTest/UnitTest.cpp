@@ -113,6 +113,8 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine)
 	TEST(((scriptEngine.call<float, float>(FUNCHNDL("test_sin"), 0.25f) - 0.247411f) < 0.01f), " fast sin");
 
 	TEST((scriptEngine.call<int>(FUNCHNDL("test_optimRetVal"))), " return value optimization");
+
+	TEST((scriptEngine.call<float>(FUNCHNDL("test_refAssign")) == 64.f), " reference assignment");
 	return result;
 }
 

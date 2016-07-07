@@ -80,7 +80,7 @@ namespace lang
 		BASICOPERATION("/", BasicType::Int, InstructionType::Div);
 		BASICOPERATION("%", BasicType::Int, InstructionType::Mod);
 		UNARYOPERATION("-", TypeInfo(*m_types[Int]), InstructionType::Neg);
-		//type = assignment because the original value is changed
+		//type is assignment because the original value is changed
 		UNARYOPERATION("++", TypeInfo(*m_types[Int]), InstructionType::Inc); m_functions.back()->intrinsicType = Function::Assignment;
 		UNARYOPERATION("--", TypeInfo(*m_types[Int]), InstructionType::Dec); m_functions.back()->intrinsicType = Function::Assignment;
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
