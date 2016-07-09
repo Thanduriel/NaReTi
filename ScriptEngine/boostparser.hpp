@@ -43,11 +43,14 @@ namespace par
 				lit('}')								[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
 			//var declaration with optional init: int a = 10
-			VarDeclaration = 
+			VarDeclaration =
 				(TypeInformation >>
-				Symbol)									[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
-				-(lit("=")								[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
-				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))];
+				Symbol)[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
+				-((lit("=")								[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
+				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))]
+				| (lit(":=")							[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
+				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string(":="))]
+				);
 			
 			//func declaration including overloaded operators with keywords
 			FuncDeclaration = 

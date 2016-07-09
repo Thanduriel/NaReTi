@@ -1,14 +1,16 @@
 # NaReTi
 A script compiler that produces native code in runtime.
 
-## features
-* compiles int and float arithmetic
+## currently working features
+* int and float arithmetic
 * custom types/ structs
 * local and global variables
-* calling native functions inside the script
+* calling native functions inside a script
 * calling script functions from outside
-* working examples are found in /scripts/
-* some optimization: inlining, var/return substitution 
+* some optimization: inlining, var/return substitution
+* generic types
+ 
+Working examples can found in /scripts/.
 
 ## dependencies
 

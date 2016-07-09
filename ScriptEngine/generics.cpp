@@ -29,6 +29,8 @@ namespace par{
 			m_targetModule->m_typeAlias.emplace_back(name, &_args[i]);
 			//give it a name which the semantic parser will find
 		}
+		auto ptr = std::move(m_targetModule->m_functions.back());
+		m_targetModule->m_functions.pop_back();
 
 		string fileContent = m_loader.load(_name);
 
@@ -38,6 +40,7 @@ namespace par{
 		parse(fileContent, *m_targetModule);
 
 		g_lastIterator = restoreIt;
+		m_targetModule->m_functions.push_back(std::move(ptr));
 	}
 
 	// ***************************************************************** //

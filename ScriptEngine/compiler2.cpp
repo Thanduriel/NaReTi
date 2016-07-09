@@ -213,6 +213,9 @@ namespace codeGen{
 
 		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_function.scope.m_variables.size());
 
+		if (_function.name == "resize")
+			int brk = 1234;
+
 		//create arguments and locals
 		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
@@ -226,8 +229,6 @@ namespace codeGen{
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
 
-		if (_function.name == "bigFunction")
-			int brk = 1234;
 		//code
 		compileCode(_function.scope);
 		
