@@ -81,4 +81,14 @@ namespace lang{
 		func.bInline = true;
 	}
 
+	void TypeDefaultGen::buildVoidCast(par::ComplexType& _type, NaReTi::Module& _module)
+	{
+		ComplexType& voidT = g_module->getBasicType(BasicType::Void);
+
+		// void -> this type
+		voidT.typeCasts.emplace_back(new Function(g_module->getAllocator(), "", InstructionType::Nop, TypeInfo(_type,true), TypeInfo(voidT,true)));
+		// this type -> void
+		_type.typeCasts.emplace_back(new Function(_module.getAllocator(), "", InstructionType::Nop, TypeInfo(voidT, true), TypeInfo(_type, true)));
+	}
+
 }

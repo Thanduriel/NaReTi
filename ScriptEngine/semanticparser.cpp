@@ -59,6 +59,9 @@ namespace par
 			}
 
 		m_funcQuery.clear();
+		if (_node.name == "free")
+			int brk = 1234;
+
 		Function* func = m_moduleLib.getFunction(_node.name, _node.args.begin(), _node.args.end(), m_funcQuery);
 		if (!func)
 		{
@@ -268,6 +271,7 @@ namespace par
 		m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
 		m_typeDefaultGen.buildElemAccess(type, *m_currentModule);
 		m_typeDefaultGen.buildRefAssignment(type, *m_currentModule);
+		m_typeDefaultGen.buildVoidCast(type, *m_currentModule);
 	}
 
 	// ************************************************** //

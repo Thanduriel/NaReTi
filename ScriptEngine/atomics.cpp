@@ -51,7 +51,8 @@ namespace lang
 			pair<string, int>("|", 12),
 			pair<string, int>("&&", 13),
 			pair<string, int>("||", 14),
-			pair<string, int>("=", 15)
+			pair<string, int>("=", 15),
+			pair<string, int>(":=", 15)
 			} }
 		)
 	{
@@ -139,9 +140,9 @@ namespace lang
 		//and free
 		m_functions.emplace_back(new Function("free", TypeInfo(*m_types[BasicType::Void])));
 		Function& freeFunc = *m_functions.back();
-		allocFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("ptr", TypeInfo(*m_types[Void], true)));
-		allocFunc.paramCount = 1;
-		allocFunc.bExternal = true;
+		freeFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("ptr", TypeInfo(*m_types[Void], true)));
+		freeFunc.paramCount = 1;
+		freeFunc.bExternal = true;
 		linkExternal("free", &__freeBoundFunc);
 
 		//global constants
