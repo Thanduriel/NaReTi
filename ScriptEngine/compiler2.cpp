@@ -211,13 +211,11 @@ namespace codeGen{
 		//setup registers
 		resetRegisters();
 
-		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(_function.scope.m_variables.size());
-
 		if (_function.name == "resize")
 			int brk = 1234;
 
 		//create arguments and locals
-		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
+/*		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
 		{
 			VarSymbol& varSymbol = *_function.scope.m_variables[i];
 			if (varSymbol.isSubstituted) continue;
@@ -225,13 +223,16 @@ namespace codeGen{
 			allocVar(varSymbol);
 
 			binVarLocations.emplace_back(&varSymbol.compiledVar);
-		}
+		}*/
+
+		//code
+		UsageStateLock lock(m_usageState);
+
+		compileCode(_function.scope);
+		
 		for (int i = 0; i < _function.paramCount; ++i)
 			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
 
-		//code
-		compileCode(_function.scope);
-		
 		// Finalize the current function.
 		m_compiler.endFunc();
 		m_compiler.finalize();
@@ -243,8 +244,17 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileCode(ASTCode& _node)
+	void Compiler::compileCode(ASTCode& _node, int _preAllocCount)
 	{
+		//create local vars in this scope
+		for (int i = _preAllocCount; i < _node.m_variables.size(); ++i)
+		{
+			VarSymbol& varSymbol = *_node.m_variables[i];
+			if (varSymbol.isSubstituted) continue;
+
+			allocVar(varSymbol);
+		}
+
 		UsageStateLock lock(m_usageState);
 
 		//imported heap vars
@@ -290,7 +300,6 @@ namespace codeGen{
 		bool indirect = false; // < use indirect addressing operations
 
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
-		std::vector< utils::PtrReset > binVarLocations; binVarLocations.reserve(func.scope.m_variables.size() - _node.args.size() + 1);
 
 		//return values are part of the caller's scope
 		if (func.bHiddenParam)
@@ -304,7 +313,6 @@ namespace codeGen{
 			{
 				//allocate the stack var and provide a reference as param
 				func.scope.m_variables[0]->compiledVar = (Var*)allocStackVar(func.scope.m_variables[0]->typeInfo.type);
-				binVarLocations.emplace_back(&func.scope.m_variables[0]->compiledVar);
 				args.push_back(func.scope.m_variables[0]->compiledVar);
 			}
 		}
@@ -409,17 +417,9 @@ namespace codeGen{
 			{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i]->compiledVar = args[i];
-				for (int i = func.paramCount; i < func.scope.m_variables.size(); ++i)
-				{
-					if (!func.scope.m_variables[i]->compiledVar)
-					{
-						
-						allocVar(*func.scope.m_variables[i]);
-						binVarLocations.emplace_back(&func.scope.m_variables[i]->compiledVar);
-					}
-				}
+				
 				m_retDstStack.push_back(_dest);
-				compileCode(_node.function->scope);
+				compileCode(_node.function->scope, args.size());
 				m_retDstStack.pop_back();
 			}
 		} // end if inline
@@ -710,6 +710,7 @@ namespace codeGen{
 			baseVar = (X86GpVar*)leaf.value->compiledVar;
 		}
 
+		assert(baseVar);
 		return baseVar;
 	}
 

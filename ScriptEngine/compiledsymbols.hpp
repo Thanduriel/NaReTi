@@ -29,7 +29,7 @@ namespace codeGen{
 
 	struct CVarSymbol
 	{
-		CVarSymbol() : isSubstituted(false), isPtr(false){}
+		CVarSymbol() : isSubstituted(false), isPtr(false), compiledVar(nullptr){}
 		asmjit::Var* compiledVar;
 		Ownership ownership;
 		bool isPtr; //< Is internally implemented as pointer. compiledVar then contains a address.

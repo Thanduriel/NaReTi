@@ -2,8 +2,10 @@
 
 #include "module.hpp"
 #include <asmjit.h>
+#include <array>
 #include "enginetypes.hpp"
 #include "ast.hpp"
+#include "ptr_stuff.hpp"
 
 namespace codeGen
 {
@@ -16,7 +18,8 @@ namespace codeGen
 
 	struct UsageStateLock
 	{
-		UsageStateLock(UsageState& _state) : state(_state), target(_state){}
+		UsageStateLock(UsageState& _state) : 
+			state(_state), target(_state){}
 		~UsageStateLock(){ target = state; }
 		void reset(){ state = target; }
 
@@ -47,7 +50,8 @@ namespace codeGen
 		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type, int _count = 1);
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
-		void compileCode(par::ASTCode& _node);
+		//@param _preAllocCount local variables that are already allocated
+		void compileCode(par::ASTCode& _node, int _preAllocCount = 0);
 		//@param _dest where the result should be stored
 		//@return the destination of the return
 		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);

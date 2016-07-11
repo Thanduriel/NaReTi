@@ -1,3 +1,5 @@
+#pragma once
+
 namespace utils{
 	/* A helper that makes sure that the given pointer is
 	 * reseted to nullptr when it goes out of scope.
