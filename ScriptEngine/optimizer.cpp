@@ -179,7 +179,8 @@ namespace codeGen{
 	void Optimizer::tryConstFold(ASTCall& _node, ASTExpNode** _dest)
 	{
 		//requires a destination to place the new node in
-		assert(_dest != nullptr);
+		if (!_dest) return;
+		//assert(_dest != nullptr);
 
 		if (!_node.function->bIntrinsic) return;
 		for (auto& arg : _node.args) if (arg->type != ASTType::LeafInt && arg->type != ASTType::LeafFloat) return;

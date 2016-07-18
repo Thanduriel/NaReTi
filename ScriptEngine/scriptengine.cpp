@@ -19,6 +19,8 @@ namespace NaReTi
 		m_parser(new par::Parser()),
 		m_moduleLoader(m_config)
 	{
+		m_compiler->compile(*m_basicModule);
+		m_basicModule->initConstants();
 		m_config.scriptLocation = "../scripts/";
 		//init globals
 		//the initialization order follows the dependencies and should not be changed

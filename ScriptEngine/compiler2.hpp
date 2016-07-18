@@ -56,12 +56,14 @@ namespace codeGen
 		//@return the destination of the return
 		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);
 		asmjit::Var* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
-		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args);
+		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, bool _indirect);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
 		
 		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
-		asmjit::X86GpVar* compileMemberAdr(par::ASTMember& _node); // returns the var where the address is stored
+		// returns the var the address of the instance is stored in
+		// in a nested member access the instance of the last member is given
+		asmjit::X86GpVar* compileMemberAdr(par::ASTMember& _node); 
 		asmjit::X86Mem getMemberAdr(par::ASTMember& _node, asmjit::X86GpVar& _var);
 		//load some member var into the given destination register
 		void compileMemberLd(par::ASTMember& _node, asmjit::X86GpVar& _var, asmjit::X86GpVar& _destination);
@@ -100,7 +102,7 @@ namespace codeGen
 		UsageState m_usageState;
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
-		bool m_isRefSet; //flag: lvalue is a reference 
+		bool m_arg0IsPtr; //flag: lvalue is a reference 
 		std::vector< asmjit::Var* > m_retDstStack; // return destinations
 		// implemented as a pseudo stack to allow recursive inlining
 	};

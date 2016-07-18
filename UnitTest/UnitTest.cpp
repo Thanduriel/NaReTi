@@ -115,6 +115,8 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine)
 	TEST((scriptEngine.call<int>(FUNCHNDL("test_optimRetVal"))), " return value optimization");
 
 	TEST((scriptEngine.call<float>(FUNCHNDL("test_refAssign")) == 64.f), " reference assignment");
+
+	TEST((scriptEngine.call<int, int, int, int>(FUNCHNDL("test_nestedMember"), 18, 27, 57) == 19+27+57), " nested member");
 	return result;
 }
 

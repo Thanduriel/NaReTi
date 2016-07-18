@@ -184,6 +184,29 @@ float test_refAssign()
 	return v1.y
 }
 
+type InnerStruct
+{
+	iVec2 location
+}
+
+type SomeStruct
+{
+	InnerStruct inner
+	int count
+}
+
+float test_nestedMember(int a, int b, int c)
+{
+	SomeStruct structure
+	structure.inner.location.x = a
+	structure.inner.location.y = b
+	structure.count = c
+	
+	return structure.inner.location.x
+		+ structure.inner.location.y
+		+ structure.count
+}
+
 int test_performance()
 {
 	int tickCount = getTickCount()

@@ -131,8 +131,8 @@ int test_performance()
 
 void main()
 {
-	initRandom(getTickCount())
-	printF(rand(15, 0))
+//	initRandom(getTickCount())
+//	printF(rand(15, 0))
 	
 /*	Vec2 v1 = Vec2(124.0, 987.0)
 	Vec2& v2
@@ -141,24 +141,31 @@ void main()
 	printF(v2.x)*/
 	
 //	Vec2[0] array
-/*	array.capacity = 0
-	array.size = 0
-	resize(array, 2)*/
+/*	init(array)
+	Vec2 vec1 = Vec2(124.0, 987.0)
+	Vec2 vec2 = Vec2(55.0, 22.0)
+	push_back(array, vec1)
+	push_back(array, vec2)
+	
+	printF(array[0].x)
+	printF(array[0].y)
+	printF(array[1].x)
+	printF(array[1].y)*/
 //	vector.data = 1234
 //	printI(vector.data)
 	
-	printF(2.0'13.2)
+//	printF(2.0'13.2)
 	
 	int i = 4
 	i = 4 * 1.5
 	i = i * 1.5
 	//printI(i)
 	
-	printI(i)
+//	printI(i)
 	
 	float f = 3 - 1
 	printF(f)
 	f = -f
-	printF(f)
+//	printF(f)
 //	printI(i)
 }

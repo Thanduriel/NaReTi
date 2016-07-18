@@ -20,6 +20,7 @@ namespace lang
 	struct BasicModule : public NaReTi::Module
 	{
 		BasicModule(asmjit::JitRuntime& _runtime);
+		void initConstants();
 
 		par::ComplexType& getBasicType(par::BasicType _basicType);
 		int getPrecedence(const std::string& _op);

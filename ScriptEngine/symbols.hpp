@@ -128,12 +128,13 @@ namespace par{
 	{
 		//the type has not been compiled yet
 		//necessary for generic specializations
+		//not in use
 		static const size_t UndefSize = 0xFFFFFF;
 
 		ComplexType(){};
 		ComplexType(const std::string& _name, BasicType _basicType = Complex) : 
 			Type(_name, _basicType),
-			size(UndefSize)
+			size(0)
 		{}
 		CodeScope scope;
 
@@ -145,6 +146,7 @@ namespace par{
 		size_t size; // size in bytes
 		size_t alignment; // required alignment when stack allocated
 
+		//todo implement a usable method for this
 		int sizeOf() override
 		{
 			int size = 0;

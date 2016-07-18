@@ -22,7 +22,7 @@ namespace codeGen{
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
 		m_compiler(&m_assembler),
-		m_isRefSet(false)
+		m_arg0IsPtr(false)
 	{
 		m_labelStack.reserve(64); // prevent moving
 	}
@@ -74,7 +74,7 @@ namespace codeGen{
 
 	void Compiler::compileType(ComplexType& _type)
 	{
-		int currentOffset = 0;
+		int currentOffset = _type.size; //primitive types already have a size
 		_type.alignment = 16; // if any stack var has a different alignment float vars wont work properly
 		_type.displacement.reserve(_type.scope.m_variables.size());
 		for (auto& member : _type.scope.m_variables)
@@ -129,7 +129,9 @@ namespace codeGen{
 			case BasicType::Int: funcBuilder.addArgT<int>(); break;
 			case BasicType::Float: funcBuilder.addArgT<float>(); break;
 			case BasicType::Complex: funcBuilder.addArgT<void*>(); break;
-			default: funcBuilder.addArgT<int>();
+			default:
+				if (_function.scope.m_variables[i]->typeInfo.isReference) funcBuilder.addArgT<void*>();
+				else funcBuilder.addArgT<int>();
 			}
 		}
 		switch (_function.returnTypeInfo.type.basic)
@@ -137,7 +139,9 @@ namespace codeGen{
 		case BasicType::Int: funcBuilder.setRetT<int>(); break;
 		case BasicType::Float: funcBuilder.setRetT<float>(); break;
 		case BasicType::Complex: funcBuilder.setRetT<void*>(); break;
-		default: funcBuilder.setRetT<void>();
+		default: 
+			if (_function.returnTypeInfo.isReference) funcBuilder.addArgT<void*>();
+			else funcBuilder.addArgT<void>();
 		}
 
 	}
@@ -212,7 +216,7 @@ namespace codeGen{
 		resetRegisters();
 
 		if (_function.name == "resize")
-			int brk = 1234;
+			int brk = 0;
 
 		//create arguments and locals
 /*		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
@@ -297,8 +301,6 @@ namespace codeGen{
 	{
 		Function& func = *_node.function;
 
-		bool indirect = false; // < use indirect addressing operations
-
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
 
 		//return values are part of the caller's scope
@@ -323,6 +325,7 @@ namespace codeGen{
 
 		if (_keepRet) lock.reset();
 
+		bool indirect = false;
 		int i = 0; //identify the first operand
 		//make sure that all arguments are located in virtual registers
 		for (auto& arg : _node.args)
@@ -374,7 +377,6 @@ namespace codeGen{
 				break;
 			}
 			} // end switch
-			if (arg->typeInfo->isReference) indirect = true;
 			i++;
 		}
 
@@ -385,7 +387,6 @@ namespace codeGen{
 				switch (_node.function->intrinsicType)
 				{
 				case Function::Assignment:
-					if (indirect) m_isRefSet = true;
 					_dest = args[0]; // assignments return their left site operand
 					break;
 				case Function::BinOp:
@@ -410,7 +411,7 @@ namespace codeGen{
 				for (auto& node : _node.function->scope)
 				{
 					ASTOp& op = *(ASTOp*)node;
-					compileOp(op.instruction, args);
+					compileOp(op.instruction, args, indirect);
 				}
 			}
 			else // general purpose inline
@@ -418,6 +419,7 @@ namespace codeGen{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i]->compiledVar = args[i];
 				
+				//returns -> jupm to the end of this block
 				m_retDstStack.push_back(_dest);
 				compileCode(_node.function->scope, args.size());
 				m_retDstStack.pop_back();
@@ -467,7 +469,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args)
+	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, bool _indirect)
 	{
 		switch (_instr)
 		{
@@ -524,14 +526,14 @@ namespace codeGen{
 			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case Set:
-			if (m_isRefSet) {
-				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]); m_isRefSet = false;
+			if (_indirect) {
+				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]);
 			} else
 				m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case fSet:
-			if (m_isRefSet) {
-				m_compiler.movss(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86XmmVar*)_args[1]); m_isRefSet = false;
+			if (_indirect) {
+				m_compiler.movss(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86XmmVar*)_args[1]);
 			}
 			else
 				m_compiler.movss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
@@ -702,12 +704,42 @@ namespace codeGen{
 	X86GpVar* Compiler::compileMemberAdr(par::ASTMember& _node)
 	{
 		X86GpVar* baseVar;
-		if (_node.instance->type == ASTType::Call)
+		switch (_node.instance->type)
+		{
+		case ASTType::Call:
 			baseVar = (X86GpVar*)compileCall(*(ASTCall*)_node.instance); // take a var that has a higher lifespan that is still valid in getMemberAdr
-		else
+			break;
+		case ASTType::LeafSym:
 		{
 			ASTLeafSym& leaf = *(ASTLeafSym*)_node.instance;
 			baseVar = (X86GpVar*)leaf.value->compiledVar;
+			break;
+		}
+		case ASTType::Member:
+		{
+			ASTMember& inst = *(ASTMember*)_node.instance;
+			//first go down to the instance that is actually loaded in this scope
+			//problem: when the member is no reference compileMemberLd will still load a 
+			// ptr at that location instead of just adding to the offset
+			baseVar = compileMemberAdr(inst);
+		
+			// the allocated var containing the instance is set free
+			// and will be reused throughout the recursion.
+			// since nothing can happen between the end of this scope and the
+			// assignment above the var can not be overwritten
+			UsageStateLock lock(m_usageState);
+
+			auto& var = getUnusedVar();
+			if (inst.typeInfo->type.scope.m_variables[inst.index]->typeInfo.isReference)
+				compileMemberLd(inst, *baseVar, var);
+			else //todo: make offset addition in compile time
+			{
+				m_compiler.lea(var, getMemberAdr(inst, *baseVar));
+			}
+			baseVar = &var;
+
+			break;
+		}
 		}
 
 		assert(baseVar);

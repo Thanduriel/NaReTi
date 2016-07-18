@@ -18,12 +18,12 @@ namespace lang
 	asmjit::JitRuntime* __runtime;
 	void* __allocBoundFunc(int _size)
 	{
-		return __runtime->getMemMgr()->alloc(_size);
+		return malloc(_size);// __runtime->getMemMgr()->alloc(_size);
 	}
 
 	void __freeBoundFunc(void* _ptr)
 	{
-		__runtime->getMemMgr()->release(_ptr);
+		free(_ptr);//__runtime->getMemMgr()->release(_ptr);
 	}
 
 	BasicModule::BasicModule(asmjit::JitRuntime& _runtime) :
@@ -150,6 +150,12 @@ namespace lang
 		makeConstant("false", 0);
 	}
 
+	void BasicModule::initConstants()
+	{
+		*(int*)m_text->m_variables[0]->ownership.rawPtr = 1;
+		*(int*)m_text->m_variables[1]->ownership.rawPtr = 0;
+	}
+
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)
 	{
 		return *m_types[_basicType];
@@ -166,13 +172,13 @@ namespace lang
 	void BasicModule::makeConstant(const std::string& _name, int _val)
 	{
 		m_text->m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], true, true)));
-		VarSymbol& var = *m_text->m_variables.back();
+	/*	VarSymbol& var = *m_text->m_variables.back();
 		var.ownership.rawPtr = m_allocator.alloc(var.typeInfo.type.size);
 		var.ownership.ownerType = codeGen::OwnershipType::Heap;
 		var.isPtr = true;
 		var.typeInfo.isReference = true;
 
 		//write value
-		*(int*)var.ownership.rawPtr = _val;
+		*(int*)var.ownership.rawPtr = _val;*/
 	}
 }
