@@ -9,11 +9,13 @@ namespace lang{
 
 	void TypeDefaultGen::buildElemAccess(par::ComplexType& _type, NaReTi::Module& _module)
 	{
-		_module.m_functions.emplace_back(new Function("__off", TypeInfo(_type, true, false, false)));
+		auto refType = TypeInfo(_type, true);
+		_module.m_functions.emplace_back(new Function("__off", refType));
 		Function& func = *_module.m_functions.back();
 		auto& alloc = _module.getAllocator();
-		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_0", TypeInfo(_type)));
-		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_1", TypeInfo(lang::g_module->getBasicType(BasicType::Int))));
+		//return value of complex types
+		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_base", refType));
+		func.scope.m_variables.push_back(alloc.construct<VarSymbol>("_count", TypeInfo(lang::g_module->getBasicType(BasicType::Int))));
 		func.paramCount = 2;
 		func.scope.emplace_back(alloc.construct<ASTOp>(InstructionType::LdO));
 		func.bIntrinsic = true;
@@ -79,6 +81,7 @@ namespace lang{
 		func.scope.emplace_back(alloc.construct<ASTOp>(InstructionType::Mov));
 		func.bIntrinsic = true;
 		func.bInline = true;
+		func.intrinsicType = Function::Assignment;
 	}
 
 	void TypeDefaultGen::buildVoidCast(par::ComplexType& _type, NaReTi::Module& _module)

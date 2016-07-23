@@ -140,14 +140,35 @@ void main()
 	v2 := v1
 	printF(v2.x)*/
 	
-//	Vec2[0] array
-/*	init(array)
+	Vec2[0] array
+	init(array)
 	Vec2 vec1 = Vec2(124.0, 987.0)
 	Vec2 vec2 = Vec2(55.0, 22.0)
+
+	array.data = vec2
+	breakpoint()
+	printF(array.data.x)
+	printF(array.data.y)
+	array.data := vec2
+	printF(array.data.x)
+	printF(array.data.y)
+	array.data := vec1
+	printF(array.data.x)
+	printF(array.data.y)
+	array.data.x = 9876
+	printF(array.data.x)
+	__off(vec1, 0) = vec2
+	printF(vec1.x)
+	printF(vec1.y)
+	array.data = vec2
+//	__off(array.data, 0) = vec2
+	printF(array.data.x)
+	printF(array.data.y)
+
 	push_back(array, vec1)
 	push_back(array, vec2)
 	
-	printF(array[0].x)
+/*	printF(array[0].x)
 	printF(array[0].y)
 	printF(array[1].x)
 	printF(array[1].y)*/

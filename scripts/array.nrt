@@ -23,12 +23,8 @@ type<T> array
 
 T& [](array<T>& arr, int i)
 {
-	printF(arr.data.x)
-//	printF(arr.data.y)
 	return __off(arr.data, i)
 }
-
-//problem: generic functions are contained in the module after the function they may be used in
 
 //void &[1] typecast(__Array _arr)
 void init(array<T>& _arr)
@@ -60,10 +56,13 @@ void reserve(array<T>& _arr, int _capacity)
 
 void push_back(array<T>& _arr, T& _el)
 {
-//	printI(_arr.size)
 	reserve(_arr, _arr.size+1)
 
-//	_arr[_arr.size] = _el
+	printI(_arr.capacity)
+	printF(_el.x)
+	_arr[_arr.size] = _el
+	printStr("after")
+	printF(_arr[_arr.size].x)
 	_arr.size = _arr.size + 1
 }
 

@@ -282,7 +282,8 @@ namespace par
 
 		m_currentFunction = m_currentModule->m_functions.back();
 
-		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex)
+		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex
+			&& !m_currentFunction->returnTypeInfo.isReference)
 		{
 			Function& func = *m_currentModule->m_functions.back();
 			func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("", m_currentFunction->returnTypeInfo));

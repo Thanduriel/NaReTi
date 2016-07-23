@@ -21,8 +21,7 @@ namespace codeGen{
 
 	Compiler::Compiler():
 		m_assembler(&m_runtime),
-		m_compiler(&m_assembler),
-		m_arg0IsPtr(false)
+		m_compiler(&m_assembler)
 	{
 		m_labelStack.reserve(64); // prevent moving
 	}
@@ -215,19 +214,8 @@ namespace codeGen{
 		//setup registers
 		resetRegisters();
 
-		if (_function.name == "resize")
+		if (_function.name == "main")
 			int brk = 0;
-
-		//create arguments and locals
-/*		for (int i = 0; i < _function.scope.m_variables.size(); ++i)
-		{
-			VarSymbol& varSymbol = *_function.scope.m_variables[i];
-			if (varSymbol.isSubstituted) continue;
-
-			allocVar(varSymbol);
-
-			binVarLocations.emplace_back(&varSymbol.compiledVar);
-		}*/
 
 		//code
 		UsageStateLock lock(m_usageState);
@@ -300,6 +288,8 @@ namespace codeGen{
 	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
+		if (func.name == ":=")
+			int brk = 0;
 
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
 
@@ -325,7 +315,7 @@ namespace codeGen{
 
 		if (_keepRet) lock.reset();
 
-		bool indirect = false;
+		int indirect = 0;
 		int i = 0; //identify the first operand
 		//make sure that all arguments are located in virtual registers
 		for (auto& arg : _node.args)
@@ -352,12 +342,12 @@ namespace codeGen{
 				ASTMember& member = *(ASTMember*)arg;
 				X86GpVar* baseVar = compileMemberAdr(member);
 	
-				if (func.name == "=" && i == 0)
+				if (func.intrinsicType == Function::Assignment && i == 0)
 				{
 					X86GpVar* var = &getUnusedVar();
 					args.push_back(var);
 					m_compiler.lea(*var, getMemberAdr(*(ASTMember*)arg, *baseVar));
-					indirect = true;
+					indirect += 0x100;
 				}
 				else
 				{
@@ -443,7 +433,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::Var* Compiler::compileLeaf(par::ASTLeaf& _node, bool* _indirect)
+	asmjit::Var* Compiler::compileLeaf(par::ASTLeaf& _node, int* _indirect)
 	{
 		//immediate val
 		if (_node.type == ASTType::LeafInt)
@@ -460,7 +450,11 @@ namespace codeGen{
 		}
 		else if (_node.type == ASTType::LeafSym)
 		{
-			if (_indirect && ((ASTLeafSym*)&_node)->value->isPtr) *_indirect = true;
+			//problem:
+			// there are 2 levels of indirection-detection:
+			// 1. member of instance is always indirect access, any recursive levels are resolved
+			// 2. pointer var, requires indirect access only when it's content should be changed
+			if (_indirect && ((ASTLeafSym*)&_node)->value->isPtr) (*_indirect)++;
 			return ((ASTLeafSym*)&_node)->value->compiledVar;
 		}
 		assert(false); // could not compile leaf
@@ -469,7 +463,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, bool _indirect)
+	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, int _indirect)
 	{
 		switch (_instr)
 		{
@@ -523,7 +517,12 @@ namespace codeGen{
 			m_compiler.or_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case Mov:
-			m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			if (_indirect >= 0x100){
+				auto addr = x86::ptr(*(X86GpVar*)_args[0]);
+				addr.setSize(PTRSIZE);
+				m_compiler.mov(addr, *(X86GpVar*)_args[1]);
+			}
+			else m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
 			break;
 		case Set:
 			if (_indirect) {
@@ -545,7 +544,7 @@ namespace codeGen{
 			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
 			break;
 		case LdO:
-			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 2)); //2
+			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 3)); //2
 			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
@@ -730,7 +729,7 @@ namespace codeGen{
 			UsageStateLock lock(m_usageState);
 
 			auto& var = getUnusedVar();
-			if (inst.typeInfo->type.scope.m_variables[inst.index]->typeInfo.isReference)
+			if (inst.instance->typeInfo->type.scope.m_variables[inst.index]->typeInfo.isReference)
 				compileMemberLd(inst, *baseVar, var);
 			else //todo: make offset addition in compile time
 			{
@@ -751,7 +750,7 @@ namespace codeGen{
 	X86Mem Compiler::getMemberAdr(ASTMember& _node, X86GpVar& _var)
 	{
 		ComplexType& type = _node.instance->typeInfo->type;
-		return x86::dword_ptr(_var, type.displacement[_node.index]);//dword
+		return x86::dword_ptr(_var, type.displacement[_node.index]);
 	}
 
 	// *************************************************** //
@@ -760,6 +759,8 @@ namespace codeGen{
 	{
 		auto adr = getMemberAdr(_node, _var);
 
+		//adjust target size
+		adr.setSize(_destination.getSize());
 		m_compiler.mov(_destination, adr);
 	}
 

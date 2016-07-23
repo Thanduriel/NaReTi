@@ -55,8 +55,8 @@ namespace codeGen
 		//@param _dest where the result should be stored
 		//@return the destination of the return
 		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);
-		asmjit::Var* compileLeaf(par::ASTLeaf& _node, bool* _indirect = nullptr);
-		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, bool _indirect);
+		asmjit::Var* compileLeaf(par::ASTLeaf& _node, int* _indirect = nullptr);
+		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, int _indirect);
 		void compileRet(par::ASTReturn& _node);
 		void compileRetF(par::ASTReturn& _node);
 		
@@ -102,8 +102,6 @@ namespace codeGen
 		UsageState m_usageState;
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
-		bool m_arg0IsPtr; //flag: lvalue is a reference 
-		std::vector< asmjit::Var* > m_retDstStack; // return destinations
-		// implemented as a pseudo stack to allow recursive inlining
+		std::vector< asmjit::Var* > m_retDstStack; // return destinations for inlining
 	};
 }
