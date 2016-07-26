@@ -88,7 +88,8 @@ namespace par{
 			Assignment,
 			BinOp,
 			Compare,
-			TypeCast
+			TypeCast,
+			StaticCast // do nothing, just return the arg as destination
 		} intrinsicType;
 	};
 

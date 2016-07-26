@@ -288,7 +288,7 @@ namespace codeGen{
 	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
-		if (func.name == ":=")
+		if (func.name == "free")
 			int brk = 0;
 
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
@@ -381,6 +381,7 @@ namespace codeGen{
 					break;
 				case Function::BinOp:
 					//since the first operand of a binop is overwritten with the result copy the values first
+					//todo movOpt
 					if (_dest->getVarType() == 15)
 					{
 						m_compiler.movss(*(X86XmmVar*)_dest, *(X86XmmVar*)args[0]);
@@ -396,6 +397,11 @@ namespace codeGen{
 					break;
 				case Function::Compare: break;
 				default: break;
+				case Function::StaticCast:
+					//todo movOpt: introduce concept to reduce unnecessary moves like this
+					args.push_back(args[0]);
+					args[0] = _dest;
+					break;
 				}
 
 				for (auto& node : _node.function->scope)
@@ -409,7 +415,7 @@ namespace codeGen{
 				for (int i = 0; i < args.size(); ++i)
 					func.scope.m_variables[i]->compiledVar = args[i];
 				
-				//returns -> jupm to the end of this block
+				//returns -> jump to the end of this block
 				m_retDstStack.push_back(_dest);
 				compileCode(_node.function->scope, args.size());
 				m_retDstStack.pop_back();
