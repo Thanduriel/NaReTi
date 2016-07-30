@@ -68,6 +68,8 @@ namespace lang
 		m_types[BasicType::Bool] = new ComplexType("bool", BasicType::Bool); m_types[BasicType::Bool]->size = 4;
 		m_types[BasicType::FlagBool] = new ComplexType("flagBool", BasicType::FlagBool); m_types[BasicType::FlagBool]->size = 4;
 
+		for (size_t i = 0; i < m_types.size(); ++i)
+			m_typeInfos[i] = new TypeInfo(*m_types[i]);
 		//operators
 		//logical -----------------------------------------------------
 		BASICOPERATION("&&", BasicType::FlagBool, InstructionType::Nop);
@@ -150,6 +152,12 @@ namespace lang
 		makeConstant("false", 0);
 	}
 
+	BasicModule::~BasicModule()
+	{
+		for (auto ptr : m_typeInfos)
+			delete ptr;
+	}
+
 	void BasicModule::initConstants()
 	{
 		*(int*)m_text->m_variables[0]->ownership.rawPtr = 1;
@@ -159,6 +167,11 @@ namespace lang
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)
 	{
 		return *m_types[_basicType];
+	}
+
+	TypeInfo& BasicModule::getBasicTypeInfo(BasicType _basicType)
+	{
+		return *m_typeInfos[_basicType];
 	}
 
 	int BasicModule::getPrecedence(const std::string& _op)

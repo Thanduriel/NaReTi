@@ -28,7 +28,8 @@ namespace par{
 		Leaf,
 		LeafInt,
 		LeafSym,
-		LeafFloat
+		LeafFloat,
+		LeafSizeOf
 	};
 
 	struct ASTNode : public utils::DetorAlloc::Destructible
@@ -136,6 +137,7 @@ namespace par{
 	typedef ASTLeafT<int, ASTType::LeafInt> ASTLeafInt;
 	typedef ASTLeafT<float, ASTType::LeafFloat> ASTLeafFloat;
 	typedef ASTLeafT<VarSymbol*, ASTType::LeafSym> ASTLeafSym;
+	typedef ASTLeafT<TypeInfo, ASTType::LeafSizeOf> ASTSizeOf;
 
 	struct ASTUnlinkedSym : public ASTExpNode
 	{

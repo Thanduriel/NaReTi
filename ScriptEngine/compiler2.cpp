@@ -327,6 +327,7 @@ namespace codeGen{
 			case ASTType::LeafFloat:
 			case ASTType::LeafSym:
 			case ASTType::Leaf:
+			case ASTType::LeafSizeOf:
 				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
 				args.push_back(compileLeaf(*leaf, &indirect));
 				break;
@@ -462,6 +463,14 @@ namespace codeGen{
 			// 2. pointer var, requires indirect access only when it's content should be changed
 			if (_indirect && ((ASTLeafSym*)&_node)->value->isPtr) (*_indirect)++;
 			return ((ASTLeafSym*)&_node)->value->compiledVar;
+		}
+		else if (_node.type == ASTType::LeafSizeOf)
+		{
+			X86GpVar& var = getUnusedVar32();
+			ASTSizeOf& node = *(ASTSizeOf*)&_node;
+
+			m_compiler.mov(var, Imm(node.value.isReference ? PTRSIZE : node.value.type.size));
+			return &var;
 		}
 		assert(false); // could not compile leaf
 		return nullptr;

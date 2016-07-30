@@ -145,17 +145,6 @@ namespace par{
 		std::vector < int > displacement;
 		size_t size; // size in bytes
 		size_t alignment; // required alignment when stack allocated
-
-		//todo implement a usable method for this
-		int sizeOf() override
-		{
-			int size = 0;
-
-	//		for (auto& member : scope.m_variables)
-//				size += member.isReference ? 4 : member.type.sizeOf();
-
-			return size;
-		}
 	};
 
 	// Function symbol got moved to ast.hpp

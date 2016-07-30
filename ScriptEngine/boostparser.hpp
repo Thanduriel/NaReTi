@@ -148,7 +148,9 @@ namespace par
 				;
 
 			Operand = 
-				Call
+				(lit("sizeof") >> lit('(') >>
+				TypeInformation >> lit(')'))			[boost::bind(&SemanticParser::sizeOf, &m_semanticParser)]
+				| Call
 				| Symbol								[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
 				| Integer								[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
 				| Float									[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]

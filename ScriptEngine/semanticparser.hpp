@@ -67,6 +67,7 @@ namespace par
 		void unaryTerm(const boost::optional<std::string>& _str);
 		void call(std::string& _name);
 		void argSeperator(); // ","
+		void sizeOf();
 
 		void lockLatestNode();
 		//looks in the tree with the given node as root for the right position of the top level on the stack.

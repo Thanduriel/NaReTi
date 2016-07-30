@@ -482,6 +482,17 @@ namespace par
 
 	// ************************************************** //
 
+	void SemanticParser::sizeOf()
+	{
+		ASTSizeOf* node = m_allocator->construct<ASTSizeOf>(buildTypeInfo());
+
+		node->typeInfo = &lang::g_module->getBasicTypeInfo(BasicType::Int);
+
+		m_stack.push_back(node);
+	}
+
+	// ************************************************** //
+
 	void SemanticParser::pushSymbol(string& _name)
 	{
 		VarSymbol* var;
@@ -516,7 +527,7 @@ namespace par
 	void SemanticParser::pushFloat(double _val)
 	{
 		ASTLeafFloat* leaf = m_allocator->construct<ASTLeafFloat>((float)_val);
-		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::Float));
+		leaf->typeInfo = &lang::g_module->getBasicTypeInfo(BasicType::Float);
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
 	}
@@ -524,7 +535,7 @@ namespace par
 	void SemanticParser::pushInt(int _val)
 	{
 		ASTLeafInt* leaf = m_allocator->construct<ASTLeafInt>(_val);
-		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::Int));
+		leaf->typeInfo = &lang::g_module->getBasicTypeInfo(BasicType::Int);
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
 	}
