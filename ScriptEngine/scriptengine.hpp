@@ -24,7 +24,7 @@ namespace NaReTi{
 	class ScriptEngine
 	{
 	public:
-		ScriptEngine();
+		ScriptEngine(const std::string& _scriptLoc);
 		~ScriptEngine();
 
 		// Loads the module if it is not found.

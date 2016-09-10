@@ -501,7 +501,7 @@ namespace par
 		if (var)
 		{
 			bool isImported = false;
-			for (auto& impVar : m_currentCode->m_importedVars) if (impVar == var){ isImported = true; break; }
+			for (auto& impVar : m_currentCode->m_importedVars) if (impVar.sym == var){ isImported = true; break; }
 			if (!isImported)
 			{ 
 				m_currentCode->m_importedVars.push_back(var); 
@@ -538,6 +538,13 @@ namespace par
 		leaf->typeInfo = &lang::g_module->getBasicTypeInfo(BasicType::Int);
 		m_stack.push_back(leaf);
 //		cout << _val << endl;
+	}
+
+	void SemanticParser::pushAddress(uint64_t _adr)
+	{
+		ASTLeafAdr* leaf = m_allocator->construct<ASTLeafAdr>(_adr);
+		leaf->typeInfo = &lang::g_module->getBasicTypeInfo(BasicType::Void);
+		m_stack.push_back(leaf);
 	}
 
 	void SemanticParser::pushString(std::string& _str)

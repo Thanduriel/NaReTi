@@ -13,7 +13,7 @@ using namespace std;
 
 namespace NaReTi
 {
-	ScriptEngine::ScriptEngine():
+	ScriptEngine::ScriptEngine(const std::string& _scriptLoc) :
 		m_compiler(new codeGen::Compiler()),
 		m_basicModule(new lang::BasicModule(m_compiler->getRuntime())),
 		m_parser(new par::Parser()),
@@ -21,7 +21,7 @@ namespace NaReTi
 	{
 		m_compiler->compile(*m_basicModule);
 		m_basicModule->initConstants();
-		m_config.scriptLocation = "../scripts/";
+		m_config.scriptLocation = _scriptLoc;
 		//init globals
 		//the initialization order follows the dependencies and should not be changed
 	//	par::g_genericsParser = new par::GenericsParser();

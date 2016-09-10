@@ -62,6 +62,7 @@ namespace par
 		void pushSymbol(std::string& _name);
 		void pushFloat(double _val);
 		void pushInt(int _val);
+		void pushAddress(uint64_t _adr);
 		void pushString(std::string& _str);
 		void term(const std::string& _operator);
 		void unaryTerm(const boost::optional<std::string>& _str);

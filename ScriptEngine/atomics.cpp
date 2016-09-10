@@ -70,6 +70,8 @@ namespace lang
 
 		for (size_t i = 0; i < m_types.size(); ++i)
 			m_typeInfos[i] = new TypeInfo(*m_types[i]);
+		//void type can only be a ptr
+		m_typeInfos[BasicType::Void]->isReference = true;
 		//operators
 		//logical -----------------------------------------------------
 		BASICOPERATION("&&", BasicType::FlagBool, InstructionType::Nop);
@@ -132,6 +134,13 @@ namespace lang
 		BASICCAST(InstructionType::CmpZ, TypeInfo(*m_types[Int], false, true), TypeInfo(*m_types[FlagBool]));// int -> bool
 		m_types[Int]->typeCasts.back()->scope.emplace_back(m_allocator.construct<ASTOp>(InstructionType::JE));
 
+		//int -> void ref
+		m_functions.emplace_back(new Function("voidRef", TypeInfo(*m_types[BasicType::Void], true)));
+		Function& voidFunc = *m_functions.back();
+		voidFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("i", TypeInfo(*m_types[Int])));
+		voidFunc.paramCount = 1;
+		
+
 		//build function for dynamic allocation
 		m_functions.emplace_back(new Function("alloc", TypeInfo(*m_types[BasicType::Void], true)));
 		Function& allocFunc = *m_functions.back();
@@ -184,7 +193,7 @@ namespace lang
 
 	void BasicModule::makeConstant(const std::string& _name, int _val)
 	{
-		m_text->m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], true, true)));
+		m_text->m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], false, true)));
 	/*	VarSymbol& var = *m_text->m_variables.back();
 		var.ownership.rawPtr = m_allocator.alloc(var.typeInfo.type.size);
 		var.ownership.ownerType = codeGen::OwnershipType::Heap;

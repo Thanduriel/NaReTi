@@ -127,7 +127,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	bool result = true;
 
 
-	NaReTi::ScriptEngine scriptEngine;
+	NaReTi::ScriptEngine scriptEngine("../scripts/");
 	NaReTi::Config& config = scriptEngine.config();
 	config.optimizationLvl = NaReTi::None;
 	config.scriptLocation = "../scripts/";
@@ -143,6 +143,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	externals->linkExternal("printStr", &printStr);
 	externals->linkExternal("getTickCount", &GetTickCount);
 	externals->linkExternal("fooAdd2", &foo);
+
+	scriptEngine.loadModule("availablesystems");
 
 	bool success = scriptEngine.loadModule("unittest");
 	if (!success) cout << "ERROR: Could not load unittest.nrt";

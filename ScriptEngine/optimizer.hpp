@@ -37,6 +37,7 @@ namespace codeGen{
 		std::vector< par::VarSymbol* > m_tempPtrs;
 		par::Function* m_function;
 		NaReTi::Module* m_module;
+		par::ASTCode* m_scope;
 		int m_callCount;
 	};
 }

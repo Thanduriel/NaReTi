@@ -152,6 +152,7 @@ namespace par
 				TypeInformation >> lit(')'))			[boost::bind(&SemanticParser::sizeOf, &m_semanticParser)]
 				| Call
 				| Symbol								[boost::bind(&SemanticParser::pushSymbol, &m_semanticParser, ::_1)]
+				| Address								[boost::bind(&SemanticParser::pushAddress, &m_semanticParser, ::_1)]
 				| Integer								[boost::bind(&SemanticParser::pushInt, &m_semanticParser, ::_1)]
 				| Float									[boost::bind(&SemanticParser::pushFloat, &m_semanticParser, ::_1)]
 				| ConstString							[boost::bind(&SemanticParser::pushString, &m_semanticParser, ::_1)]
@@ -175,6 +176,11 @@ namespace par
 				!char_('.') //cannot be followed by an . as that would indicate a float
 				;
 			Float = double_;
+
+			Address =
+				lit("0a") >>
+				hex64
+				;
 
 
 //			qi::on_error<qi::fail>(BaseExpression, handler);
@@ -208,8 +214,11 @@ namespace par
 		qi::rule<Iterator, std::string()> ConstString;
 		qi::rule<Iterator, int()> Integer;
 		qi::rule<Iterator, double()> Float;
+		qi::rule<Iterator, uint64_t()> Address;
 		qi::rule<Iterator, Skipper> Operand;
 		qi::rule<Iterator, std::string()> Operator;
+
+		qi::uint_parser<uint64_t, 16, 1, 16> hex64;
 
 		par::SemanticParser& m_semanticParser;
 	};

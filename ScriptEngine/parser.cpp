@@ -81,7 +81,7 @@ namespace par{
 	void BasicParser::parsingError(str_it _begin, const str_it& _it, const std::string& _msg)
 	{
 		int lineCount = 1; //lines are numbered beginning with 1
-		str_it lastLb;
+		str_it lastLb(_begin);
 		while (_begin != _it)
 		{
 			if (*_begin == '\n')

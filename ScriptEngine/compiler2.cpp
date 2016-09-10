@@ -91,6 +91,9 @@ namespace codeGen{
 
 	void Compiler::compileHeapVar(VarSymbol& _var)
 	{
+		//reference uses rawPtr, no extra space is required
+		//todo: make above true
+	//	if(!_var.typeInfo.isReference)
 		_var.ownership.rawPtr = m_runtime.getMemMgr()->alloc(_var.typeInfo.type.size);
 		_var.ownership.ownerType = OwnershipType::Module;
 		_var.isPtr = true; 
@@ -253,8 +256,9 @@ namespace codeGen{
 		for (auto& var : _node.m_importedVars)
 		{
 			X86GpVar& gpVar = getUnusedVar(); //is always a ptr
-			var->compiledVar = &gpVar;
-			m_compiler.mov(gpVar, asmjit::imm_ptr(var->ownership.rawPtr));
+			var.sym->compiledVar = &gpVar;
+			m_compiler.mov(gpVar, asmjit::imm_ptr(var.sym->ownership.rawPtr));
+
 		}
 
 		for (auto& subNode : _node)
@@ -279,6 +283,24 @@ namespace codeGen{
 					compileRetF(*(ASTReturn*)subNode);
 				else compileRet(*(ASTReturn*)subNode);
 				break;
+			}
+		}
+
+		//write back changed addresses of globals
+		//todo: rework way globals are handled
+		//they should not be imported to regs/stack, instead use mem access
+		for (auto& var : _node.m_importedVars)
+		{
+			if (var.sym->name != "g_vecRef")
+				continue;
+
+			if (var.refHasChanged)
+			{
+				X86GpVar& gpVar = getUnusedVar();
+				m_compiler.mov(gpVar, asmjit::imm_ptr(&var.sym->ownership.rawPtr));
+
+			//	m_compiler.mov(*(X86GpVar*)var.sym->compiledVar, imm(2));
+				m_compiler.mov(asmjit::Mem(gpVar,0), *(X86GpVar*)var.sym->compiledVar);
 			}
 		}
 	}
@@ -331,6 +353,14 @@ namespace codeGen{
 				ASTLeaf* leaf; leaf = (ASTLeaf*)arg;
 				args.push_back(compileLeaf(*leaf, &indirect));
 				break;
+			case ASTType::LeafAddress:
+			{
+				//address constants are always typecasted to the required type
+				//this cast is free and combined with the necessary load
+				ASTLeafAdr* adr = static_cast<ASTLeafAdr*>(arg);
+				m_compiler.mov(*(X86GpVar*)_dest, Imm(adr->value));
+				break;
+			}
 			case ASTType::String:
 			{
 				X86GpVar& var = getUnusedVar();
@@ -472,7 +502,7 @@ namespace codeGen{
 			m_compiler.mov(var, Imm(node.value.isReference ? PTRSIZE : node.value.type.size));
 			return &var;
 		}
-		assert(false); // could not compile leaf
+		assert(false && "Could not compile leaf."); // could not compile leaf
 		return nullptr;
 	}
 

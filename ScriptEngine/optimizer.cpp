@@ -2,6 +2,7 @@
 #include "module.hpp"
 #include "ast.hpp"
 #include <assert.h>
+#include <algorithm>
 
 #define FOLDCONST(type, op) ((type*)_node.args[0])->value op ((type*)_node.args[1])->value; *_dest = _node.args[0]; break;
 
@@ -85,10 +86,19 @@ namespace codeGen{
 
 	void Optimizer::traceCode(ASTCode& _node)
 	{
+		m_scope = &_node;
+
+		for (auto& var : _node.m_importedVars)
+		{
+			var.refHasChanged = false; //assume no changes and set if necessary in traceCall
+		}
+
 		for (auto& subNode : _node)
 		{
 			traceNode(subNode, (ASTExpNode**)&subNode);
 		}
+
+		m_scope = _node.parent;
 	}
 
 	void Optimizer::traceBranch(ASTBranch& _node)
@@ -143,6 +153,20 @@ namespace codeGen{
 				_node.name = rCall->name;
 				_node.args = rCall->args;
 				_node.typeInfo = rCall->typeInfo;
+			}
+		}
+		//ref count and global import/export
+		else if (_node.function->name == ":=")
+		{
+			if (_node.args[0]->type == ASTType::LeafSym)
+			{
+				ASTLeafSym* leaf = static_cast<ASTLeafSym*>(_node.args[0]);
+				if (leaf->value->ownership.ownerType == OwnershipType::Heap)
+				{
+					auto it = std::find_if(m_scope->m_importedVars.begin(), m_scope->m_importedVars.end(),
+						[&](const CodeScope::ImportedVar& _var){return _var.sym == leaf->value; });
+					it->refHasChanged = true;
+				}
 			}
 		}
 	}

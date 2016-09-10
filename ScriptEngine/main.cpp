@@ -60,7 +60,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 //	_CrtSetBreakAlloc(810);
 
-	NaReTi::ScriptEngine scriptEngine;
+/*	NaReTi::ScriptEngine scriptEngine;
 	NaReTi::Config& config = scriptEngine.config();
 	config.optimizationLvl = NaReTi::Basic;
 	config.scriptLocation = "scripts/";
@@ -147,7 +147,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		scriptEngine.call<void>(hndlMain);
 
 	}
-
+	*/
 	char tmp;
 	std::cin >> tmp;
 	return 0;

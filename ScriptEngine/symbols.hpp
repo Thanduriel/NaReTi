@@ -107,7 +107,16 @@ namespace par{
 		CodeScope() : m_parent(nullptr) {};
 
 		std::vector< VarSymbol* > m_variables;
-		std::vector< VarSymbol* > m_importedVars; //< variables from a global scope; need to be allocated in the used scope
+
+		struct ImportedVar
+		{
+			VarSymbol* sym;
+			bool refHasChanged; //< the ptr has changed in this scope
+
+			ImportedVar(VarSymbol* _sym) : sym(_sym), refHasChanged(true){}
+		};
+
+		std::vector< ImportedVar > m_importedVars; //< variables from a global scope; need to be allocated in the used scope
 
 		VarSymbol* getVar(std::string& _name)
 		{

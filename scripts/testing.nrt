@@ -129,6 +129,8 @@ int test_performance()
 	return getTickCount() - tickCount
 }
 
+Vec2& g_vecRef := 0a00000001
+
 void main()
 {
 //	initRandom(getTickCount())
