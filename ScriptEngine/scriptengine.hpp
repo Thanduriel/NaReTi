@@ -1,5 +1,4 @@
 #include "enginetypes.hpp"
-#include "optimizer.hpp"
 #include "module.hpp"
 #include "moduleloader.hpp"
 #include <assert.h>
@@ -8,6 +7,7 @@
 
 namespace codeGen{
 	class Compiler;
+	class Optimizer;
 }
 namespace par{
 	class Parser;
@@ -78,7 +78,7 @@ namespace NaReTi{
 		par::GenericsParser* m_genericsParser;
 
 		codeGen::Compiler* m_compiler;
-		codeGen::Optimizer m_optimizer;
+		codeGen::Optimizer* m_optimizer;
 
 		std::vector< FunctionHandle > m_nativeFunctions;
 		std::vector< std::unique_ptr<Module> > m_modules;

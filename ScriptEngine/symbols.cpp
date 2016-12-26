@@ -51,7 +51,7 @@ namespace par{
 
 	// ************************************************ //
 	
-	bool TypeInfo::operator==(TypeInfo& oth)
+	bool TypeInfo::operator==(const TypeInfo& oth) const
 	{
 		return &type == &oth.type
 			&& (type.basic == BasicType::Complex || isArray || isReference == oth.isReference)
@@ -59,7 +59,7 @@ namespace par{
 			&& isArray == oth.isArray;
 	}
 
-	bool TypeInfo::operator!= (TypeInfo& oth)
+	bool TypeInfo::operator!= (const TypeInfo& oth) const
 	{
 		return !(*this == oth);
 /*		// complex types are always by reference and the distinction only matters for the caller

@@ -18,7 +18,8 @@ namespace lang
 	asmjit::JitRuntime* __runtime;
 	void* __allocBoundFunc(int _size)
 	{
-		return malloc(_size);// __runtime->getMemMgr()->alloc(_size);
+		void* ptr = malloc(_size);
+		return ptr;// __runtime->getMemMgr()->alloc(_size);
 	}
 
 	void __freeBoundFunc(void* _ptr)

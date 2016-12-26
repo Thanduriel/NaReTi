@@ -1,5 +1,7 @@
 #pragma once
 
+// this file is named compiler2.hpp to prevent a name collision with asmjit
+
 #include "module.hpp"
 #include <asmjit.h>
 #include <array>
@@ -45,7 +47,7 @@ namespace codeGen
 		void compileModuleInit(NaReTi::Module& _module);
 
 		//sets up a par::Function's asmjit funcbuilder
-		void convertSignature(par::Function& _function);
+		void convertSignature(par::Function& _function) const;
 		void allocVar(par::VarSymbol& _sym);
 		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type, int _count = 1);
 		//compile a specific structure
@@ -75,7 +77,7 @@ namespace codeGen
 		//compiles an expression that resolves to a branch decision
 		void compileCondExp(par::ASTCall& _node);
 
-		UsageState getUsageState() { return m_usageState; }
+		UsageState getUsageState() const { return m_usageState; }
 		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
 		// returns a virtual register currently not in use
 		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)

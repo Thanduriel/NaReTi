@@ -120,6 +120,11 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine)
 	return result;
 }
 
+void testFunc(void* ptr, int i)
+{
+	int brk = 12;
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -144,7 +149,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	externals->linkExternal("getTickCount", &GetTickCount);
 	externals->linkExternal("fooAdd2", &foo);
 
+	NaReTi::Module* m = scriptEngine.getModule("shipfunctions");
+	m->linkExternal("setFiring", &testFunc);
 	scriptEngine.loadModule("availablesystems");
+	scriptEngine.call<void>(scriptEngine.getFuncHndl("dmain"));
+	
 
 	bool success = scriptEngine.loadModule("unittest");
 	if (!success) cout << "ERROR: Could not load unittest.nrt";
@@ -161,7 +170,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		if (!success) cout << "ERROR: Could not reload unittest.nrt" << endl;
 		else cout << "Unit tests with optimization level basic completed: " << testRun(scriptEngine) << endl;
 	}
-
+	config.optimizationLvl = NaReTi::None;
 	scriptEngine.loadModule("testing");
 
 	//script functions

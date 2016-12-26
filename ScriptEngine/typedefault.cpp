@@ -90,8 +90,9 @@ namespace lang{
 
 		// void -> this type
 		voidT.typeCasts.emplace_back(new Function(g_module->getAllocator(), "", InstructionType::Nop, TypeInfo(_type,true), TypeInfo(voidT,true)));
+		voidT.typeCasts.back()->intrinsicType = Function::StaticCast;
 		// this type -> void
-		_type.typeCasts.emplace_back(new Function(_module.getAllocator(), "", InstructionType::Mov, TypeInfo(voidT, true), TypeInfo(_type, true)));
+		_type.typeCasts.emplace_back(new Function(_module.getAllocator(), "", InstructionType::Nop, TypeInfo(voidT, true), TypeInfo(_type, true)));
 		_type.typeCasts.back()->intrinsicType = Function::StaticCast;
 	}
 

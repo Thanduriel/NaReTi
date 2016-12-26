@@ -121,7 +121,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::convertSignature(par::Function& _function)
+	void Compiler::convertSignature(par::Function& _function) const
 	{
 		FuncBuilderX& funcBuilder = _function.funcBuilder;
 		for (int i = 0; i < _function.paramCount; ++i)
@@ -142,8 +142,8 @@ namespace codeGen{
 		case BasicType::Float: funcBuilder.setRetT<float>(); break;
 		case BasicType::Complex: funcBuilder.setRetT<void*>(); break;
 		default: 
-			if (_function.returnTypeInfo.isReference) funcBuilder.addArgT<void*>();
-			else funcBuilder.addArgT<void>();
+			if (_function.returnTypeInfo.isReference) funcBuilder.setRetT<void*>();
+			else funcBuilder.setRetT<void>();
 		}
 
 	}
@@ -291,9 +291,6 @@ namespace codeGen{
 		//they should not be imported to regs/stack, instead use mem access
 		for (auto& var : _node.m_importedVars)
 		{
-			if (var.sym->name != "g_vecRef")
-				continue;
-
 			if (var.refHasChanged)
 			{
 				X86GpVar& gpVar = getUnusedVar();
@@ -310,7 +307,7 @@ namespace codeGen{
 	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
-		if (func.name == "free")
+		if (func.name == "alloc")
 			int brk = 0;
 
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
@@ -358,7 +355,9 @@ namespace codeGen{
 				//address constants are always typecasted to the required type
 				//this cast is free and combined with the necessary load
 				ASTLeafAdr* adr = static_cast<ASTLeafAdr*>(arg);
-				m_compiler.mov(*(X86GpVar*)_dest, Imm(adr->value));
+				X86GpVar& var = getUnusedVar();
+				m_compiler.mov(var, Imm(adr->value));
+				args.push_back(&var);
 				break;
 			}
 			case ASTType::String:
@@ -429,9 +428,10 @@ namespace codeGen{
 				case Function::Compare: break;
 				default: break;
 				case Function::StaticCast:
+					assert(false && "static casts should be skipped in the parser.");
 					//todo movOpt: introduce concept to reduce unnecessary moves like this
-					args.push_back(args[0]);
-					args[0] = _dest;
+				//	args.push_back(args[0]);
+				//	args[0] = _dest;
 					break;
 				}
 
@@ -454,11 +454,12 @@ namespace codeGen{
 		} // end if inline
 		else
 		{
-			X86GpVar& var = getUnusedVar();
-			m_compiler.mov(var, imm_ptr(func.binary));
-			X86CallNode* call = m_compiler.call(var, func.funcBuilder);
+	//		X86GpVar& var = getUnusedVar();
+	//		auto ptr = &var;
+			X86CallNode* call = m_compiler.call(imm_ptr(func.binary), func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[i]);
+
 			if(_dest) call->setRet(0, *_dest);
 		}
 

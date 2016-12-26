@@ -142,7 +142,7 @@ namespace par
 		//put casts into the tree
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
-			if (!casts[i]) continue;
+			if (!casts[i] || casts[i]->intrinsicType == Function::StaticCast) continue;
 
 			ASTCall& call = *m_allocator->construct<ASTCall>();
 			call.function = casts[i];
@@ -171,7 +171,7 @@ namespace par
 
 	// ************************************************** //
 
-	std::string SemanticParser::buildTypeInfoString(const TypeInfo& _t)
+	std::string SemanticParser::buildTypeInfoString(const TypeInfo& _t) const
 	{
 		return _t.type.name + (_t.isConst ? " const" : "")
 			+ (_t.isArray ? "[]" : "")

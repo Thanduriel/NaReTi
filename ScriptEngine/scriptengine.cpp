@@ -8,6 +8,7 @@
 #include "atomics.hpp"
 #include "parser.hpp"
 #include "generics.hpp"
+#include "optimizer.hpp"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ namespace NaReTi
 {
 	ScriptEngine::ScriptEngine(const std::string& _scriptLoc) :
 		m_compiler(new codeGen::Compiler()),
+		m_optimizer(new codeGen::Optimizer()),
 		m_basicModule(new lang::BasicModule(m_compiler->getRuntime())),
 		m_parser(new par::Parser()),
 		m_moduleLoader(m_config)
@@ -88,7 +90,7 @@ namespace NaReTi
 			//check dependencies again(generics can produce code)
 		//	for (auto dep : module.m_dependencies)
 		//		if (dep->hasChanged()) reloadModule(dep);
-			if(m_config.optimizationLvl > None) m_optimizer.optimize(module);
+			if(m_config.optimizationLvl > None) m_optimizer->optimize(module);
 			m_compiler->compile(module);
 		}
 		else

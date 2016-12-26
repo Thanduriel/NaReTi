@@ -129,18 +129,17 @@ int test_performance()
 	return getTickCount() - tickCount
 }
 
-Vec2& g_vecRef := 0a00000001
-
 void main()
 {
-//	initRandom(getTickCount())
-//	printF(rand(15, 0))
+
+	initRandom(getTickCount())
+	printStr("random---------------")
+	printI(rand(4, 0))
 	
-/*	Vec2 v1 = Vec2(124.0, 987.0)
+	Vec2 v1 = Vec2(124.0, 987.0)
 	Vec2& v2
-	printF(v2.x)
 	v2 := v1
-	printF(v2.x)*/
+	printF(v2.x)
 	
 	Vec2[0] array
 	init(array)

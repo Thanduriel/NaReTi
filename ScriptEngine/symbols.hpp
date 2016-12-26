@@ -37,7 +37,7 @@ namespace par{
 		Type(const std::string& _name, BasicType _basic) : Symbol(_name), basic(_basic){};
 		BasicType basic;
 
-		virtual int sizeOf()
+		virtual int sizeOf() const
 		{
 			switch (basic)
 			{
@@ -78,9 +78,9 @@ namespace par{
 
 		//
 
-		bool operator!= (TypeInfo& oth);
+		bool operator!= (const TypeInfo& oth) const;
 
-		bool operator== (TypeInfo& oth);
+		bool operator== (const TypeInfo& oth) const;
 	};
 
 	struct VarSymbol : public Symbol, public codeGen::CVarSymbol, public utils::DetorAlloc::Destructible
