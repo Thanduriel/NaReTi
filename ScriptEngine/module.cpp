@@ -42,6 +42,7 @@ namespace NaReTi{
 		return nullptr;
 	}
 
+	// ************************************************************ //
 	par::Function* Module::getFunction(const std::string& _name,
 		const std::vector<par::ASTExpNode*>::iterator& _begin,
 		const std::vector<par::ASTExpNode*>::iterator& _end,
@@ -78,6 +79,7 @@ namespace NaReTi{
 		return nullptr;
 	}
 
+	// ************************************************************ //
 	Function* Module::getFunction(const std::string& _name, bool _external)
 	{
 		auto it = std::find_if(m_functions.begin(), m_functions.end(),
@@ -94,6 +96,7 @@ namespace NaReTi{
 		return nullptr;*/
 	}
 
+	// ************************************************************ //
 	VarSymbol* Module::getGlobalVar(const std::string& _name)
 	{
 		auto it = std::find_if(m_text->m_variables.begin(), m_text->m_variables.end(),
@@ -112,7 +115,37 @@ namespace NaReTi{
 		return nullptr;
 	}
 
-	// ******************************************************** //
+	// ************************************************************ //
+	Module::ExportVarIterator::ExportVarIterator(std::vector< VarSymbol* >& _variables)
+		: m_variables(_variables),
+		m_iterator(_variables.begin())
+	{
+		//find first element
+		if (m_iterator != m_variables.end() && !(*m_iterator)->isExport) ++(*this);
+	}
+
+	// ************************************************************ //
+	Module::ExportVarIterator& Module::ExportVarIterator::operator++()
+	{
+		++m_iterator;// go forward at least once
+		while (m_iterator != m_variables.end() && !(*m_iterator)->isExport) ++m_iterator;
+
+		return *this;
+	}
+
+	// ************************************************************ //
+	Module::ExportVarIterator Module::getExportVars()
+	{
+		return Module::ExportVarIterator(m_text->m_variables);
+	}
+
+	// ************************************************************ //
+	VariableHandle Module::ExportVarIterator::operator*() const
+	{
+		return VariableHandle((**m_iterator).ownership.rawPtr);
+	}
+
+	// ************************************************************ //
 
 	bool Module::linkExternal(const string& _name, void* _funcPtr)
 	{

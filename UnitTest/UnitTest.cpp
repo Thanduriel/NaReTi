@@ -63,7 +63,7 @@ struct iVec2
 	int y;
 };
 
-bool testRun(NaReTi::ScriptEngine& scriptEngine)
+bool testRun(NaReTi::ScriptEngine& scriptEngine, NaReTi::Module& module)
 {
 	bool result = true;
 	cout << "Doing unit tests: " << endl;
@@ -117,6 +117,17 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine)
 	TEST((scriptEngine.call<float>(FUNCHNDL("test_refAssign")) == 64.f), " reference assignment");
 
 	TEST((scriptEngine.call<int, int, int, int>(FUNCHNDL("test_nestedMember"), 19, 27, 57) == 19+27+57), " nested member");
+
+	// export var
+	auto it = module.getExportVars();
+	++it; ++it;
+	TEST(it, "fetch export var");
+	if (it)
+	{
+		float& f = *(float*)(*it).get();
+		f = 42;
+		TEST((scriptEngine.call<float>(FUNCHNDL("test_exportVar")) == 42), " write export var value");
+	}
 	return result;
 }
 
@@ -159,7 +170,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (!success) cout << "ERROR: Could not load unittest.nrt";
 	else
 	{
-		cout << "Unit tests with optimization level none completed: " << testRun(scriptEngine) << endl;
+		cout << "Unit tests with optimization level none completed: " 
+			<< testRun(scriptEngine, *scriptEngine.getModule("unittest")) << endl;
 
 		//unload dependencies to ensure that they are recompiled aswell
 		config.optimizationLvl = NaReTi::Basic;
@@ -168,7 +180,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		success = scriptEngine.reloadModule("unittest");
 
 		if (!success) cout << "ERROR: Could not reload unittest.nrt" << endl;
-		else cout << "Unit tests with optimization level basic completed: " << testRun(scriptEngine) << endl;
+		else cout << "Unit tests with optimization level basic completed: " 
+			<< testRun(scriptEngine, *scriptEngine.getModule("unittest")) << endl;
 	}
 	config.optimizationLvl = NaReTi::None;
 	scriptEngine.loadModule("testing");

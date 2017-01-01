@@ -45,6 +45,7 @@ namespace par
 		void makeArray();
 		void setArraySize(int _val) { m_typeInfo.arraySize = _val; }
 		void makeExternal() { m_currentFunction->bExternal = true; }
+		void makeExport() { m_currentScope->m_variables.back()->isExport = true; }
 		void finishGeneralExpression();
 		void beginCodeScope();
 		void finishCodeScope();

@@ -429,7 +429,6 @@ namespace codeGen{
 				default: break;
 				case Function::StaticCast:
 					assert(false && "static casts should be skipped in the parser.");
-					//todo movOpt: introduce concept to reduce unnecessary moves like this
 				//	args.push_back(args[0]);
 				//	args[0] = _dest;
 					break;

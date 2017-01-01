@@ -73,6 +73,7 @@ int test_boolean(int a, int b)
 	return 0
 }
 
+// ******************************************* //
 int test_loop(int a, int b)
 {
 	while(0 < a && b < 57)
@@ -82,6 +83,7 @@ int test_loop(int a, int b)
 	return b
 }
 
+// ******************************************* //
 int test_external(int i)
 {
 	(++i)
@@ -89,7 +91,6 @@ int test_external(int i)
 }
 
 // *********************************************** //
-
 float test_sin(float x)
 {
 	float xx = x * x
@@ -98,6 +99,7 @@ float test_sin(float x)
 	return s
 }
 
+// ******************************************* //
 float test_sqrt(float x)
 {
 	float n = x / 2.0
@@ -111,7 +113,6 @@ float test_sqrt(float x)
 }
 
 // ******************************************** //
-
 iVec2 addiVec(int x0, int y0, int x1, int y1 )
 {
 	iVec2 res
@@ -167,6 +168,8 @@ float [](Vec3& _vec, int _i)
 	else if(_i == 1){return _vec.y}
 	else if(_i == 2){return _vec.z}
 }
+
+// ******************************************* //
 float pi = 3.14159265
 int test_global()
 {
@@ -174,6 +177,7 @@ int test_global()
 	return g_test_vec.y
 }
 
+// ******************************************* //
 float test_refAssign()
 {
 	Vec2 v1 = Vec2(124.0, 987.0)
@@ -184,6 +188,7 @@ float test_refAssign()
 	return v1.y
 }
 
+// ******************************************* //
 type InnerStruct
 {
 	iVec2 location
@@ -207,6 +212,7 @@ float test_nestedMember(int a, int b, int c)
 		+ structure.count
 }
 
+// ******************************************* //
 int test_performance()
 {
 	int tickCount = getTickCount()
@@ -232,4 +238,12 @@ int test_performance()
 	}
 	
 	return getTickCount() - tickCount
+}
+
+
+// ******************************************* //
+float exportVar = 17 export
+float test_exportVar()
+{
+	return exportVar
 }

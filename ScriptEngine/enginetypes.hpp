@@ -38,6 +38,16 @@ namespace NaReTi{
 		void* ptr;
 	};
 
+	struct VariableHandle
+	{
+		void* get() { return ptr; }
+	private:
+		friend class Module;
+		VariableHandle(void* _ptr): ptr(_ptr){};
+
+		void* ptr;
+	};
+
 	/* Configuration options
 	*/
 
