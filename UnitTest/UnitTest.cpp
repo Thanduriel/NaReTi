@@ -120,11 +120,11 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine, NaReTi::Module& module)
 
 	// export var
 	auto it = module.getExportVars();
-	++it; ++it;
+	while (it.get().name != "exportVar") { ++it;  }
 	TEST(it, "fetch export var");
 	if (it)
 	{
-		float& f = *(float*)(*it).get();
+		float& f = *(float*)it.get().ptr;
 		f = 42;
 		TEST((scriptEngine.call<float>(FUNCHNDL("test_exportVar")) == 42), " write export var value");
 	}

@@ -58,7 +58,7 @@ namespace NaReTi{
 			ExportVarIterator(std::vector< par::VarSymbol* >& _variables);
 
 			ExportVarIterator& operator++();
-			VariableHandle operator*() const;
+			VariableHandle get() const;
 			operator bool() { return m_iterator != m_variables.end(); };
 		private:
 			std::vector< par::VarSymbol* >::iterator m_iterator;

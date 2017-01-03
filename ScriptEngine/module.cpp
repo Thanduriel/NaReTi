@@ -140,9 +140,10 @@ namespace NaReTi{
 	}
 
 	// ************************************************************ //
-	VariableHandle Module::ExportVarIterator::operator*() const
+	VariableHandle Module::ExportVarIterator::get() const
 	{
-		return VariableHandle((**m_iterator).ownership.rawPtr);
+		auto& sym = (**m_iterator);
+		return VariableHandle(sym.ownership.rawPtr, sym.name);
 	}
 
 	// ************************************************************ //
