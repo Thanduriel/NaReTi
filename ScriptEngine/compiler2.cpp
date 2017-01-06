@@ -279,7 +279,7 @@ namespace codeGen{
 				break;
 			case ASTType::Ret:
 				ASTReturn* retNode = (ASTReturn*)subNode;
-				if (retNode->body->typeInfo->type.basic == BasicType::Float && !retNode->body->typeInfo->isReference)
+				if (retNode->body && retNode->body->typeInfo->type.basic == BasicType::Float && !retNode->body->typeInfo->isReference)
 					compileRetF(*(ASTReturn*)subNode);
 				else compileRet(*(ASTReturn*)subNode);
 				break;
@@ -667,7 +667,14 @@ namespace codeGen{
 	{
 		UsageStateLock lock(m_usageState);
 
-		asmjit::X86GpVar* var;
+		//void f()
+		if (!_node.body)
+		{
+			m_compiler.ret();
+			return;
+		}
+
+		asmjit::X86GpVar* var = nullptr;
 		if (_node.body->type == ASTType::Call)
 		{
 			var = (X86GpVar*)compileCall(*(ASTCall*)_node.body);

@@ -87,8 +87,8 @@ namespace par
 				lit(']')								[boost::bind(&SemanticParser::makeArray, &m_semanticParser)]
 				;
 
-			GeneralExpression = 
-				(("return" >> Expression)				[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
+			GeneralExpression =
+				(("return" >> (lit(";") | Expression))	[boost::bind(&SemanticParser::returnStatement, &m_semanticParser)]
 				| Conditional
 				| Loop
 				| VarDeclaration

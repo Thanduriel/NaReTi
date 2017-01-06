@@ -153,7 +153,7 @@ void main()
 	push_back(array, vec1)
 	
 //	array[0] = vec2
-	
+	return;
 	printF(array[0].x)
 	printF(array[0].y)
 	printF(array[1].x)

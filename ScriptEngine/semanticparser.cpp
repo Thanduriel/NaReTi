@@ -393,6 +393,7 @@ namespace par
 				retNode.body = &call;
 			}
 		}
+		else retNode.body = nullptr;
 	}
 
 	// ************************************************** //

@@ -191,6 +191,9 @@ namespace codeGen{
 
 	void Optimizer::traceReturn(ASTReturn& _node)
 	{
+		//void f()
+		if (!_node.body) return;
+
 		traceNode(_node.body, &_node.body);
 		
 		//only when a local var is returned substitution may take place
