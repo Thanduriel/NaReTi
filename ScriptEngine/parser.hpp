@@ -18,7 +18,7 @@ namespace par{
 		//writes an formated error message to the log including the line number and a snippet of the faulty code
 		//@param _begin begin iterator to the text
 		//@param _it iterator of where the error appeared
-		void parsingError(str_it _begin, const str_it& _it, const std::string& _msg);
+		void parsingError(str_it _begin, const str_it& _it, const str_it& _end, const std::string& _msg);
 
 		par::SemanticParser m_semanticParser;
 		par::NaReTiGrammar m_grammar;
