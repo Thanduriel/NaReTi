@@ -5,7 +5,7 @@
 #include <functional>
 
 namespace asmjit{
-	struct JitRuntime;
+	class JitRuntime;
 }
 
 namespace par{

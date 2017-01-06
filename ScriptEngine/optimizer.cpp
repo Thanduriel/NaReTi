@@ -20,6 +20,15 @@ namespace codeGen{
 	void Optimizer::optimize(NaReTi::Module& _module)
 	{
 		m_module = &_module;
+		// the module init has to be optimized too to be compatible with
+		// optimzed functions
+		m_function = nullptr;
+		resetState();
+		//since this happens before compilation ownership information is not correct
+		for (auto& var : _module.m_text->m_variables)
+			var->ownership = OwnershipType::Module;
+		traceCode(*_module.m_text);
+
 		for (auto& func : _module.m_functions)
 			optimizeFunction(*func);
 	}
@@ -36,9 +45,7 @@ namespace codeGen{
 		}
 
 		m_function = &_func;
-		m_callCount = 0;
-		m_usageStack.clear();
-		m_tempPtrs.clear();
+		resetState();
 		traceCode(_func.scope);
 
 		bool isConst = true;
@@ -52,6 +59,15 @@ namespace codeGen{
 		}
 		if (m_callCount <= InlineTreshhold && isConst)
 			_func.bInline = true;
+	}
+
+	// ****************************************************** //
+
+	void Optimizer::resetState()
+	{
+		m_callCount = 0;
+		m_usageStack.clear();
+		m_tempPtrs.clear();
 	}
 
 	// ****************************************************** //
@@ -132,7 +148,6 @@ namespace codeGen{
 				((ASTLeafSym*)arg)->value->typeInfo.isConst = false;
 		}
 		tryConstFold(_node, _dest);
-
 		// expressions of the form: a = foo()
 		if (_node.function->name == "=" && _node.args[1]->type == ASTType::Call && _node.args[0]->type == ASTType::LeafSym)
 		{
@@ -161,7 +176,8 @@ namespace codeGen{
 			if (_node.args[0]->type == ASTType::LeafSym)
 			{
 				ASTLeafSym* leaf = static_cast<ASTLeafSym*>(_node.args[0]);
-				if (leaf->value->ownership.ownerType == OwnershipType::Heap)
+				if (leaf->value->ownership.ownerType == OwnershipType::Heap 
+					|| leaf->value->ownership.ownerType == OwnershipType::Module)
 				{
 					auto it = std::find_if(m_scope->m_importedVars.begin(), m_scope->m_importedVars.end(),
 						[&](const CodeScope::ImportedVar& _var){return _var.sym == leaf->value; });
@@ -178,7 +194,7 @@ namespace codeGen{
 		traceNode(_node.body, &_node.body);
 		
 		//only when a local var is returned substitution may take place
-		if (m_function->bHiddenParam && _node.body->type == ASTType::LeafSym)
+		if (m_function && m_function->bHiddenParam && _node.body->type == ASTType::LeafSym)
 		{
 			trySubstitution(**m_usageStack.back(), *m_function->scope.m_variables[0]);
 

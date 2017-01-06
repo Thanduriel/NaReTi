@@ -160,10 +160,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	externals->linkExternal("getTickCount", &GetTickCount);
 	externals->linkExternal("fooAdd2", &foo);
 
-	NaReTi::Module* m = scriptEngine.getModule("shipfunctions");
+/*	NaReTi::Module* m = scriptEngine.getModule("shipfunctions");
 	m->linkExternal("setFiring", &testFunc);
 	scriptEngine.loadModule("availablesystems");
-	scriptEngine.call<void>(scriptEngine.getFuncHndl("dmain"));
+	scriptEngine.call<void>(scriptEngine.getFuncHndl("dmain"));*/
 	
 
 	bool success = scriptEngine.loadModule("unittest");
@@ -183,7 +183,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		else cout << "Unit tests with optimization level basic completed: " 
 			<< testRun(scriptEngine, *scriptEngine.getModule("unittest")) << endl;
 	}
-	config.optimizationLvl = NaReTi::None;
+	config.optimizationLvl = NaReTi::Basic;
 	scriptEngine.loadModule("testing");
 
 	//script functions

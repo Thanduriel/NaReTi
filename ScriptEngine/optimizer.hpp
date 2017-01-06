@@ -20,6 +20,8 @@ namespace codeGen{
 
 		void traceCode(par::ASTCode& _node);
 	private:
+		void resetState();
+
 		//will call the correct trace function on the given node
 		void traceNode(par::ASTNode* _node, par::ASTExpNode** _dest = nullptr);
 		void traceBranch(par::ASTBranch& _node);

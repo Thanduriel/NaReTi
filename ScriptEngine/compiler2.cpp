@@ -40,12 +40,12 @@ namespace codeGen{
 		{
 			compileHeapVar(*var);
 		}
-		compileModuleInit(_module);
-
 		for (auto& function : _module.m_functions)
 		{
 			compileFuction(*function);
 		}
+		//do this last so that anything defined in this module can be used
+		compileModuleInit(_module);
 
 		_module.setChanged(false); // is compiled up to date
 
@@ -307,7 +307,7 @@ namespace codeGen{
 	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
 	{
 		Function& func = *_node.function;
-		if (func.name == "alloc")
+		if (func.name == "DisplayValue")
 			int brk = 0;
 
 		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());

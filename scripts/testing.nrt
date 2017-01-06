@@ -3,6 +3,7 @@ use math
 use random
 use externals
 use vector
+use availablesystems
 
 //use this to get a breakpoint in the compiler
 void breakpoint()
@@ -143,6 +144,7 @@ void main()
 	
 	Vec2[0] array
 	init(array)
+
 	Vec2 vec1 = Vec2(124.0, 987.0)
 	Vec2 vec2 = Vec2(55.0, 22.0)
 	
@@ -175,4 +177,7 @@ void main()
 	f = -f
 //	printF(f)
 //	printI(i)
+
+//	printF(dp.value)
+//	printI(dp.mode)
 }
