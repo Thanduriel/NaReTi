@@ -6,6 +6,8 @@
 
 #define FOLDCONST(type, op) ((type*)_node.args[0])->value op ((type*)_node.args[1])->value; *_dest = _node.args[0]; break;
 
+//#define OPTIMIZEINIT
+
 namespace codeGen{
 	using namespace par;
 
@@ -20,14 +22,15 @@ namespace codeGen{
 	void Optimizer::optimize(NaReTi::Module& _module)
 	{
 		m_module = &_module;
-		// the module init has to be optimized too to be compatible with
-		// optimzed functions
+
+#ifdef OPTIMIZEINIT
 		m_function = nullptr;
 		resetState();
 		//since this happens before compilation ownership information is not correct
 		for (auto& var : _module.m_text->m_variables)
 			var->ownership = OwnershipType::Module;
 		traceCode(*_module.m_text);
+#endif
 
 		for (auto& func : _module.m_functions)
 			optimizeFunction(*func);

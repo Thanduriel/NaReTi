@@ -30,7 +30,7 @@ namespace par{
 			//give it a name which the semantic parser will find
 		}
 		//the last function of the target module could be the one where the generic type first occurs
-		//to have generic functions compiled before this functios is moved to the back after
+		//to have generic functions compiled before this function is moved to the back after
 		auto ptr = std::move(m_targetModule->m_functions.back());
 		m_targetModule->m_functions.pop_back();
 

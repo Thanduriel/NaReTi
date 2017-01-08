@@ -24,6 +24,7 @@ namespace codeGen{
 		m_compiler(&m_assembler)
 	{
 		m_labelStack.reserve(64); // prevent moving
+		m_retDstStack.reserve(64);
 	}
 
 	// *************************************************** //
@@ -187,7 +188,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	X86GpVar* Compiler::allocStackVar(ComplexType& _type, int _count)
+	X86GpVar* Compiler::allocStackVar(const ComplexType& _type, int _count)
 	{
 		X86GpVar& gpVar = getUnusedVar();
 		X86Mem mem = m_compiler.newStack(_type.size * _count, _type.alignment); // if floats are used  -> operations with xmm(128) register
@@ -317,7 +318,6 @@ namespace codeGen{
 		{
 			if (_node.returnSub) // optimization
 			{
-				_dest = _node.returnSub->compiledVar;
 				args.push_back(_node.returnSub->compiledVar);
 			}
 			else
@@ -326,6 +326,7 @@ namespace codeGen{
 				func.scope.m_variables[0]->compiledVar = (Var*)allocStackVar(func.scope.m_variables[0]->typeInfo.type);
 				args.push_back(func.scope.m_variables[0]->compiledVar);
 			}
+			_dest = args.back();
 		}
 
 		UsageStateLock lock(m_usageState);
@@ -446,15 +447,18 @@ namespace codeGen{
 					func.scope.m_variables[i]->compiledVar = args[i];
 				
 				//returns -> jump to the end of this block
-				m_retDstStack.push_back(_dest);
+				m_retDstStack.emplace_back(_dest, m_compiler.newLabel());
+				Function* callee = m_function;
+				m_function = _node.function;
 				compileCode(_node.function->scope, args.size());
+				m_function = callee;
+				m_compiler.bind(m_retDstStack.back().second);
 				m_retDstStack.pop_back();
 			}
 		} // end if inline
 		else
 		{
-	//		X86GpVar& var = getUnusedVar();
-	//		auto ptr = &var;
+			// make call
 			X86CallNode* call = m_compiler.call(imm_ptr(func.binary), func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[i]);
@@ -508,7 +512,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, int _indirect)
+	void Compiler::compileOp(par::InstructionType _instr, const std::vector< asmjit::Var* >& _args, int _indirect)
 	{
 		switch (_instr)
 		{
@@ -663,7 +667,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileRet(ASTReturn& _node)
+	void Compiler::compileRet(const ASTReturn& _node)
 	{
 		UsageStateLock lock(m_usageState);
 
@@ -699,9 +703,11 @@ namespace codeGen{
 			var = &dest;
 		}
 
+		//currently inlining
 		if (m_retDstStack.size())
 		{
-			if (var != m_retDstStack.back()) m_compiler.mov(*(X86GpVar*)m_retDstStack.back(), *var);
+			if (var != m_retDstStack.back().first) m_compiler.mov(*(X86GpVar*)m_retDstStack.back().first, *var);
+			m_compiler.jmp(m_retDstStack.back().second);
 		}
 		else
 			m_compiler.ret(*var);
@@ -709,7 +715,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileRetF(ASTReturn& _node)
+	void Compiler::compileRetF(const ASTReturn& _node)
 	{
 		UsageStateLock lock(m_usageState);
 
@@ -731,7 +737,8 @@ namespace codeGen{
 
 		if (m_retDstStack.size())
 		{
-			if (var != m_retDstStack.back()) m_compiler.movss(*(X86XmmVar*)m_retDstStack.back(), *var);
+			if (var != m_retDstStack.back().first) m_compiler.movss(*(X86XmmVar*)m_retDstStack.back().first, *var);
+			m_compiler.jmp(m_retDstStack.back().second);
 		}
 		else
 			m_compiler.ret(*var);
@@ -739,7 +746,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileMemCpy(X86GpVar& _dst, X86GpVar& _src, size_t _size)
+	void Compiler::compileMemCpy(const X86GpVar& _dst, const X86GpVar& _src, size_t _size)
 	{
 		X86GpVar& tmp = getUnusedVar();
 		size_t chunks = _size / 4;

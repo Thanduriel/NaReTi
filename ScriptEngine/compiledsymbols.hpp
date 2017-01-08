@@ -8,6 +8,8 @@ namespace codeGen{
 	 */
 	struct CFunction
 	{
+		CFunction() : binary(nullptr){}
+
 		//the compiled version (the callee should know its signature)
 		void* binary;
 		asmjit::FuncBuilderX funcBuilder; //signature needed to compile calls

@@ -3,7 +3,7 @@ use math
 use random
 use externals
 use vector
-use availablesystems
+use hud
 
 //use this to get a breakpoint in the compiler
 void breakpoint()
@@ -130,6 +130,7 @@ int test_performance()
 	return getTickCount() - tickCount
 }
 
+DisplayValue dp = DisplayValue(2.0, 42)
 void main()
 {
 
@@ -153,7 +154,7 @@ void main()
 	push_back(array, vec1)
 	
 //	array[0] = vec2
-	return;
+	
 	printF(array[0].x)
 	printF(array[0].y)
 	printF(array[1].x)
@@ -178,6 +179,6 @@ void main()
 //	printF(f)
 //	printI(i)
 
-//	printF(dp.value)
-//	printI(dp.mode)
+	printF(dp.value)
+	printI(dp.mode)
 }

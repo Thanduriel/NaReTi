@@ -63,7 +63,7 @@ namespace par{
 		ASTCode* parent;
 	};
 
-	//function symbol; just here because of crosslinks between ast and symbols
+	//function symbol; just here because of cross-links between ast and symbols
 	struct Function : public Symbol, codeGen::CFunction
 	{
 		//definitions can be found in "symbols.cpp"

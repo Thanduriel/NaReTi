@@ -247,3 +247,21 @@ float test_exportVar()
 {
 	return exportVar
 }
+
+// ******************************************* //
+int test_array()
+{
+	iVec2[0] array
+	init(array)
+	
+	iVec2 vec
+	vec.x = 2 vec.y = 3
+	push_back(array, vec)
+	vec.x = 5 vec.y = 7
+	push_back(array, vec)
+	vec.x = 11 vec.y = 13
+	push_back(array, vec)
+	
+	return array[0].x + array[1].y + array[2].y
+}
+

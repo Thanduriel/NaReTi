@@ -49,7 +49,7 @@ namespace codeGen
 		//sets up a par::Function's asmjit funcbuilder
 		void convertSignature(par::Function& _function) const;
 		void allocVar(par::VarSymbol& _sym);
-		asmjit::X86GpVar* allocStackVar(par::ComplexType& _type, int _count = 1);
+		asmjit::X86GpVar* allocStackVar(const par::ComplexType& _type, int _count = 1);
 		//compile a specific structure
 		void compileFuction(par::Function& _function);
 		//@param _preAllocCount local variables that are already allocated
@@ -58,11 +58,11 @@ namespace codeGen
 		//@return the destination of the return
 		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);
 		asmjit::Var* compileLeaf(par::ASTLeaf& _node, int* _indirect = nullptr);
-		void compileOp(par::InstructionType _instr, std::vector< asmjit::Var* >& _args, int _indirect);
-		void compileRet(par::ASTReturn& _node);
-		void compileRetF(par::ASTReturn& _node);
+		void compileOp(par::InstructionType _instr, const std::vector< asmjit::Var* >& _args, int _indirect);
+		void compileRet(const par::ASTReturn& _node);
+		void compileRetF(const par::ASTReturn& _node);
 		
-		void compileMemCpy(asmjit::X86GpVar& _dst, asmjit::X86GpVar& _src, size_t _size);
+		void compileMemCpy(const asmjit::X86GpVar& _dst, const asmjit::X86GpVar& _src, size_t _size);
 		// returns the var the address of the instance is stored in
 		// in a nested member access the instance of the last member is given
 		asmjit::X86GpVar* compileMemberAdr(par::ASTMember& _node); 
@@ -78,7 +78,7 @@ namespace codeGen
 		void compileCondExp(par::ASTCall& _node);
 
 		UsageState getUsageState() const { return m_usageState; }
-		void setUsageState(UsageState& _newState) { m_usageState = _newState; }
+		void setUsageState(const UsageState& _newState) { m_usageState = _newState; }
 		// returns a virtual register currently not in use
 		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)
 		asmjit::X86GpVar& getUnusedVar32();
@@ -104,6 +104,6 @@ namespace codeGen
 		UsageState m_usageState;
 
 		std::vector< asmjit::Label> m_labelStack; // asm labels required in conditional branches
-		std::vector< asmjit::Var* > m_retDstStack; // return destinations for inlining
+		std::vector< std::pair<asmjit::Var*, asmjit::Label> > m_retDstStack; // return destinations for inlining
 	};
 }

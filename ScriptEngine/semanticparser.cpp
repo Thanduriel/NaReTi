@@ -593,7 +593,8 @@ namespace par
 	ComplexType& SemanticParser::getType(const std::string& _name)
 	{
 		ComplexType* type = m_moduleLib.getType(_name);
-		if (!type) throw ParsingError("Unknown type: " + _name);
+		if (!type) 
+			throw ParsingError("Unknown type: " + _name);
 
 		return *type;
 	}
