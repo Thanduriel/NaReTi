@@ -60,7 +60,7 @@ namespace lang
 		__runtime = &_runtime;
 		g_module = this;
 
-		m_types.resize(6);
+		m_types.resize(BasicType::Count);
 		//basic types
 		m_types[BasicType::Int] = new ComplexType("int", BasicType::Int); m_types[BasicType::Int]->size = 4; m_types[BasicType::Int]->alignment = 16;
 		m_types[BasicType::Float] = new ComplexType("float", BasicType::Float); m_types[BasicType::Float]->size = 4;
@@ -68,6 +68,8 @@ namespace lang
 		m_types[BasicType::Void] = new ComplexType("void", BasicType::Void);
 		m_types[BasicType::Bool] = new ComplexType("bool", BasicType::Bool); m_types[BasicType::Bool]->size = 4;
 		m_types[BasicType::FlagBool] = new ComplexType("flagBool", BasicType::FlagBool); m_types[BasicType::FlagBool]->size = 4;
+		m_types[BasicType::Undefined] = new ComplexType("undefined", BasicType::Undefined); m_types[BasicType::Undefined]->size = 4;
+
 
 		for (size_t i = 0; i < m_types.size(); ++i)
 			m_typeInfos[i] = new TypeInfo(*m_types[i]);

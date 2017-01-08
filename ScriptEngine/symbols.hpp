@@ -27,8 +27,9 @@ namespace par{
 		String,
 		Void, //when no type is given it is implicitly void
 		FlagBool, // bool in the form of eflags after a cmp instr
-		Complex,
-		Undefined // has to be linked first (currently not in use)
+		Undefined, // a type with on allowed operations
+		Count,
+		Complex
 	};
 
 	struct Type : public Symbol
@@ -37,7 +38,7 @@ namespace par{
 		Type(const std::string& _name, BasicType _basic) : Symbol(_name), basic(_basic){};
 		BasicType basic;
 
-		virtual int sizeOf() const
+	/*	virtual int sizeOf() const
 		{
 			switch (basic)
 			{
@@ -48,7 +49,7 @@ namespace par{
 			default:
 				return 4; // references, int and float all are one dword
 			}
-		};
+		};*/
 	};
 
 	// ************************************************* //

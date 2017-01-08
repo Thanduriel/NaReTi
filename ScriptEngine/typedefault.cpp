@@ -65,7 +65,10 @@ namespace lang{
 			call.name = "=";
 			call.typeInfo = &func.returnTypeInfo;
 			call.function = _lib.getFunction(call.name, call.args.begin(), call.args.end(), m_funcQuery);
-			func.scope.push_back(&call);
+			// if the type has no assignment just skip it;
+			// this is currently only true for undefined
+			if (call.function)
+				func.scope.push_back(&call);
 		}
 	}
 

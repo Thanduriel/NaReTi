@@ -30,7 +30,7 @@ namespace lang
 	private:
 		void makeConstant(const std::string& _name, int _val);
 
-		std::array< par::TypeInfo*, 6 > m_typeInfos;
+		std::array< par::TypeInfo*, 7 > m_typeInfos;
 		std::array< std::pair< std::string, int >, 23> m_precedence;
 	};
 
