@@ -98,5 +98,4 @@ namespace lang{
 		_type.typeCasts.emplace_back(new Function(_module.getAllocator(), "", InstructionType::Nop, TypeInfo(voidT, true), TypeInfo(_type, true)));
 		_type.typeCasts.back()->intrinsicType = Function::StaticCast;
 	}
-
 }

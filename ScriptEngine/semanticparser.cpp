@@ -127,12 +127,15 @@ namespace par
 		std::vector<Function*> casts; casts.resize(_node.args.size());
 		ZeroMemory(&casts[0], sizeof(Function*) * casts.size()); //make sure to only have nullptr; maybe not std conform
 
+		int off = _func.bHiddenParam ? 1 : 0;
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
 			TypeInfo& t0 = *_node.args[i]->typeInfo;
-			TypeInfo& t1 = _func.scope.m_variables[i]->typeInfo;
+			TypeInfo& t1 = _func.scope.m_variables[i+off]->typeInfo;
+			if (t1.type.name == "DisplayValue")
+				int brk = 12;
 			if (t0 == t1) continue;
-			//right site of an assignment may not be casted
+			//left site of an assignment may not be casted
 			if (_func.intrinsicType == Function::Assignment && i == 0) return false;
 
 			casts[i] = typeCast(t0, t1);
@@ -166,7 +169,7 @@ namespace par
 			}
 		}
 
-		return nullptr;
+		return lang::g_module->tryBasicCast(_t0, _t1);
 	}
 
 	// ************************************************** //
@@ -282,6 +285,10 @@ namespace par
 
 		m_currentFunction = m_currentModule->m_functions.back();
 
+		//detect special functions
+		if (m_currentFunction->name == m_currentFunction->returnTypeInfo.type.name)
+			m_currentFunction->returnTypeInfo.type.constructors.push_back(m_currentFunction);
+
 		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex
 			&& !m_currentFunction->returnTypeInfo.isReference)
 		{
@@ -302,6 +309,20 @@ namespace par
 	{
 		Function& function = *m_currentModule->m_functions.back();
 		function.paramCount = (int)function.scope.m_variables.size();
+	}
+
+	// ************************************************** //
+
+	void SemanticParser::finishInit()
+	{
+		auto var = m_currentScope->m_variables.back();
+		//init / construction can be done on consts
+		bool c = var->typeInfo.isConst;
+		var->typeInfo.isConst = false;
+		term("=");
+		m_currentCode->push_back(popNode());
+		var->typeInfo.isConst = c; //recover state
+		assert(!m_stack.size() && "The stack should be empty after an init.");
 	}
 
 	// ************************************************** //
@@ -386,11 +407,14 @@ namespace par
 					+ buildTypeInfoString(*retNode.body->typeInfo)
 					+ "\" but expected \""
 					+ buildTypeInfoString(m_currentFunction->returnTypeInfo) + "\"");
-				ASTCall& call = *m_allocator->construct<ASTCall>();
-				call.function = cast;
-				call.args.push_back(retNode.body);
-				call.typeInfo = &cast->returnTypeInfo;
-				retNode.body = &call;
+				if (cast->intrinsicType != Function::StaticCast)
+				{
+					ASTCall& call = *m_allocator->construct<ASTCall>();
+					call.function = cast;
+					call.args.push_back(retNode.body);
+					call.typeInfo = &cast->returnTypeInfo;
+					retNode.body = &call;
+				}
 			}
 		}
 		else retNode.body = nullptr;

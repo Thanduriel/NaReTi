@@ -130,7 +130,7 @@ int test_performance()
 	return getTickCount() - tickCount
 }
 
-DisplayValue dp = DisplayValue(3.0, 41)
+DisplayValue dp = DisplayValue(3.0, DISPLAYMODE_ONLYBAR)
 
 void main()
 {

@@ -151,6 +151,8 @@ namespace par{
 
 		// available casts for this type
 		std::vector< std::unique_ptr<Function> > typeCasts;
+		std::vector< Function* > constructors;
+		std::vector< Function* > destructors;
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;

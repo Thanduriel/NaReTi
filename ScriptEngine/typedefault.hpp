@@ -19,6 +19,7 @@ namespace lang{
 		//typecast void -> this type
 		//will be added to ComplexType Void's typecasts
 		void buildVoidCast(par::ComplexType& _type, NaReTi::Module& _module);
+		void buildConstCast(par::ComplexType& _type, NaReTi::Module& _module);
 	private:
 		std::vector<NaReTi::Module::FuncMatch> m_funcQuery;
 	};

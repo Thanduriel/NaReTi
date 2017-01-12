@@ -47,7 +47,7 @@ namespace par
 			VarDeclaration =
 				(TypeInformation >>Symbol)				[boost::bind(&SemanticParser::varDeclaration, &m_semanticParser, ::_1)] >>
 				-((lit("=")								[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
-				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string("="))]
+				Expression)								[boost::bind(&SemanticParser::finishInit, &m_semanticParser)]
 				| (lit(":=")							[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
 				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string(":="))]
 				) >> - lit("export")					[boost::bind(&SemanticParser::makeExport, &m_semanticParser)]

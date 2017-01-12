@@ -27,11 +27,14 @@ namespace lang
 		par::TypeInfo& getBasicTypeInfo(par::BasicType _basicType);
 		int getPrecedence(const std::string& _op);
 
+		par::Function* tryBasicCast(const par::TypeInfo& _lhs, const par::TypeInfo& _rhs);
 	private:
 		void makeConstant(const std::string& _name, int _val);
 
 		std::array< par::TypeInfo*, 7 > m_typeInfos;
 		std::array< std::pair< std::string, int >, 23> m_precedence;
+
+		std::unique_ptr<par::Function> m_dummyCast;
 	};
 
 	extern BasicModule* g_module;

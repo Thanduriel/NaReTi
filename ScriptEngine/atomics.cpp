@@ -162,6 +162,9 @@ namespace lang
 		//global constants
 		makeConstant("true", 1);
 		makeConstant("false", 0);
+
+		m_dummyCast = std::make_unique<Function>(m_allocator, std::string("dummy_cast"), InstructionType::Nop, TypeInfo(*m_types[Undefined]), TypeInfo(*m_types[Undefined]));
+		m_dummyCast->intrinsicType = Function::StaticCast;
 	}
 
 	BasicModule::~BasicModule()
@@ -192,6 +195,14 @@ namespace lang
 			if (prec.first == _op) return prec.second;
 
 		return 1; // unknown operator or function takes precedence
+	}
+
+	par::Function* BasicModule::tryBasicCast(const par::TypeInfo& _lhs, const par::TypeInfo& _rhs)
+	{
+		//const copy to non const
+		if (&_lhs.type == &_rhs.type && !_rhs.isReference)
+			return m_dummyCast.get();
+		return nullptr;
 	}
 
 	void BasicModule::makeConstant(const std::string& _name, int _val)

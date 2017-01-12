@@ -38,6 +38,9 @@ namespace par
 		void finishTypeDec();
 		void funcDeclaration(std::string& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
+		// for var in place initializations
+		// takes care of const
+		void finishInit();
 		//typeinfo
 		void newTypeInfo(const std::string& _attr) { m_typeName = _attr; m_typeInfo.isReference = false; m_typeInfo.isConst = false; m_typeInfo.isArray = false; }
 		void makeReference() { m_typeInfo.isReference = true; }
