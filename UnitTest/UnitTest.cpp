@@ -146,11 +146,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	//	_CrtSetBreakAlloc(810);
 	bool result = true;
 
-
-	NaReTi::ScriptEngine scriptEngine("../scripts/");
-	NaReTi::Config& config = scriptEngine.config();
-	config.optimizationLvl = NaReTi::None;
+	NaReTi::Config config;
+	config.numThreads = 1;
 	config.scriptLocation = "../scripts/";
+	config.optimizationLvl = NaReTi::None;
+	NaReTi::ScriptEngine scriptEngine(config);
 
 	//some native function
 	NaReTi::FunctionHandle hndl(foo);
@@ -181,7 +181,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		config.optimizationLvl = NaReTi::Basic;
 		scriptEngine.unloadModule("vector");
 		scriptEngine.unloadModule("random");
-		success = scriptEngine.reloadModule("unittest");
+		success = scriptEngine.loadModule("unittest");
 
 		if (!success) cout << "ERROR: Could not reload unittest.nrt" << endl;
 		else cout << "Unit tests with optimization level basic completed: " 
@@ -208,8 +208,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	cout << sum / 132 << " performance" << endl;
 
 	NaReTi::FunctionHandle hndlMain = scriptEngine.getFuncHndl("main");
-	scriptEngine.call<void>(hndlMain);
+	scriptEngine.call(hndlMain);
 
+	clock_t beginClock = clock();
+	NaReTi::FunctionHandle hndlWork = scriptEngine.getFuncHndl("much_work");
+	for (int i = 0; i < 4; ++i)
+		scriptEngine.callRestricted<int>(hndlWork, 0.8f, 100);
+	auto ptr = scriptEngine.testcall<int>(hndlWork, 100);
+	while (true) scriptEngine.checkTasks();
+	for (int i = 0; i < 5; ++i)
+		scriptEngine.call<int>(hndlWork, 100);
+
+	while (!ptr->isDone);
+	clock_t endClock = clock();
+
+	cout << (double(endClock - beginClock) / CLOCKS_PER_SEC) << endl;
 
 	char tmp;
 	std::cin >> tmp;

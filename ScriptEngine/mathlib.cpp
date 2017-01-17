@@ -13,11 +13,12 @@ namespace lang{
 	MathModule::MathModule():
 		NaReTi::Module("math")
 	{
-		UNARYOPERATION("sqrt", TypeInfo(g_module->getBasicType(Float)), InstructionType::Sqrt);
 	}
 
 	void MathModule::linkExternals()
 	{
+		// add this function here to not have it removed on compile
+		UNARYOPERATION("sqrt", TypeInfo(g_module->getBasicType(Float)), InstructionType::Sqrt);
 		bool fail;
 		//cast are necessary to determine the right overload
 		fail = !linkExternal("'", static_cast<float(*)(float, float)>(pow));

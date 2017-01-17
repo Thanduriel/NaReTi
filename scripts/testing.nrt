@@ -183,3 +183,18 @@ void main()
 	printF(dp.value)
 	printI(dp.mode)
 }
+
+void much_work(int howMuch)
+{
+	int i
+	int c = 0
+	while(c < howMuch)
+	{
+		i = 0
+		while(i < 3260000)
+		{
+			++i
+		}
+		++c
+	}
+}

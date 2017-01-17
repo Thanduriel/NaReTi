@@ -10,7 +10,8 @@ namespace NaReTi{
 
 	Module::Module(const std::string& _name) 
 		: m_name(_name),
-		m_text(new ASTCode())
+		m_text(new ASTCode()),
+		m_hasChanged(true)
 	{
 
 	}

@@ -135,6 +135,9 @@
     <ClInclude Include="typedefault.hpp">
       <Filter>lang</Filter>
     </ClInclude>
+    <ClInclude Include="threadpool.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

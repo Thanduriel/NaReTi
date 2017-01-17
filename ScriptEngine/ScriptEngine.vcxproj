@@ -205,6 +205,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="symbols.hpp" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="typedefault.hpp" />
   </ItemGroup>
   <ItemGroup>

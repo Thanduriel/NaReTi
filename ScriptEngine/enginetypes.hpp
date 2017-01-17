@@ -66,5 +66,6 @@ namespace NaReTi{
 	struct Config : public LoaderConfig
 	{
 		OptimizationLvl optimizationLvl;
+		int numThreads; // threads used for restricted calls
 	};
 }
