@@ -143,7 +143,7 @@ void testFunc(void* ptr, int i)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//	_CrtSetBreakAlloc(810);
+//	_CrtSetBreakAlloc(13170);
 	bool result = true;
 
 	NaReTi::Config config;
@@ -213,16 +213,18 @@ int _tmain(int argc, _TCHAR* argv[])
 	clock_t beginClock = clock();
 	NaReTi::FunctionHandle hndlWork = scriptEngine.getFuncHndl("much_work");
 	for (int i = 0; i < 4; ++i)
-		scriptEngine.callRestricted<int>(hndlWork, 0.8f, 100);
+		scriptEngine.callRestricted<int>(hndlWork, 0.001f, 100);
 	auto ptr = scriptEngine.testcall<int>(hndlWork, 100);
-	while (true) scriptEngine.checkTasks();
+
 	for (int i = 0; i < 5; ++i)
 		scriptEngine.call<int>(hndlWork, 100);
-
-	while (!ptr->isDone);
 	clock_t endClock = clock();
 
 	cout << (double(endClock - beginClock) / CLOCKS_PER_SEC) << endl;
+
+	scriptEngine.callRestricted<int>(hndlWork, 0.0001f, 100000000);
+	Sleep(1);
+	scriptEngine.checkTasks();
 
 	char tmp;
 	std::cin >> tmp;

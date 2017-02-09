@@ -5,10 +5,11 @@
 #include <vector>
 #include <memory>
 #include <queue>
+#include <windows.h>
 
 namespace utils{
 	template <typename T>
-	class LockFreeQueue {
+	class ThreadSaveQueue {
 	public:
 		void push(const T& value) 
 		{
@@ -54,31 +55,45 @@ namespace utils{
 		typedef std::shared_ptr<Task> TaskHandle;
 
 		ThreadPool(int _numThreads):
-			m_numWorking(0)
+			m_numWorking(0),
+			m_shouldStop(false)
 		{
 			m_threads.reserve(_numThreads);
 			m_flags.resize(_numThreads);
 
 			for (int i = 0; i < _numThreads; ++i)
 			{
-				auto runner = [&]()
-				{
-		//			std::atomic<bool>& flag = *m_flags[i].get();
-					//wait for task
-					while (true)
-					{
-						std::shared_ptr<Task> f;
-						if (m_queue.pop(f))
-						{
-					//		flag = true;
-							(*f)();
-							f->isDone = true;
-					//		flag = false;
-						}
-					}
-				};
-				m_threads.emplace_back(runner);
+				m_threads.emplace_back(newWorker());
 			}
+		}
+
+		/* restarts a thread
+		 * only use this if you know that its current task is still running
+		 */
+		void resetThread(size_t ind)
+		{
+			std::thread t(newWorker());
+
+			t.swap(m_threads[ind]);
+			auto hndl = t.native_handle();
+
+			DWORD exit = 0;
+		//	GetExitCodeThread(hndl, &exit);
+			bool b = TerminateThread(hndl, exit);
+			t.detach();
+
+			auto err = GetLastError();
+			assert(b && "Thread could not be terminated!");
+		}
+
+		~ThreadPool()
+		{
+			// tell threads to finish
+			m_shouldStop = true;
+
+			// wait for them to finish
+			for (auto& thread : m_threads)
+				if (thread.joinable()) thread.join();
 		}
 
 		template<typename... _Args>
@@ -90,12 +105,35 @@ namespace utils{
 			return std::move(ptr);
 		}
 	private:
+		std::thread newWorker()
+		{
+			auto runner = [&]()
+			{
+				//			std::atomic<bool>& flag = *m_flags[i].get();
+				//wait for task
+				while (!m_shouldStop)
+				{
+					std::shared_ptr<Task> f;
+					if (m_queue.pop(f))
+					{
+						//		flag = true;
+						(*f)();
+						f->isDone = true;
+						//		flag = false;
+					}
+				}
+			};
+
+			return std::thread(runner);
+		}
+
 
 		std::vector< std::thread > m_threads;
 		std::vector < std::unique_ptr<std::atomic<bool>> > m_flags;
-		LockFreeQueue< std::shared_ptr<Task> > m_queue;
+		std::atomic<bool> m_shouldStop;
+		ThreadSaveQueue< std::shared_ptr<Task> > m_queue;
 
 		int m_numWorking;
-		std::mutex m_mutex;
+	//	std::mutex m_mutex;
 	};
 }

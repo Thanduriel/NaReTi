@@ -46,6 +46,7 @@ namespace NaReTi
 		delete m_compiler;
 		delete m_parser;
 		delete m_basicModule;
+		delete m_optimizer;
 	}
 
 	// ******************************************************* //
@@ -186,7 +187,7 @@ namespace NaReTi
 		{
 			return _ptr->m_name == _name;
 		});
-
+		
 		return it != m_modules.end() ? it->get() : nullptr;
 	}
 	// ******************************************************* //
@@ -205,7 +206,10 @@ namespace NaReTi
 		for (auto& tr : m_tasks)
 		{
 			if (double(end - tr.begin) / CLOCKS_PER_SEC > tr.maxTime)
+			{
 				cout << "Task takes longer then allowed." << endl;
+				m_threadPool.resetThread(0);
+			}
 		}
 	}
 }
