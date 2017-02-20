@@ -224,6 +224,24 @@ namespace par
 	{
 		auto typeInfo = buildTypeInfo();
 		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>(_attr, typeInfo));
+
+		//invoke constructor
+		if (typeInfo.isReference || typeInfo.type.basic != BasicType::Complex) return;
+		VarSymbol& var = *m_currentScope->m_variables.back();
+		ComplexType& type = typeInfo.type;
+		//todo: with arguments
+		auto it = std::find_if(type.constructors.begin(), type.constructors.end(), [](const Function* _func)
+		{
+			return _func->paramCount == 1;
+		});
+		if (it != type.constructors.end())
+		{
+			ASTCall& call = *m_allocator->construct<ASTCall>();
+			call.function = *it;
+			call.args.push_back(m_allocator->construct<ASTLeafSym>(&var));
+			call.typeInfo = &call.function->returnTypeInfo;
+			m_currentCode->push_back(&call);
+		}
 	}
 
 	void SemanticParser::pushLatestVar()
@@ -266,7 +284,42 @@ namespace par
 	}
 
 	// ************************************************** //
+	void SemanticParser::constructorDec()
+	{
+		ComplexType& t = *m_currentModule->m_types.back();
+		t.constructors.push_back(new Function(t.name + "::constructor", lang::g_module->getBasicTypeInfo(BasicType::Void)));
+		m_currentFunction = t.constructors.back();
+		m_currentModule->m_functions.push_back(m_currentFunction);
 
+		//init environment
+		m_targetScope = &m_currentFunction->scope;
+		m_targetScope->m_parent = m_currentScope->m_parent;
+		//param dec is outside of the following code scope
+		m_currentScope = m_targetScope;
+
+		//this param:
+		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>("this", TypeInfo(t, true)));
+	}
+
+	// ************************************************** //
+	void SemanticParser::destructorDec()
+	{
+		ComplexType& t = *m_currentModule->m_types.back();
+		t.destructor = new Function(t.name + "::destructor", lang::g_module->getBasicTypeInfo(BasicType::Void));
+		m_currentFunction = t.destructor;
+		m_currentModule->m_functions.push_back(m_currentFunction);
+
+		//init environment
+		m_targetScope = &m_currentFunction->scope;
+		m_targetScope->m_parent = m_currentScope->m_parent;
+		//param dec is outside of the following code scope
+		m_currentScope = m_targetScope;
+
+		//this param:
+		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>("this", TypeInfo(t, true))); 
+	}
+
+	// ************************************************** //
 	void SemanticParser::finishTypeDec()
 	{
 		ComplexType& type = *m_currentModule->m_types.back();
@@ -286,20 +339,20 @@ namespace par
 		m_currentFunction = m_currentModule->m_functions.back();
 
 		//detect special functions
-		if (m_currentFunction->name == m_currentFunction->returnTypeInfo.type.name)
-			m_currentFunction->returnTypeInfo.type.constructors.push_back(m_currentFunction);
+	//	if (m_currentFunction->name == m_currentFunction->returnTypeInfo.type.name)
+	//		m_currentFunction->returnTypeInfo.type.constructors.push_back(m_currentFunction);
 
 		if (m_currentFunction->returnTypeInfo.type.basic == BasicType::Complex
 			&& !m_currentFunction->returnTypeInfo.isReference)
 		{
-			Function& func = *m_currentModule->m_functions.back();
+			Function& func = *m_currentFunction;
 			func.scope.m_variables.emplace_back(m_allocator->construct<VarSymbol>("", m_currentFunction->returnTypeInfo));
 			func.scope.m_variables.back()->typeInfo.isReference = true; // it is the pointer to the stack var
 			func.bHiddenParam = true;
 		}
 
 		//init environment
-		m_targetScope = &m_currentModule->m_functions.back()->scope;
+		m_targetScope = &m_currentFunction->scope;
 		m_targetScope->m_parent = m_currentScope;
 		//param dec is outside of the following code scope
 		m_currentScope = m_targetScope;
@@ -307,8 +360,7 @@ namespace par
 
 	void SemanticParser::finishParamList()
 	{
-		Function& function = *m_currentModule->m_functions.back();
-		function.paramCount = (int)function.scope.m_variables.size();
+		m_currentFunction->paramCount = (int)m_currentFunction->scope.m_variables.size();
 	}
 
 	// ************************************************** //
@@ -350,7 +402,7 @@ namespace par
 		}
 		m_targetScope = nullptr;
 		codeNode->parent = m_currentCode;
-		codeNode->m_parent = m_currentCode;
+		if (!codeNode->m_parent) codeNode->m_parent = m_currentCode;
 		m_currentCode = codeNode;
 		m_currentScope = codeNode;
 	}
@@ -359,6 +411,19 @@ namespace par
 
 	void SemanticParser::finishCodeScope()
 	{
+		// check for destructors
+		for (auto var : m_currentScope->m_variables)
+		{
+			if (!var->typeInfo.isReference && var->typeInfo.type.destructor != nullptr)
+			{
+				ASTCall& call = *m_allocator->construct<ASTCall>();
+				call.function = var->typeInfo.type.destructor;
+				call.args.push_back(m_allocator->construct<ASTLeafSym>(var));
+				call.typeInfo = &call.function->returnTypeInfo;
+				m_currentCode->push_back(&call);
+			}
+		}
+
 		//return to the previous scope
 		m_currentCode = m_currentCode->parent;
 		m_currentScope = m_currentScope->m_parent;

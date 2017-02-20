@@ -13,10 +13,22 @@ type array
 
 //proposed generics
 type<T> array
-{
+{	
 	T& data
 	int capacity
 	int size
+	
+	constructor ()
+	{
+		this.data := alloc(16)
+		this.capacity = 2
+		this.size = 0
+	}
+	
+	destructor ()
+	{
+		free(this.data)
+	}
 }
 
 
@@ -25,14 +37,14 @@ T& [](array<T>& arr, int i)
 {
 	return __off(arr.data, i)
 }
-
+/*
 //void &[1] typecast(__Array _arr)
 void init(array<T>& _arr)
 {
 	_arr.data := alloc(16)
 	_arr.capacity = 2
 	_arr.size = 0
-}
+}*/
 
 //ensures that the array has atleast space for _size
 void reserve(array<T>& _arr, int _capacity)

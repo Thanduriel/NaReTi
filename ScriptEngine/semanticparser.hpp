@@ -35,6 +35,8 @@ namespace par
 		void typeDeclaration(std::string& _attr);
 		void genericTypePar(std::string& _attr);
 		void useStatement(std::string& _attr);
+		void constructorDec();
+		void destructorDec();
 		void finishTypeDec();
 		void funcDeclaration(std::string& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function

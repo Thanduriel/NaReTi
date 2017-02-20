@@ -142,17 +142,18 @@ namespace par{
 		//not in use
 		static const size_t UndefSize = 0xFFFFFF;
 
-		ComplexType(){};
+		ComplexType(): destructor(nullptr){};
 		ComplexType(const std::string& _name, BasicType _basicType = Complex) : 
 			Type(_name, _basicType),
-			size(0)
+			size(0),
+			destructor(nullptr)
 		{}
 		CodeScope scope;
 
 		// available casts for this type
 		std::vector< std::unique_ptr<Function> > typeCasts;
 		std::vector< Function* > constructors;
-		std::vector< Function* > destructors;
+		Function* destructor;
 		//offsets of the member vars
 		//is set by the compiler
 		std::vector < int > displacement;

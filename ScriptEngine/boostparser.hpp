@@ -28,8 +28,10 @@ namespace par
 			// by default declarations go to the global scope
 			BaseExpression = 
 				*UseStatement >>
-				*((TypeDeclaration | FuncDeclaration)	[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
-				| VarDeclaration						[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]) >
+				*(TypeDeclaration						[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
+				| FuncDeclaration						[boost::bind(&SemanticParser::resetScope, &m_semanticParser)]
+				| VarDeclaration						[boost::bind(&SemanticParser::finishGeneralExpression, &m_semanticParser)]
+				)>
 				qi::eoi;
 
 			UseStatement =
@@ -39,7 +41,10 @@ namespace par
 			TypeDeclaration = 
 				("type" >> -GenericTypeParam >> Symbol)	[boost::bind(&SemanticParser::typeDeclaration, &m_semanticParser, ::_1)] >>
 				'{' >> 
-				*VarDeclaration >> 
+				*(VarDeclaration 
+				| Constructor							
+				| Destructor							
+				) >>
 				lit('}')								[boost::bind(&SemanticParser::finishTypeDec, &m_semanticParser)];
 
 			//var declaration with optional init: int a = 10
@@ -58,12 +63,26 @@ namespace par
 				(TypeInformation >> 
 				(Symbol | Operator | qi::string("[]")) >> 
 				'(')									[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
-				-VarDeclaration >> 
-				*(',' > VarDeclaration) >> 
+				FuncBody
+				;
+
+			FuncBody = -VarDeclaration >>
+				*(',' > VarDeclaration) >>
 				lit(')')								[boost::bind(&SemanticParser::finishParamList, &m_semanticParser)] >>
 				(lit("external")						[boost::bind(&SemanticParser::makeExternal, &m_semanticParser)]
 				| CodeScope)
 				;
+
+			Constructor =
+				lit("constructor")						[boost::bind(&SemanticParser::constructorDec, &m_semanticParser)] >>
+				lit('(') >> FuncBody
+				;
+
+			Destructor =
+				lit("destructor")						[boost::bind(&SemanticParser::destructorDec, &m_semanticParser)] >>
+				lit('(') >> FuncBody
+				;
+
 
 			GenericTypeParam =
 				'<' >>
@@ -197,7 +216,10 @@ namespace par
 		qi::rule<Iterator, Skipper> VarDeclaration;
 		qi::rule<Iterator, Skipper> UseStatement;
 		qi::rule<Iterator, Skipper> FuncDeclaration;
+		qi::rule<Iterator, Skipper> FuncBody;
 
+		qi::rule<Iterator, Skipper> Constructor;
+		qi::rule<Iterator, Skipper> Destructor;
 		qi::rule<Iterator, Skipper> TypeInformation;
 		qi::rule<Iterator, Skipper> TypeAttr;
 		qi::rule<Iterator, Skipper> GenericTypeParam;

@@ -252,7 +252,6 @@ float test_exportVar()
 int test_array()
 {
 	iVec2[0] array
-	init(array)
 	
 	iVec2 vec
 	vec.x = 2 vec.y = 3
