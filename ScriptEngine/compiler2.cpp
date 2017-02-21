@@ -239,7 +239,6 @@ namespace codeGen{
 	}
 
 	// *************************************************** //
-
 	void Compiler::compileCode(ASTCode& _node, int _preAllocCount)
 	{
 		//create local vars in this scope
@@ -279,6 +278,8 @@ namespace codeGen{
 				compileCall(*(ASTCall*)subNode, false);
 				break;
 			case ASTType::Ret:
+				// return needs the current scope to call its epilogue
+				m_currentCodeNode = &_node;
 				ASTReturn* retNode = (ASTReturn*)subNode;
 				if (retNode->body && retNode->body->typeInfo->type.basic == BasicType::Float && !retNode->body->typeInfo->isReference)
 					compileRetF(*(ASTReturn*)subNode);
@@ -287,6 +288,12 @@ namespace codeGen{
 			}
 		}
 
+		compileEpilogue(_node);
+	}
+
+	// *************************************************** //
+	void Compiler::compileEpilogue(const par::ASTCode& _node)
+	{
 		//write back changed addresses of globals
 		//todo: rework way globals are handled
 		//they should not be imported to regs/stack, instead use mem access
@@ -297,10 +304,33 @@ namespace codeGen{
 				X86GpVar& gpVar = getUnusedVar();
 				m_compiler.mov(gpVar, asmjit::imm_ptr(&var.sym->ownership.rawPtr));
 
-			//	m_compiler.mov(*(X86GpVar*)var.sym->compiledVar, imm(2));
-				m_compiler.mov(asmjit::Mem(gpVar,0), *(X86GpVar*)var.sym->compiledVar);
+				//	m_compiler.mov(*(X86GpVar*)var.sym->compiledVar, imm(2));
+				m_compiler.mov(asmjit::Mem(gpVar, 0), *(X86GpVar*)var.sym->compiledVar);
 			}
 		}
+		for (auto& subNode : _node.epilogue)
+		{
+			switch (subNode->type)
+			{
+			case ASTType::Code:
+				compileCode(*(ASTCode*)subNode);
+				break;
+			case ASTType::Branch:
+				compileBranch(*(ASTBranch*)subNode);
+				break;
+			case ASTType::Loop:
+				compileLoop(*(ASTLoop*)subNode);
+				break;
+			case ASTType::Call:
+				compileCall(*(ASTCall*)subNode, false);
+				break;
+			case ASTType::Ret:
+				assert(true && "There should be no return statement in the epilogue");
+				break;
+			}
+		}
+		// resolve higher level scopes
+	//	if (_node.m_parent) compileEpilogue(*_node.parent);
 	}
 
 	// *************************************************** //
@@ -703,6 +733,8 @@ namespace codeGen{
 			var = &dest;
 		}
 
+		compileEpilogue(*m_currentCodeNode);
+
 		//currently inlining
 		if (m_retDstStack.size())
 		{
@@ -734,6 +766,8 @@ namespace codeGen{
 		{
 			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
+
+		compileEpilogue(*m_currentCodeNode);
 
 		if (m_retDstStack.size())
 		{

@@ -54,6 +54,7 @@ namespace codeGen
 		void compileFuction(par::Function& _function);
 		//@param _preAllocCount local variables that are already allocated
 		void compileCode(par::ASTCode& _node, int _preAllocCount = 0);
+		void compileEpilogue(const par::ASTCode& _node);
 		//@param _dest where the result should be stored
 		//@return the destination of the return
 		asmjit::Var* compileCall(par::ASTCall& _node, bool _keepRet = true, asmjit::Var* _dest = nullptr);
@@ -79,6 +80,8 @@ namespace codeGen
 
 		UsageState getUsageState() const { return m_usageState; }
 		void setUsageState(const UsageState& _newState) { m_usageState = _newState; }
+
+		par::ASTCode* m_currentCodeNode;
 		// returns a virtual register currently not in use
 		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)
 		asmjit::X86GpVar& getUnusedVar32();
@@ -94,7 +97,7 @@ namespace codeGen
 
 		par::Function* m_function; // currently compiled function
 		asmjit::X86GpVar* m_accumulator; //asmjit temp var of the currently compiled function
-		asmjit::X86XmmVar* m_fp0;
+
 		//virtual registers used
 		std::vector<asmjit::X86GpVar> m_anonymousVars;
 		std::vector<asmjit::X86GpVar> m_anonymousVars32;

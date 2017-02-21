@@ -55,12 +55,15 @@ namespace par{
 		VarSymbol* returnSub;
 	};
 
+	typedef std::vector< ASTNode* > Text;
+
 	struct ASTCode : public ASTNode, 
 		public CodeScope, 
-		public std::vector< ASTNode* >
+		public Text
 	{
 		ASTCode() { type = ASTType::Code; }
 		ASTCode* parent;
+		Text epilogue; // destructor calls
 	};
 
 	//function symbol; just here because of cross-links between ast and symbols

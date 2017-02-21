@@ -411,7 +411,7 @@ namespace par
 
 	void SemanticParser::finishCodeScope()
 	{
-		// check for destructors
+		// check for destructors and build epilogue
 		for (auto var : m_currentScope->m_variables)
 		{
 			if (!var->typeInfo.isReference && var->typeInfo.type.destructor != nullptr)
@@ -420,7 +420,7 @@ namespace par
 				call.function = var->typeInfo.type.destructor;
 				call.args.push_back(m_allocator->construct<ASTLeafSym>(var));
 				call.typeInfo = &call.function->returnTypeInfo;
-				m_currentCode->push_back(&call);
+				m_currentCode->epilogue.push_back(&call);
 			}
 		}
 
