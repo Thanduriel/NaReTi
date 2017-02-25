@@ -130,8 +130,8 @@ namespace par
 		int off = _func.bHiddenParam ? 1 : 0;
 		for (int i = 0; i < (int)_node.args.size(); ++i)
 		{
-			TypeInfo& t0 = *_node.args[i]->typeInfo;
-			TypeInfo& t1 = _func.scope.m_variables[i+off]->typeInfo;
+			const TypeInfo& t0 = *_node.args[i]->typeInfo;
+			const TypeInfo& t1 = _func.scope.m_variables[i+off]->typeInfo;
 			if (t1.type.name == "DisplayValue")
 				int brk = 12;
 			if (t0 == t1) continue;
@@ -159,7 +159,7 @@ namespace par
 
 	// ************************************************** //
 
-	Function* SemanticParser::typeCast(TypeInfo& _t0, TypeInfo& _t1)
+	Function* SemanticParser::typeCast(const TypeInfo& _t0, const TypeInfo& _t1) const
 	{
 		for (auto& cast : _t0.type.typeCasts)
 		{
@@ -293,6 +293,7 @@ namespace par
 
 		//init environment
 		m_targetScope = &m_currentFunction->scope;
+		// don't use the types scope as parent, otherwise the member vars are linked as regular vars
 		m_targetScope->m_parent = m_currentScope->m_parent;
 		//param dec is outside of the following code scope
 		m_currentScope = m_targetScope;
@@ -640,8 +641,8 @@ namespace par
 	void SemanticParser::pushString(std::string& _str)
 	{
 		ASTUnlinkedSym* leaf = m_allocator->construct<ASTUnlinkedSym>(_str);
-		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::String));
-		leaf->typeInfo->isReference = true; // actually false, but strings can not be used as value currently
+		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::String), true);
+		// actually not a reference, but strings can not be used as value currently
 		m_stack.push_back(leaf);
 	}
 

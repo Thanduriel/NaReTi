@@ -312,25 +312,19 @@ namespace codeGen{
 		{
 			switch (subNode->type)
 			{
-			case ASTType::Code:
-				compileCode(*(ASTCode*)subNode);
-				break;
-			case ASTType::Branch:
-				compileBranch(*(ASTBranch*)subNode);
-				break;
-			case ASTType::Loop:
-				compileLoop(*(ASTLoop*)subNode);
-				break;
 			case ASTType::Call:
 				compileCall(*(ASTCall*)subNode, false);
 				break;
+			case ASTType::Branch:
+			case ASTType::Loop:
+			case ASTType::Code:
 			case ASTType::Ret:
-				assert(true && "There should be no return statement in the epilogue");
+				assert(true && "There should be no such statement in the epilogue");
 				break;
 			}
 		}
-		// resolve higher level scopes
-	//	if (_node.m_parent) compileEpilogue(*_node.parent);
+		// resolve higher level scopes; stop before reaching the global scope
+		if (_node.parent && _node.parent->parent) compileEpilogue(*_node.parent);
 	}
 
 	// *************************************************** //
@@ -962,7 +956,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::Var* Compiler::getUnusedVarAuto(TypeInfo& _typeInfo)
+	asmjit::Var* Compiler::getUnusedVarAuto(const TypeInfo& _typeInfo)
 	{
 		if (_typeInfo.isReference || _typeInfo.type.basic == BasicType::Complex) //complex is always a reference
 			return &getUnusedVar();

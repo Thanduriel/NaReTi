@@ -23,12 +23,15 @@ namespace lang
 		~BasicModule();
 		void initConstants();
 
+		const par::ComplexType& getBasicType(par::BasicType _basicType) const;
 		par::ComplexType& getBasicType(par::BasicType _basicType);
-		par::TypeInfo& getBasicTypeInfo(par::BasicType _basicType);
+		const par::TypeInfo& getBasicTypeInfo(par::BasicType _basicType) const;
 		int getPrecedence(const std::string& _op);
 
 		par::Function* tryBasicCast(const par::TypeInfo& _lhs, const par::TypeInfo& _rhs);
 	private:
+		void buildStringType();
+
 		void makeConstant(const std::string& _name, int _val);
 
 		std::array< par::TypeInfo*, 7 > m_typeInfos;

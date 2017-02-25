@@ -203,6 +203,7 @@
     <ClInclude Include="skipper.hpp" />
     <ClInclude Include="stackalloc.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="string.hpp" />
     <ClInclude Include="symbols.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="threadpool.hpp" />

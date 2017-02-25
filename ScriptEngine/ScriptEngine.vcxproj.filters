@@ -138,6 +138,9 @@
     <ClInclude Include="threadpool.hpp">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="string.hpp">
+      <Filter>lang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

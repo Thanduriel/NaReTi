@@ -41,7 +41,7 @@ namespace par{
 	// node with a type
 	struct ASTExpNode : public ASTNode
 	{
-		TypeInfo* typeInfo;
+		const TypeInfo* typeInfo;
 	};
 
 	struct ASTCall : public ASTExpNode
@@ -61,7 +61,7 @@ namespace par{
 		public CodeScope, 
 		public Text
 	{
-		ASTCode() { type = ASTType::Code; }
+		ASTCode() : parent(0) { type = ASTType::Code; }
 		ASTCode* parent;
 		Text epilogue; // destructor calls
 	};
@@ -75,9 +75,9 @@ namespace par{
 		// general purpose T1 x T2 -> T0
 		Function(utils::DetorAlloc& _alloc, const std::string& _name, std::initializer_list<InstructionType> _instr, ComplexType& _t0, ComplexType* _t1, ComplexType* _t2);
 		//typecast
-		Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1);
+		Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, const TypeInfo& _t0, const TypeInfo& _t1);
 		//standard
-		Function(const std::string& _name, TypeInfo& _type) : Symbol(_name), returnTypeInfo(_type), bExternal(false), bHiddenParam(false), bInline(false), bIntrinsic(false){};
+		Function(const std::string& _name, const TypeInfo& _type) : Symbol(_name), returnTypeInfo(_type), bExternal(false), bHiddenParam(false), bInline(false), bIntrinsic(false){};
 
 		TypeInfo returnTypeInfo;
 		ASTCode scope;

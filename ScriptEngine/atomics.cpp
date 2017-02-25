@@ -179,16 +179,23 @@ namespace lang
 		*(int*)m_text->m_variables[1]->ownership.rawPtr = 0;
 	}
 
+	// ******************************************************* //
+	const par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType) const
+	{
+		return *m_types[_basicType];
+	}
+
 	par::ComplexType& BasicModule::getBasicType(par::BasicType _basicType)
 	{
 		return *m_types[_basicType];
 	}
 
-	TypeInfo& BasicModule::getBasicTypeInfo(BasicType _basicType)
+	const TypeInfo& BasicModule::getBasicTypeInfo(BasicType _basicType) const
 	{
 		return *m_typeInfos[_basicType];
 	}
 
+	// ******************************************************* //
 	int BasicModule::getPrecedence(const std::string& _op)
 	{
 		for (auto& prec : m_precedence)
@@ -197,6 +204,7 @@ namespace lang
 		return 1; // unknown operator or function takes precedence
 	}
 
+	// ******************************************************* //
 	par::Function* BasicModule::tryBasicCast(const par::TypeInfo& _lhs, const par::TypeInfo& _rhs)
 	{
 		//const copy to non const
@@ -205,6 +213,7 @@ namespace lang
 		return nullptr;
 	}
 
+	// ******************************************************* //
 	void BasicModule::makeConstant(const std::string& _name, int _val)
 	{
 		m_text->m_variables.push_back(m_allocator.construct<par::VarSymbol>(_name, par::TypeInfo(*m_types[BasicType::Int], false, true)));
@@ -216,5 +225,13 @@ namespace lang
 
 		//write value
 		*(int*)var.ownership.rawPtr = _val;*/
+	}
+
+	// ******************************************************* //
+	void BasicModule::buildStringType()
+	{
+		ComplexType& type = getBasicType(BasicType::String);
+		// constructors:
+		
 	}
 }

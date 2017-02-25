@@ -37,7 +37,7 @@ namespace par{
 			scope.emplace_back(_alloc.construct<ASTOp>(instr));
 	};
 
-	Function::Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, TypeInfo& _t0, TypeInfo& _t1)
+	Function::Function(utils::DetorAlloc& _alloc, const std::string& _name, InstructionType _instr, const TypeInfo& _t0, const TypeInfo& _t1)
 		: Function(_name, TypeInfo(_t0))
 	{
 		bInline = true;

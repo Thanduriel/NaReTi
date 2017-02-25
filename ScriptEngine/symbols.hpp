@@ -86,7 +86,7 @@ namespace par{
 
 	struct VarSymbol : public Symbol, public codeGen::CVarSymbol, public utils::DetorAlloc::Destructible
 	{
-		VarSymbol(const std::string& _name, TypeInfo& _typeInfo) :
+		VarSymbol(const std::string& _name, const TypeInfo& _typeInfo) :
 			Symbol(_name),
 			typeInfo(_typeInfo)
 		{}

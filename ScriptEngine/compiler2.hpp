@@ -86,7 +86,7 @@ namespace codeGen
 		asmjit::X86GpVar& getUnusedVar(); //native size var (x86: 32bit; x64: 64bit)
 		asmjit::X86GpVar& getUnusedVar32();
 		asmjit::X86XmmVar& getUnusedFloat();
-		asmjit::Var* getUnusedVarAuto(par::TypeInfo& _typeInfo); // returns the right var for the given type
+		asmjit::Var* getUnusedVarAuto(const par::TypeInfo& _typeInfo); // returns the right var for the given type
 		void resetRegisters();
 
 
