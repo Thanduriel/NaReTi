@@ -63,12 +63,12 @@ namespace par{
 		}
 		catch (ParsingError& _error) //semantic errors
 		{
-			parsingError(_text.begin(), g_lastIterator, _text.end(), _error.message);
+			parsingError(_text.begin(), g_lastIterator, _text.end(), _error.message, _module);
 			return false;
 		}
 		catch (qi::expectation_failure<pos_iterator_type>& e) //syntax errors
 		{
-			parsingError(_text.begin(), e.first, _text.end(), string("Syntax error: did not expect \"") + *e.first + "\"");
+			parsingError(_text.begin(), e.first, _text.end(), string("Syntax error: did not expect \"") + *e.first + "\"", _module);
 			return false;
 		}
 
@@ -78,7 +78,7 @@ namespace par{
 		return b;
 	}
 
-	void BasicParser::parsingError(str_it _begin, const str_it& _it, const str_it& _end, const std::string& _msg)
+	void BasicParser::parsingError(str_it _begin, const str_it& _it, const str_it& _end, const std::string& _msg, const NaReTi::Module& _module)
 	{
 		int lineCount = 1; //lines are numbered beginning with 1
 		str_it lastLb(_begin);
@@ -95,6 +95,6 @@ namespace par{
 		str_it nextLb(lastLb); //start at last endl because _it might be an '\n'
 		while (nextLb != _end && *nextLb++ != '\n');
 
-		LOG(Error, "[l." << lineCount << "] " << _msg << '\n' << string(++lastLb, nextLb));
+		LOG(Error, "[" << _module.m_name << "] " << "[l." << lineCount << "] " << _msg << '\n' << string(++lastLb, nextLb));
 	}
 }

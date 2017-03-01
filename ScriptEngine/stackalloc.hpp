@@ -25,8 +25,10 @@ namespace utils{
 			if (sp - (char*)memBlocks[bp] + sizeof(_T) > _BlockSize) newBlock();
 
 			//call constructor
-			auto ptr = new(sp) (_T)( std::forward< _Args >(_args)...);
+			auto spBeg = sp;
+			// increase before in case that the constructor allocates a buffer with this allocator 
 			sp += sizeof(_T);
+			auto ptr = new(spBeg)(_T)(std::forward< _Args >(_args)...);
 			return ptr;
 		}
 

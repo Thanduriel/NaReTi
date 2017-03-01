@@ -9,6 +9,7 @@
 #include "parser.hpp"
 #include "generics.hpp"
 #include "optimizer.hpp"
+#include "stringlib.hpp"
 
 using namespace std;
 
@@ -31,6 +32,11 @@ namespace NaReTi
 		m_genericsParser = new par::GenericsParser(m_moduleLoader);
 		par::g_genericsParser = m_genericsParser;
 		//g_module is set in BasicModule::BasicModule
+
+		//setup string
+		lang::StringModule* strMod = new lang::StringModule();
+		loadModule(*strMod);
+		m_modules.emplace_back(strMod);
 
 		//setup std math lib
 		lang::MathModule* module = new lang::MathModule();

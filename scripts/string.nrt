@@ -1,0 +1,52 @@
+
+use externals
+
+type string
+{	
+	char& data
+	int capacity
+	int size
+	
+	constructor ()
+	{
+		this.data := alloc(2)
+		this.capacity = 2
+		this.size = 0
+	}
+	
+	destructor ()
+	{
+		free(this.data)
+	}
+}
+
+
+
+char& [](string& str, int i)
+{
+	return __off(str.data, i)
+}
+
+//ensures that the array has atleast space for _size
+void reserve(string& str, int _capacity)
+{
+	if(_capacity > str.capacity)
+	{
+		char& dat := str.data
+		
+		str.capacity = _capacity * 1.5
+
+		str.data := alloc(str.capacity * sizeof(char))
+		
+		if(str.size != 0) {memcpy(str.data, dat, str.size)}
+		
+		free(dat)
+	}
+}
+
+void =(string& str, string_literal& lit)
+{
+	reserve(str, lit.size)
+	str.size = lit.size
+	memcpy(str.data, lit._buf, lit.size)
+}

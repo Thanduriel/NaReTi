@@ -5,6 +5,8 @@
 #include "defmacros.hpp"
 #include "symbols.hpp"
 #include "ast.hpp"
+#include "generics.hpp"
+#include "typedefault.hpp"
 
 namespace lang
 {
@@ -25,6 +27,13 @@ namespace lang
 	void __freeBoundFunc(void* _ptr)
 	{
 		free(_ptr);//__runtime->getMemMgr()->release(_ptr);
+	}
+
+	void __cpyBoundFunc(void* _dst, void* _src, int _size)
+	{
+		auto d = reinterpret_cast<char*>(_dst);
+		auto ptr = reinterpret_cast<char*>(_src);
+		memcpy(_dst, _src, _size);
 	}
 
 	BasicModule::BasicModule(asmjit::JitRuntime& _runtime) :
@@ -64,7 +73,8 @@ namespace lang
 		//basic types
 		m_types[BasicType::Int] = new ComplexType("int", BasicType::Int); m_types[BasicType::Int]->size = 4; m_types[BasicType::Int]->alignment = 16;
 		m_types[BasicType::Float] = new ComplexType("float", BasicType::Float); m_types[BasicType::Float]->size = 4;
-		m_types[BasicType::String] = new ComplexType("string", BasicType::String);
+		m_types[BasicType::String] = new ComplexType("string_literal", BasicType::String); m_types[BasicType::String]->size = 0;
+		m_types[BasicType::Char] = new ComplexType("char", BasicType::Char); m_types[BasicType::Char]->size = 1;
 		m_types[BasicType::Void] = new ComplexType("void", BasicType::Void);
 		m_types[BasicType::Bool] = new ComplexType("bool", BasicType::Bool); m_types[BasicType::Bool]->size = 4;
 		m_types[BasicType::FlagBool] = new ComplexType("flagBool", BasicType::FlagBool); m_types[BasicType::FlagBool]->size = 4;
@@ -94,7 +104,6 @@ namespace lang
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set);
 		//assignment to address is currently decided by the compiler
 		// this is only to make sure that no typecast is necessary
-		//todo: better concept for ref assign
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true;
 		BASICOPERATION("<<", BasicType::Int, InstructionType::ShL);
 		BASICOPERATION(">>", BasicType::Int, InstructionType::ShR);
@@ -143,6 +152,17 @@ namespace lang
 		voidFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("i", TypeInfo(*m_types[Int])));
 		voidFunc.paramCount = 1;
 		
+		// string stuff
+		TypeDefaultGen typeGen;
+		typeGen.buildRefAssignment(*m_types[BasicType::Char], *this);
+		typeGen.buildElemAccess(*m_types[BasicType::Char], *this);
+
+		// string_lit size
+		m_types[BasicType::String]->scope.m_variables.push_back(m_allocator.construct<VarSymbol>("_buf", TypeInfo(getBasicType(BasicType::Char), true)));
+		m_types[BasicType::String]->scope.m_variables.push_back(m_allocator.construct<VarSymbol>("size", TypeInfo(getBasicType(BasicType::Int))));
+
+		
+
 
 		//build function for dynamic allocation
 		m_functions.emplace_back(new Function("alloc", TypeInfo(*m_types[BasicType::Void], true)));
@@ -158,6 +178,16 @@ namespace lang
 		freeFunc.paramCount = 1;
 		freeFunc.bExternal = true;
 		linkExternal("free", &__freeBoundFunc);
+
+		// fast mem copy
+		m_functions.emplace_back(new Function("memcpy", TypeInfo(*m_types[BasicType::Void])));
+		Function& cpyFunc = *m_functions.back();
+		cpyFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("dst", TypeInfo(*m_types[Void], true)));
+		cpyFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("src", TypeInfo(*m_types[Void], true)));
+		cpyFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("size", TypeInfo(*m_types[Int])));
+		cpyFunc.paramCount = 3;
+		cpyFunc.bExternal = true;
+		linkExternal("memcpy", &__cpyBoundFunc);
 
 		//global constants
 		makeConstant("true", 1);
@@ -207,8 +237,11 @@ namespace lang
 	// ******************************************************* //
 	par::Function* BasicModule::tryBasicCast(const par::TypeInfo& _lhs, const par::TypeInfo& _rhs)
 	{
-		//const copy to non const
-		if (&_lhs.type == &_rhs.type && !_rhs.isReference)
+		// const copy to non const
+		// void& -> any&; any& -> void&
+		if (&_lhs.type == &_rhs.type && !_rhs.isReference 
+			|| _lhs.isReference && _rhs.isReference 
+			&& (&_rhs.type == &getBasicType(BasicType::Void) || &_lhs.type == &getBasicType(BasicType::Void)))
 			return m_dummyCast.get();
 		return nullptr;
 	}
@@ -225,13 +258,5 @@ namespace lang
 
 		//write value
 		*(int*)var.ownership.rawPtr = _val;*/
-	}
-
-	// ******************************************************* //
-	void BasicModule::buildStringType()
-	{
-		ComplexType& type = getBasicType(BasicType::String);
-		// constructors:
-		
 	}
 }

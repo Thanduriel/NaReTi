@@ -39,9 +39,9 @@ void printF(float num)
 	cout << num << endl;
 }
 
-void printStr(char* _str)
+void printStr(char** _str)
 {
-	cout << _str << endl;
+	cout << *_str << endl;
 }
 
 struct Vec2

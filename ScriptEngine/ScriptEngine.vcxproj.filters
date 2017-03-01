@@ -138,8 +138,11 @@
     <ClInclude Include="threadpool.hpp">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="string.hpp">
+    <ClInclude Include="stringlib.hpp">
       <Filter>lang</Filter>
+    </ClInclude>
+    <ClInclude Include="immstring.hpp">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +192,9 @@
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="typedefault.cpp">
+      <Filter>lang</Filter>
+    </ClCompile>
+    <ClCompile Include="stringlib.cpp">
       <Filter>lang</Filter>
     </ClCompile>
   </ItemGroup>

@@ -101,6 +101,8 @@ namespace par
 		//same error as in linkCall
 		if (_node.args[0]->type == ASTType::String) 
 			throw ParsingError("Unknown Symbol: " + ((ASTUnlinkedSym*)_node.args[0])->name);
+		if (_node.args[1]->type == ASTType::Call)
+			throw ParsingError(std::string("\".") + static_cast<ASTCall*>(_node.args[1])->name + "()\" " + "This calls are currently not part of NaReTi.");
 
 		ASTUnlinkedSym* strLeaf = (ASTUnlinkedSym*)_node.args[1];
 		size_t i = 0;
@@ -640,7 +642,11 @@ namespace par
 
 	void SemanticParser::pushString(std::string& _str)
 	{
-		ASTUnlinkedSym* leaf = m_allocator->construct<ASTUnlinkedSym>(_str);
+		int b = offsetof(utils::ImmString, buf);
+		int s = offsetof(utils::ImmString, size);
+		int test = sizeof(utils::ImmString);
+//		ASTUnlinkedSym* leaf = m_allocator->construct<ASTUnlinkedSym>(_str);
+		ASTLeafStr* leaf = m_allocator->constructUnsafe<ASTLeafStr>(*m_allocator, _str);
 		leaf->typeInfo = m_allocator->constructUnsafe<TypeInfo>(lang::g_module->getBasicType(BasicType::String), true);
 		// actually not a reference, but strings can not be used as value currently
 		m_stack.push_back(leaf);

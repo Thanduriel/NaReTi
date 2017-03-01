@@ -3,6 +3,7 @@ use math
 use random
 use externals
 use vector
+use string
 
 //use this to get a breakpoint in the compiler
 void breakpoint()

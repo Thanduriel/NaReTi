@@ -185,6 +185,7 @@
     <ClInclude Include="defmacros.hpp" />
     <ClInclude Include="enginetypes.hpp" />
     <ClInclude Include="generics.hpp" />
+    <ClInclude Include="immstring.hpp" />
     <ClInclude Include="instruction.hpp" />
     <ClInclude Include="iterator.hpp" />
     <ClInclude Include="logger.hpp" />
@@ -203,7 +204,7 @@
     <ClInclude Include="skipper.hpp" />
     <ClInclude Include="stackalloc.hpp" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="string.hpp" />
+    <ClInclude Include="stringlib.hpp" />
     <ClInclude Include="symbols.hpp" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="threadpool.hpp" />
@@ -229,6 +230,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="stringlib.cpp" />
     <ClCompile Include="symbols.cpp" />
     <ClCompile Include="typedefault.cpp" />
   </ItemGroup>

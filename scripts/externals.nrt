@@ -1,5 +1,5 @@
 void printI(int num) external
 void printF(float num) external
-void printStr(string& str) external
+void printStr(string_literal& str) external
 int getTickCount() external
 int fooAdd2(int i) external

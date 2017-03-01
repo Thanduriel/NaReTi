@@ -1,5 +1,6 @@
 
 use math
+use string
 use random
 use externals
 use vector
@@ -132,6 +133,11 @@ int test_performance()
 
 DisplayValue dp = DisplayValue(3.0, DISPLAYMODE_ONLYBAR)
 
+void strSize(string_literal& str)
+{
+	printI(str.size)
+}
+
 void main()
 {
 
@@ -181,6 +187,9 @@ void main()
 
 	printF(dp.value)
 	printI(dp.mode)
+
+	string str = "0123456789"
+	printI(str.size)
 }
 
 void much_work(int howMuch)

@@ -34,6 +34,7 @@ namespace par
 		Mov, //simple mov reg,reg
 		Set, // uses first reg as address depending on the argument input
 		fSet,
+		Mov8, // move for single bytes
 		//load value from adr
 		Ld,
 		fLd,

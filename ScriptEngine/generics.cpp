@@ -10,9 +10,9 @@ namespace par{
 
 	std::string GenericsParser::mangledName(const std::string& _name, const std::vector<std::string>& _args)
 	{
-		string mangled = _name + "<";
-		for (auto& argName : _args)
-			mangled += argName + ",";
+		string mangled = _name + "<" + _args[0];
+		for (size_t i = 0; i < _args.size(); ++i)
+			mangled += "," + _args[i];
 		mangled += ">";
 
 		return std::move(mangled);

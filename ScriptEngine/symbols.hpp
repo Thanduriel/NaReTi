@@ -25,9 +25,10 @@ namespace par{
 		Float,
 		Bool,
 		String,
+		Char,
 		Void, //when no type is given it is implicitly void
 		FlagBool, // bool in the form of eflags after a cmp instr
-		Undefined, // a type with on allowed operations
+		Undefined, // a type without allowed operations
 		Count,
 		Complex
 	};

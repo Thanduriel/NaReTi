@@ -5,6 +5,7 @@
 #include "symbols.hpp"
 #include "instruction.hpp"
 #include "complexalloc.hpp"
+#include "immstring.hpp"
 
 namespace par{
 
@@ -30,7 +31,8 @@ namespace par{
 		LeafSym,
 		LeafFloat,
 		LeafSizeOf,
-		LeafAddress
+		LeafAddress,
+		LeafString
 	};
 
 	struct ASTNode : public utils::DetorAlloc::Destructible
@@ -129,7 +131,14 @@ namespace par{
 	template < typename _T, ASTType _astType>
 	struct ASTLeafT : public ASTExpNode
 	{
-		ASTLeafT(_T _value) : value(_value)
+		template< typename... _Args>
+		ASTLeafT(_Args&&... _args) : value(std::forward<_Args>(_args)...)
+		{
+			static_assert((int)_astType > (int)ASTType::Leaf, "Leaf types have to be at the end of the type enum.");
+			type = _astType;
+		}
+
+		ASTLeafT(_T&& _value) : value(_value)
 		{ 
 			static_assert((int)_astType > (int)ASTType::Leaf, "Leaf types have to be at the end of the type enum.");
 			type = _astType;
@@ -143,7 +152,9 @@ namespace par{
 	typedef ASTLeafT<VarSymbol*, ASTType::LeafSym> ASTLeafSym;
 	typedef ASTLeafT<TypeInfo, ASTType::LeafSizeOf> ASTSizeOf;
 	typedef ASTLeafT<uint64_t, ASTType::LeafAddress> ASTLeafAdr;
-
+	typedef ASTLeafT<utils::ImmString, ASTType::LeafString> ASTLeafStr;
+	
+	
 	struct ASTUnlinkedSym : public ASTExpNode
 	{
 		ASTUnlinkedSym(const std::string& _name) : name(_name){ type = ASTType::String; }

@@ -386,10 +386,13 @@ namespace codeGen{
 				break;
 			}
 			case ASTType::String:
+				assert(false && "This type is not in use anymore.");
+				break;
+			case ASTType::LeafString:
 			{
 				X86GpVar& var = getUnusedVar();
 				args.push_back(&var);
-				m_compiler.mov(var, imm_ptr(((ASTUnlinkedSym*)arg)->name.c_str()));
+				m_compiler.mov(var, imm_ptr(&(static_cast<ASTLeafStr*>(arg)->value))); //->value.buf
 				break;
 			}
 			case ASTType::Member:
@@ -962,7 +965,7 @@ namespace codeGen{
 			return &getUnusedVar();
 		else if (_typeInfo.type.basic == BasicType::Float)
 			return &getUnusedFloat();
-		else if (_typeInfo.type.size == 4)
+		else if (_typeInfo.type.size <= 4)
 			return &getUnusedVar32();
 		else if (_typeInfo.type.basic == BasicType::Void)
 			return nullptr;
