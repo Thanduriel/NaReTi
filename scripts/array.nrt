@@ -35,16 +35,9 @@ type<T> array
 
 T& [](array<T>& arr, int i)
 {
-	return __off(arr.data, i)
+	return __off(arr.data, i * sizeof(T))
 }
-/*
-//void &[1] typecast(__Array _arr)
-void init(array<T>& _arr)
-{
-	_arr.data := alloc(16)
-	_arr.capacity = 2
-	_arr.size = 0
-}*/
+
 
 //ensures that the array has atleast space for _size
 void reserve(array<T>& _arr, int _capacity)
@@ -57,7 +50,7 @@ void reserve(array<T>& _arr, int _capacity)
 
 		_arr.data := alloc(_arr.capacity * sizeof(T))
 		int i = -1
-		while(++i < _arr.size) { _arr[i] = __off(dat, i) }
+		while(++i < _arr.size) { _arr[i] = __off(dat, i * sizeof(T)) }
 		
 		free(dat)
 	}

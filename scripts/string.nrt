@@ -4,8 +4,8 @@ use externals
 type string
 {	
 	char& data
-	int capacity
 	int size
+	int capacity
 	
 	constructor ()
 	{
@@ -30,6 +30,7 @@ char& [](string& str, int i)
 //ensures that the array has atleast space for _size
 void reserve(string& str, int _capacity)
 {
+	++_capacity // ensure space for a \0
 	if(_capacity > str.capacity)
 	{
 		char& dat := str.data
@@ -46,7 +47,16 @@ void reserve(string& str, int _capacity)
 
 void =(string& str, string_literal& lit)
 {
-	reserve(str, lit.size)
+	int s = lit.size
+	reserve(str, s)
 	str.size = lit.size
-	memcpy(str.data, lit._buf, lit.size)
+	memcpy(str.data, lit._buf, s+1)
+}
+
+void +=(string& lhs, string& rhs)
+{
+	int s = lhs.size + rhs.size
+	reserve(lhs, s)
+	memcpy(__off(lhs.data, lhs.size), rhs.data, rhs.size + 1)
+	lhs.size = s
 }

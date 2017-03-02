@@ -36,6 +36,7 @@ namespace NaReTi
 		//setup string
 		lang::StringModule* strMod = new lang::StringModule();
 		loadModule(*strMod);
+		strMod->buildFunctions();
 		m_modules.emplace_back(strMod);
 
 		//setup std math lib

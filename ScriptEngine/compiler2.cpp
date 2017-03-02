@@ -620,7 +620,7 @@ namespace codeGen{
 			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
 			break;
 		case LdO:
-			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 3)); //2
+			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 0)); //2
 			break;
 		case Cmp:
 			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);

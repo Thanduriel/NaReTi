@@ -161,7 +161,7 @@ namespace lang
 		m_types[BasicType::String]->scope.m_variables.push_back(m_allocator.construct<VarSymbol>("_buf", TypeInfo(getBasicType(BasicType::Char), true)));
 		m_types[BasicType::String]->scope.m_variables.push_back(m_allocator.construct<VarSymbol>("size", TypeInfo(getBasicType(BasicType::Int))));
 
-		
+		// string_lit -> string; since they have a similar layout this cast is free
 
 
 		//build function for dynamic allocation

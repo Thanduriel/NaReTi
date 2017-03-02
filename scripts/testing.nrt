@@ -189,7 +189,9 @@ void main()
 	printI(dp.mode)
 
 	string str = "0123456789"
-	printI(str.size)
+	string str2 = "abc"
+	str += str2
+	printStr(str)
 }
 
 void much_work(int howMuch)
