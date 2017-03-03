@@ -192,6 +192,8 @@ void main()
 	string str2 = "abc"
 	str += str2
 	printStr(str)
+	str = str2
+	printStr(str)
 }
 
 void much_work(int howMuch)

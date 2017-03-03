@@ -60,3 +60,11 @@ void +=(string& lhs, string& rhs)
 	memcpy(__off(lhs.data, lhs.size), rhs.data, rhs.size + 1)
 	lhs.size = s
 }
+
+void =(string& lhs, string& rhs)
+{
+	int s = rhs.size
+	reserve(lhs, s)
+	lhs.size = s
+	memcpy(lhs.data, rhs.data, s + 1)
+}

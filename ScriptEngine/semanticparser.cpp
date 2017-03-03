@@ -327,7 +327,8 @@ namespace par
 	{
 		ComplexType& type = *m_currentModule->m_types.back();
 
-		m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
+		// types that have a destructor are not trivially copied
+		if(!type.destructor) m_typeDefaultGen.buildDefaultAssignment(type, *m_currentModule, m_moduleLib);
 		m_typeDefaultGen.buildElemAccess(type, *m_currentModule);
 		m_typeDefaultGen.buildRefAssignment(type, *m_currentModule);
 		m_typeDefaultGen.buildVoidCast(type, *m_currentModule);
