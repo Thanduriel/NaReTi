@@ -55,6 +55,7 @@ namespace par
 				Expression)								[boost::bind(&SemanticParser::finishInit, &m_semanticParser)]
 				| (lit(":=")							[boost::bind(&SemanticParser::pushLatestVar, &m_semanticParser)] >>
 				Expression)								[boost::bind(&SemanticParser::term, &m_semanticParser, string(":="))]
+				| ('(' >> ArgList >> ')')
 				) >> - lit("export")					[boost::bind(&SemanticParser::makeExport, &m_semanticParser)]
 				;
 			
@@ -162,9 +163,13 @@ namespace par
 			Call =
 				(Symbol >>
 				'(')									[boost::bind(&SemanticParser::call, &m_semanticParser, ::_1)] >>
-				-(Expression							[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)] >> 
-				*(',' >> Expression						[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)])) >>
+				ArgList >>
 				')'
+				;
+			ArgList =
+				-(Expression							[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)] >>
+				*(',' >> Expression						[boost::bind(&SemanticParser::argSeperator, &m_semanticParser)]
+				))
 				;
 
 			Operand = 
@@ -232,6 +237,7 @@ namespace par
 		qi::rule<Iterator, Skipper> Conditional;
 		qi::rule<Iterator, Skipper> Loop;
 		qi::rule<Iterator, Skipper> Call;
+		qi::rule<Iterator, Skipper> ArgList;
 		
 		qi::rule<Iterator, std::string()> Symbol;
 		qi::rule<Iterator, std::string()> ConstString;

@@ -189,7 +189,7 @@ void main()
 	printI(dp.mode)
 
 	string str = "0123456789"
-	string str2 = "abc"
+	string str2("abc")
 	str += str2
 	printStr(str)
 	str = str2

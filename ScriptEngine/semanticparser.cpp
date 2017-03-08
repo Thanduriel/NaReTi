@@ -228,10 +228,20 @@ namespace par
 		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>(_attr, typeInfo));
 
 		//invoke constructor
-		if (typeInfo.isReference || typeInfo.type.basic != BasicType::Complex) return;
-		VarSymbol& var = *m_currentScope->m_variables.back();
 		ComplexType& type = typeInfo.type;
-		//todo: with arguments
+		if (typeInfo.isReference || typeInfo.type.basic != BasicType::Complex 
+			|| !type.constructors.size()) return;
+		VarSymbol& var = *m_currentScope->m_variables.back();
+		call(type.name + "::constructor");
+		// this param
+		ASTLeafSym* leaf = m_allocator->construct<ASTLeafSym>(&var);
+		leaf->typeInfo = &var.typeInfo;
+		m_stack.push_back(leaf);
+		argSeperator();
+
+
+
+	/*	//todo: with arguments
 		auto it = std::find_if(type.constructors.begin(), type.constructors.end(), [](const Function* _func)
 		{
 			return _func->paramCount == 1;
@@ -243,11 +253,15 @@ namespace par
 			call.args.push_back(m_allocator->construct<ASTLeafSym>(&var));
 			call.typeInfo = &call.function->returnTypeInfo;
 			m_currentCode->push_back(&call);
-		}
+		}*/
 	}
 
 	void SemanticParser::pushLatestVar()
 	{
+		// a constructor call could be on the stack
+		if (m_stack.size()) m_currentCode->push_back(popNode());
+		assert(!m_stack.size() && "The stack should be empty.");
+
 		pushSymbol(m_currentScope->m_variables.back()->name);
 	}
 

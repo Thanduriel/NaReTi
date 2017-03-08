@@ -14,6 +14,15 @@ type string
 		this.size = 0
 	}
 	
+	constructor (string_literal& lit)
+	{
+		int s = lit.size
+		this.capacity = s + 1
+		this.data := alloc(this.capacity)
+		this.size = s
+		memcpy(this.data, lit._buf, s + 1)
+	}
+	
 	destructor ()
 	{
 		free(this.data)
@@ -45,12 +54,17 @@ void reserve(string& str, int _capacity)
 	}
 }
 
+// ensures enough space, may remove any current content
+void reserve_new(string& str, int _capacity)
+{
+}
+
 void =(string& str, string_literal& lit)
 {
 	int s = lit.size
 	reserve(str, s)
 	str.size = lit.size
-	memcpy(str.data, lit._buf, s+1)
+	memcpy(str.data, lit._buf, s + 1)
 }
 
 void +=(string& lhs, string& rhs)
@@ -64,6 +78,7 @@ void +=(string& lhs, string& rhs)
 void =(string& lhs, string& rhs)
 {
 	int s = rhs.size
+	lhs.size = 0 // prevent cpy in reserve
 	reserve(lhs, s)
 	lhs.size = s
 	memcpy(lhs.data, rhs.data, s + 1)
