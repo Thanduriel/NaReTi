@@ -222,7 +222,7 @@ namespace par
 
 		return str;
 	}
-	void SemanticParser::varDeclaration(string&  _attr)
+	void SemanticParser::varDeclaration(const string&  _attr)
 	{
 		auto typeInfo = buildTypeInfo();
 		m_currentScope->m_variables.emplace_back(m_allocator->construct<VarSymbol>(_attr, typeInfo));
@@ -267,7 +267,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::typeDeclaration(std::string& _attr)
+	void SemanticParser::typeDeclaration(const std::string& _attr)
 	{
 		if (m_genericTypeParams.size())
 		{
@@ -294,7 +294,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::genericTypePar(std::string& _attr)
+	void SemanticParser::genericTypePar(const std::string& _attr)
 	{
 		m_genericTypeParams.push_back(_attr);
 	}
@@ -350,7 +350,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::funcDeclaration(std::string & _attr)
+	void SemanticParser::funcDeclaration(const std::string & _attr)
 	{
 		m_currentModule->m_functions.emplace_back(new Function(_attr, buildTypeInfo()));
 
@@ -473,19 +473,31 @@ namespace par
 
 	void SemanticParser::returnStatement()
 	{
-		m_currentCode->emplace_back(m_allocator->construct<ASTReturn>());
-		ASTReturn& retNode = *(ASTReturn*)m_currentCode->back();
+		ASTReturn& retNode = *m_allocator->construct<ASTReturn>();
+		TypeInfo& info = m_currentFunction->returnTypeInfo;
 
-		if (m_currentFunction->returnTypeInfo.type.basic != BasicType::Void)
+		if (info.type.basic != BasicType::Void
+			/*&& !info.isReference*/)
 		{
 			retNode.body = popNode();
 			assert(retNode.body->typeInfo);
 
-			//types do not match
-			//todo: make typechecking same for functions and return
-			if (*retNode.body->typeInfo != m_currentFunction->returnTypeInfo)
+			// use the assignment operator
+			if (info.type.basic == BasicType::Complex && !info.isReference)
 			{
-				auto cast = typeCast(*retNode.body->typeInfo, m_currentFunction->returnTypeInfo);
+				call("=");
+				ASTCall& call = *static_cast<ASTCall*>(m_stack.back());
+				ASTLeafSym* retLeaf = m_allocator->construct<ASTLeafSym>(m_currentFunction->scope.m_variables[0]);
+				retLeaf->typeInfo = &m_currentFunction->scope.m_variables[0]->typeInfo;
+				call.args.push_back(retLeaf);
+				call.args.push_back(retNode.body);
+				m_currentCode->push_back(popNode());
+			}
+			else if (*retNode.body->typeInfo != info)
+			{
+				//types do not match
+				//todo: make type-checking same for functions and return
+				auto cast = typeCast(*retNode.body->typeInfo, info);
 				if (!cast) throw ParsingError("Type mismatch found \"" 
 					+ buildTypeInfoString(*retNode.body->typeInfo)
 					+ "\" but expected \""
@@ -501,6 +513,8 @@ namespace par
 			}
 		}
 		else retNode.body = nullptr;
+
+		m_currentCode->emplace_back(&retNode);
 	}
 
 	// ************************************************** //
@@ -571,7 +585,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::call(string& _name)
+	void SemanticParser::call(const string& _name)
 	{
 		//build new node
 		ASTCall* node = m_allocator->construct<ASTCall>();
@@ -601,7 +615,7 @@ namespace par
 
 	// ************************************************** //
 
-	void SemanticParser::pushSymbol(string& _name)
+	void SemanticParser::pushSymbol(const string& _name)
 	{
 		VarSymbol* var;
 		//look in global scope
@@ -655,7 +669,7 @@ namespace par
 		m_stack.push_back(leaf);
 	}
 
-	void SemanticParser::pushString(std::string& _str)
+	void SemanticParser::pushString(const std::string& _str)
 	{
 		int b = offsetof(utils::ImmString, buf);
 		int s = offsetof(utils::ImmString, size);

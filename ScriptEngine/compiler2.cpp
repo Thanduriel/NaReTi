@@ -725,7 +725,7 @@ namespace codeGen{
 		{
 			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0]->compiledVar;
 			//due to substitution the value can already be in the destination
-			if(&dest != var) compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
+		//	if(&dest != var) compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
 
 			var = &dest;
 		}

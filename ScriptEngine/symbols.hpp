@@ -92,7 +92,7 @@ namespace par{
 			typeInfo(_typeInfo)
 		{}
 
-		VarSymbol& operator= (VarSymbol& oth)
+		VarSymbol& operator= (const VarSymbol& oth)
 		{
 			name = oth.name;
 //			typeInfo.type = oth.typeInfo.type;
@@ -121,7 +121,7 @@ namespace par{
 
 		std::vector< ImportedVar > m_importedVars; //< variables from a global scope; need to be allocated in the used scope
 
-		VarSymbol* getVar(std::string& _name) const
+		VarSymbol* getVar(const std::string& _name) const
 		{
 			for (auto& var : m_variables)
 				if (var->name == _name) return var;

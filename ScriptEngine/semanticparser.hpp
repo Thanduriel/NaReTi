@@ -30,15 +30,15 @@ namespace par
 		//set the scope back to the default scope of the module
 		void resetScope() { m_currentCode = m_currentModule->m_text; m_currentScope = m_currentModule->m_text; };
 
-		void varDeclaration(std::string& _attr);
+		void varDeclaration(const std::string& _attr);
 		void pushLatestVar();
-		void typeDeclaration(std::string& _attr);
-		void genericTypePar(std::string& _attr);
-		void useStatement(std::string& _attr);
+		void typeDeclaration(const std::string& _attr);
+		void genericTypePar(const std::string& _attr);
+		void useStatement(const std::string& _attr);
 		void constructorDec();
 		void destructorDec();
 		void finishTypeDec();
-		void funcDeclaration(std::string& _attr);
+		void funcDeclaration(const std::string& _attr);
 		void finishParamList(); // finish the param list of the currently parsed function
 		// for var in place initializations
 		// takes care of const
@@ -65,14 +65,14 @@ namespace par
 		 * * expressions(stuff that returns smth) take required operands from the stack and put the assembled node back.
 		 * * statements (e.g. return) take required operands from the stack and output the nodes to the current codescope.
 		 */
-		void pushSymbol(std::string& _name);
+		void pushSymbol(const std::string& _name);
 		void pushFloat(double _val);
 		void pushInt(int _val);
 		void pushAddress(uint64_t _adr);
-		void pushString(std::string& _str);
+		void pushString(const std::string& _str);
 		void term(const std::string& _operator);
 		void unaryTerm(const boost::optional<std::string>& _str);
-		void call(std::string& _name);
+		void call(const std::string& _name);
 		void argSeperator(); // ","
 		void sizeOf();
 

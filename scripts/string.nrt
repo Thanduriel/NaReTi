@@ -83,3 +83,10 @@ void =(string& lhs, string& rhs)
 	lhs.size = s
 	memcpy(lhs.data, rhs.data, s + 1)
 }
+
+string +(string& lhs, string& rhs)
+{
+	string str = "test_test"
+//	str += rhs
+	return str
+}
