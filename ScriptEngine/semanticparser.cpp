@@ -137,7 +137,7 @@ namespace par
 			if (t1.type.name == "DisplayValue")
 				int brk = 12;
 			if (t0 == t1) continue;
-			//left site of an assignment may not be casted
+			//left side of an assignment may not be casted
 			if (_func.intrinsicType == Function::Assignment && i == 0) return false;
 
 			casts[i] = typeCast(t0, t1);
@@ -482,10 +482,14 @@ namespace par
 			retNode.body = popNode();
 			assert(retNode.body->typeInfo);
 
-			// use the assignment operator
+			// use the copy constructor or assignment
 			if (info.type.basic == BasicType::Complex && !info.isReference)
 			{
-				call("=");
+				// type is not trivially constructible; todo: decide this depended on the data
+				if(info.type.constructors.size())
+					call(info.type.name + "::constructor");
+				else call("=");
+
 				ASTCall& call = *static_cast<ASTCall*>(m_stack.back());
 				ASTLeafSym* retLeaf = m_allocator->construct<ASTLeafSym>(m_currentFunction->scope.m_variables[0]);
 				retLeaf->typeInfo = &m_currentFunction->scope.m_variables[0]->typeInfo;

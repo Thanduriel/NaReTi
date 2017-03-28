@@ -105,6 +105,7 @@ namespace lang
 		//assignment to address is currently decided by the compiler
 		// this is only to make sure that no typecast is necessary
 		BASICASSIGN("=", BasicType::Int, InstructionType::Set); m_functions.back()->scope.m_variables[0]->typeInfo.isReference = true;
+		TypeDefaultGen::buildRefAssignment(*m_types[BasicType::Int], *this);
 		BASICOPERATION("<<", BasicType::Int, InstructionType::ShL);
 		BASICOPERATION(">>", BasicType::Int, InstructionType::ShR);
 		BASICOPERATION("&", BasicType::Int, InstructionType::And);
@@ -153,9 +154,8 @@ namespace lang
 		voidFunc.paramCount = 1;
 		
 		// string stuff
-		TypeDefaultGen typeGen;
-		typeGen.buildRefAssignment(*m_types[BasicType::Char], *this);
-		typeGen.buildElemAccess(*m_types[BasicType::Char], *this);
+		TypeDefaultGen::buildRefAssignment(*m_types[BasicType::Char], *this);
+		TypeDefaultGen::buildElemAccess(*m_types[BasicType::Char], *this);
 
 		// string_lit size
 		m_types[BasicType::String]->scope.m_variables.push_back(m_allocator.construct<VarSymbol>("_buf", TypeInfo(getBasicType(BasicType::Char), true)));

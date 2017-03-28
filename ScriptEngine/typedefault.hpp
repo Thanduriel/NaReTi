@@ -11,10 +11,10 @@ namespace lang{
 	class TypeDefaultGen
 	{
 	public:
-		void buildElemAccess(par::ComplexType& _type, NaReTi::Module& _module);
+		static void buildElemAccess(par::ComplexType& _type, NaReTi::Module& _module);
 
 		void buildDefaultAssignment(par::ComplexType& _type, NaReTi::Module& _module, par::ModuleLibrary& _lib);
-		void buildRefAssignment(par::ComplexType& _type, NaReTi::Module& _module);
+		static void buildRefAssignment(par::ComplexType& _type, NaReTi::Module& _module);
 
 		//typecast void -> this type
 		//will be added to ComplexType Void's typecasts

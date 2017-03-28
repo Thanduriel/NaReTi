@@ -265,3 +265,25 @@ int test_array()
 	return array[0].x + array[1].y + array[2].y
 }
 
+// ******************************************* //
+// constructor
+type Constructable
+{
+	int& target
+	
+	constructor (int& _target)
+	{
+		this.target := _target
+		_target = 12
+	}
+	
+	destructor()
+	{
+		this.target = 42
+	}
+}
+void test_constructor(int& _target)
+{
+	_target = 26
+	Constructable c(_target)
+}

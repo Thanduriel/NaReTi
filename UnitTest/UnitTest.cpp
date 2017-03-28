@@ -129,8 +129,14 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine, NaReTi::Module& module)
 		TEST((scriptEngine.call<float>(FUNCHNDL("test_exportVar")) == 42), " write export var value");
 	}
 
+	// constructor and destructor
+	int targetInt;
+	scriptEngine.call<int*>(FUNCHNDL("test_constructor"), &targetInt);
+	TEST((targetInt == 42), " constructor and destructor");
+
 	//std array
 	TEST((scriptEngine.call<int>(FUNCHNDL("test_array")) == 22), " build and access array of complex type");
+	
 
 	return result;
 }

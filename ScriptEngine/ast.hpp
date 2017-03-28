@@ -124,7 +124,7 @@ namespace par{
 		ASTExpNode* body;
 	};
 
-	//just additional typesafety
+	//just additional type safety
 	struct ASTLeaf : public ASTExpNode
 	{};
 

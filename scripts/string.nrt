@@ -23,6 +23,15 @@ type string
 		memcpy(this.data, lit._buf, s + 1)
 	}
 	
+	constructor(string& str)
+	{
+		int s = str.size
+		this.capacity = s + 1
+		this.data := alloc(this.capacity)
+		this.size = s
+		memcpy(this.data, str.data, s + 1)
+	}
+	
 	destructor ()
 	{
 		free(this.data)

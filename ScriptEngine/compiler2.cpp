@@ -399,13 +399,21 @@ namespace codeGen{
 			{
 				ASTMember& member = *(ASTMember*)arg;
 				X86GpVar* baseVar = compileMemberAdr(member);
-	
+				
 				if (func.intrinsicType == Function::Assignment && i == 0)
 				{
 					X86GpVar* var = &getUnusedVar();
 					args.push_back(var);
 					m_compiler.lea(*var, getMemberAdr(*(ASTMember*)arg, *baseVar));
 					indirect += 0x100;
+
+					// todo: make global decision on indirection
+					if (func.name == "=" && arg->typeInfo->isReference)
+					{
+						auto addr = x86::ptr(*var);
+						addr.setSize(PTRSIZE);
+						m_compiler.mov(*var, addr);
+					}
 				}
 				else
 				{
