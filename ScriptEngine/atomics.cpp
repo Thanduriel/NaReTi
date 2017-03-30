@@ -189,6 +189,17 @@ namespace lang
 		cpyFunc.bExternal = true;
 		linkExternal("memcpy", &__cpyBoundFunc);
 
+		// mem cmp
+		m_functions.emplace_back(new Function("memcmp", TypeInfo(*m_types[BasicType::Int])));
+		Function& cmpFunc = *m_functions.back();
+		cmpFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("dst", TypeInfo(*m_types[Void], true)));
+		cmpFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("src", TypeInfo(*m_types[Void], true)));
+		cmpFunc.scope.m_variables.push_back(m_allocator.construct<VarSymbol>("size", TypeInfo(*m_types[Int])));
+		cmpFunc.paramCount = 3;
+		cmpFunc.bExternal = true;
+		linkExternal("memcmp", &memcmp);
+
+
 		//global constants
 		makeConstant("true", 1);
 		makeConstant("false", 0);

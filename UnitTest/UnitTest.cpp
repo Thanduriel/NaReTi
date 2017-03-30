@@ -137,6 +137,8 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine, NaReTi::Module& module)
 	//std array
 	TEST((scriptEngine.call<int>(FUNCHNDL("test_array")) == 22), " build and access array of complex type");
 	
+	//std string
+	TEST((scriptEngine.call<int>(FUNCHNDL("test_string")) == 13), " construction, assignment and comparison of strings");
 
 	return result;
 }

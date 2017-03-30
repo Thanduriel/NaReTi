@@ -99,3 +99,12 @@ string +(string& lhs, string& rhs)
 //	str += rhs
 	return str
 }
+
+
+int ==(string& lhs, string& rhs)
+{
+	if(lhs.size != rhs.size) {return false}
+	// check for the terminating 0
+	if(memcmp(lhs, rhs, lhs.size + 1) == 0) {return true}
+	return false
+}

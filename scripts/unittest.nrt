@@ -266,7 +266,7 @@ int test_array()
 }
 
 // ******************************************* //
-// constructor
+// constructor destrutcro
 type Constructable
 {
 	int& target
@@ -286,4 +286,21 @@ void test_constructor(int& _target)
 {
 	_target = 26
 	Constructable c(_target)
+}
+
+// ******************************************* //
+int test_string()
+{
+	string str = "abc"
+	string str2("abc")
+	
+	if(str == str)
+	{
+		str2 = "0123456789"
+		str += str2
+		
+		return str.size
+	}
+	
+	return 0
 }

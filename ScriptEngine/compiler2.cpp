@@ -407,6 +407,7 @@ namespace codeGen{
 					m_compiler.lea(*var, getMemberAdr(*(ASTMember*)arg, *baseVar));
 					indirect += 0x100;
 
+					// member reference with actual assignment
 					// todo: make global decision on indirection
 					if (func.name == "=" && arg->typeInfo->isReference)
 					{

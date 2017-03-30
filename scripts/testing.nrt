@@ -192,7 +192,7 @@ void main()
 	string str2("abc")
 	str += str2
 	printStr(str)
-	str = str2 + str
+//	str = str2 + str
 	printStr(str)
 }
 
