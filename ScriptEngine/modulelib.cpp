@@ -6,7 +6,7 @@
 
 namespace par
 {
-	ComplexType* ModuleLibrary::getType(const std::string& _name)
+	ComplexType* ModuleLibrary::getType(const std::string& _name) const
 	{
 		for (auto& module : m_modules)
 		{
@@ -19,7 +19,7 @@ namespace par
 	par::Function* ModuleLibrary::getFunction(const std::string& _name,
 		const std::vector<par::ASTExpNode*>::iterator& _begin,
 		const std::vector<par::ASTExpNode*>::iterator& _end,
-		std::vector<NaReTi::Module::FuncMatch>& _funcQuery)
+		std::vector<NaReTi::Module::FuncMatch>& _funcQuery) const
 	{
 		for (auto& module : m_modules)
 		{
@@ -29,7 +29,7 @@ namespace par
 		return nullptr;
 	}
 
-	VarSymbol* ModuleLibrary::getGlobalVar(const std::string& _name)
+	VarSymbol* ModuleLibrary::getGlobalVar(const std::string& _name) const
 	{
 		for (auto& module : m_modules)
 		{

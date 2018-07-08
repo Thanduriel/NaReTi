@@ -2,7 +2,7 @@
 
 namespace utils{
 
-#pragma pack
+//#pragma pack
 	template<typename T>
 	class ImmBasicString
 	{

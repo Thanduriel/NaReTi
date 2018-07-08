@@ -126,11 +126,10 @@ namespace par
 
 	bool SemanticParser::tryArgCasts(ASTCall& _node, Function& _func)
 	{
-		std::vector<Function*> casts; casts.resize(_node.args.size());
-		ZeroMemory(&casts[0], sizeof(Function*) * casts.size()); //make sure to only have nullptr; maybe not std conform
+		std::vector<Function*> casts(_node.args.size(), nullptr);
 
 		int off = _func.bHiddenParam ? 1 : 0;
-		for (int i = 0; i < (int)_node.args.size(); ++i)
+		for (size_t i = 0; i < _node.args.size(); ++i)
 		{
 			const TypeInfo& t0 = *_node.args[i]->typeInfo;
 			const TypeInfo& t1 = _func.scope.m_variables[i+off]->typeInfo;
@@ -145,7 +144,7 @@ namespace par
 		}
 
 		//put casts into the tree
-		for (int i = 0; i < (int)_node.args.size(); ++i)
+		for (size_t i = 0; i < _node.args.size(); ++i)
 		{
 			if (!casts[i] || casts[i]->intrinsicType == Function::StaticCast) continue;
 
@@ -210,18 +209,6 @@ namespace par
 
 	using namespace boost::fusion;
 
-	std::string fa(boost::fusion::vector2<char, std::vector<char>>& _attr)
-	{
-		std::string str;
-		str.resize(_attr.m1.size() + 1);
-		str[0] = _attr.m0;
-		for (int i = 0; i < _attr.m1.size(); ++i)
-			str[i + 1] = _attr.m1[i];
-
-		//	std::cout << str << std::endl;
-
-		return str;
-	}
 	void SemanticParser::varDeclaration(const string&  _attr)
 	{
 		auto typeInfo = buildTypeInfo();
@@ -560,6 +547,7 @@ namespace par
 	{
 		if (!_str.is_initialized()) return;
 
+		assert(m_stack.size());
 		ASTExpNode* arg = m_stack.back();
 		
 		if (arg->type == ASTType::LeafInt)
@@ -746,7 +734,7 @@ namespace par
 			m_typeName = g_genericsParser->mangledName(m_typeName, m_genericTypeParams);
 
 			if (!m_currentModule->getType(m_typeName))
-				g_genericsParser->parseType("array", m_genericTypeParams.size(), params[0]);
+				g_genericsParser->parseType("array", static_cast<int>(m_genericTypeParams.size()), params[0]);
 			m_genericTypeParams.clear(); //clear afterwards
 		}
 

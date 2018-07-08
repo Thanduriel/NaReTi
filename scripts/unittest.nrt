@@ -130,6 +130,14 @@ int test_optimRetVal()
 	if(stackVec.x == 10 && stackVec.y == 12) { return true}
 	return false
 }
+
+int test_complexFnCast()
+{
+	iVec2 stackVec = addiVec(2.0, 3, 8, 9)
+	if(stackVec.x == 10 && stackVec.y == 12) { return true}
+	return false
+}
+
 iVec2 g_test_vec
 
 void test_globalInit()
@@ -266,7 +274,7 @@ int test_array()
 }
 
 // ******************************************* //
-// constructor destrutcro
+// constructor destructor
 type Constructable
 {
 	int& target

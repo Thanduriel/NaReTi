@@ -14,15 +14,16 @@ namespace boost {
 			 * The data is just restructured.
 			 */
 			template <>
-			struct transform_attribute<std::string, boost::fusion::vector2<char, std::vector<char>>, qi::domain>
+			struct transform_attribute<std::string, boost::fusion::vector<char, std::vector<char>>, qi::domain>
 			{
 				static int pre(std::string& d) { return 0; }//not useful in this case but required to avoid compiler errors
-				static void post(std::string& val, boost::fusion::vector2<char, std::vector<char>> const& attr) //`val` is the "returned" string, `attr` is what int_ parses
+				static void post(std::string& val, boost::fusion::vector<char, std::vector<char>> const& attr) //`val` is the "returned" string, `attr` is what int_ parses
 				{
-					val.resize(attr.m1.size() + 1);
-					val[0] = attr.m0;
-					for (int i = 0; i < attr.m1.size(); ++i)
-						val[i + 1] = attr.m1[i];
+					using namespace boost::fusion;
+					val.resize(at_c<1>(attr).size() + 1);
+					val[0] = at_c<0>(attr);
+					for (int i = 0; i < at_c<1>(attr).size(); ++i)
+						val[i + 1] = at_c<1>(attr)[i];
 
 				}
 				static void fail(std::string&) {}
@@ -30,12 +31,12 @@ namespace boost {
 
 			//RExpression -> string (just the operator)
 			template <>
-			struct transform_attribute<std::string, boost::fusion::vector2<std::string, boost::optional<std::string>>, qi::domain>
+			struct transform_attribute<std::string, boost::fusion::vector<std::string, boost::optional<std::string>>, qi::domain>
 			{
 				static int pre(std::string& d) { return 0; }//not useful in this case but required to avoid compiler errors
-				static void post(std::string& val, boost::fusion::vector2<std::string, boost::optional<std::string>> const& attr) //`val` is the "returned" string, `attr` is what  parses
+				static void post(std::string& val, boost::fusion::vector<std::string, boost::optional<std::string>> const& attr) //`val` is the "returned" string, `attr` is what  parses
 				{
-					val = attr.m0; //discard the optional string
+					val = boost::fusion::at_c<0>(attr); //discard the optional string
 				}
 				static void fail(std::string&) {}
 			};

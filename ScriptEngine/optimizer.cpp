@@ -12,7 +12,7 @@ namespace codeGen{
 	using namespace par;
 
 	//amount of calls a function may contain to be inlined
-	const int InlineTreshhold = 6;
+	constexpr int InlineTreshhold = 6;
 
 	Optimizer::Optimizer()
 	{

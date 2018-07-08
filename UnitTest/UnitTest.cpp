@@ -112,6 +112,8 @@ bool testRun(NaReTi::ScriptEngine& scriptEngine, NaReTi::Module& module)
 	TEST(((scriptEngine.call<float, float>(FUNCHNDL("test_sqrt"), 765.34f) - 27.6647f) < 0.01f), " simple sqrt");
 	TEST(((scriptEngine.call<float, float>(FUNCHNDL("test_sin"), 0.25f) - 0.247411f) < 0.01f), " fast sin");
 
+	TEST((scriptEngine.call<int>(FUNCHNDL("test_complexFnCast"))), " returning function arg cast");
+
 	TEST((scriptEngine.call<int>(FUNCHNDL("test_optimRetVal"))), " return value optimization");
 
 	TEST((scriptEngine.call<float>(FUNCHNDL("test_refAssign")) == 64.f), " reference assignment");

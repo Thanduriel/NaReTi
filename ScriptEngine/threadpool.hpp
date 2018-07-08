@@ -6,6 +6,7 @@
 #include <memory>
 #include <queue>
 #include <windows.h>
+#include <cassert>
 
 namespace utils{
 	template <typename T>
