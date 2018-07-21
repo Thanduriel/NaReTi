@@ -61,10 +61,10 @@ namespace par
 			
 			//func declaration including overloaded operators with keywords
 			FuncDeclaration = 
-				(TypeInformation >> 
+				((TypeInformation >> 
 				(Symbol | Operator | qi::string("[]")) >> 
 				'(')									[boost::bind(&SemanticParser::funcDeclaration, &m_semanticParser, ::_1)] >
-				FuncBody
+				FuncBody)								[boost::bind(&SemanticParser::finishFunction, &m_semanticParser)]
 				;
 
 			FuncBody = -VarDeclaration >>

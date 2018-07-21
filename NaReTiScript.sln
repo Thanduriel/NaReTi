@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptEngine", "ScriptEngine\ScriptEngine.vcxproj", "{A09169AB-78D8-4CB1-9563-646342766D0C}"
 EndProject
@@ -76,32 +76,31 @@ Global
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.RelWithDebInfo|Win32.Build.0 = Release|Win32
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.RelWithDebInfo|x64.ActiveCfg = Release|x64
 		{FCCB9542-2081-4A25-96AB-5B070E2F1D09}.RelWithDebInfo|x64.Build.0 = Release|x64
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Win32.Build.0 = Debug|Win32
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|Win32.ActiveCfg = Debug|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|x64.ActiveCfg = Debug|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.Debug|x64.Build.0 = Debug|x64
-		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Mixed Platforms.ActiveCfg = MinSizeRel|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Mixed Platforms.Build.0 = MinSizeRel|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Mixed Platforms.ActiveCfg = MinSizeRel|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Mixed Platforms.Build.0 = MinSizeRel|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|x64.ActiveCfg = MinSizeRel|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.MinSizeRel|x64.Build.0 = MinSizeRel|x64
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Win32.ActiveCfg = Release|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Win32.Build.0 = Release|Win32
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Mixed Platforms.Build.0 = Release|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|Win32.ActiveCfg = Release|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|x64.ActiveCfg = Release|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.Release|x64.Build.0 = Release|x64
-		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Mixed Platforms.ActiveCfg = RelWithDebInfo|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Mixed Platforms.Build.0 = RelWithDebInfo|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
-		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
+		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Mixed Platforms.ActiveCfg = RelWithDebInfo|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Mixed Platforms.Build.0 = RelWithDebInfo|x64
+		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|x64.ActiveCfg = RelWithDebInfo|x64
 		{D476EC80-7411-3E73-994F-E70B5680C925}.RelWithDebInfo|x64.Build.0 = RelWithDebInfo|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AF4551BB-4303-4818-9EC8-1A397A569269}
 	EndGlobalSection
 EndGlobal

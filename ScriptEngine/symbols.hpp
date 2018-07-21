@@ -79,6 +79,7 @@ namespace par{
 		int arraySize;
 
 		//
+		bool isVoid() const;
 
 		bool operator!= (const TypeInfo& oth) const;
 

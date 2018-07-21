@@ -39,6 +39,7 @@ namespace par
 		void destructorDec();
 		void finishTypeDec();
 		void funcDeclaration(const std::string& _attr);
+		void finishFunction();
 		void finishParamList(); // finish the param list of the currently parsed function
 		// for var in place initializations
 		// takes care of const

@@ -51,6 +51,11 @@ namespace par{
 
 	// ************************************************ //
 	
+	bool TypeInfo::isVoid() const
+	{
+		return type.basic == BasicType::Void && !isReference;
+	}
+	
 	bool TypeInfo::operator==(const TypeInfo& oth) const
 	{
 		return &type == &oth.type

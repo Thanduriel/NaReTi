@@ -12,7 +12,7 @@ namespace codeGen{
 
 		//the compiled version (the callee should know its signature)
 		void* binary;
-		asmjit::FuncBuilderX funcBuilder; //signature needed to compile calls
+		asmjit::FuncSignatureX funcBuilder; //signature needed to compile calls
 	};
 
 	enum class OwnershipType
@@ -32,7 +32,7 @@ namespace codeGen{
 	struct CVarSymbol
 	{
 		CVarSymbol() : isSubstituted(false), isPtr(false), compiledVar(nullptr){}
-		asmjit::Var* compiledVar;
+		asmjit::Operand* compiledVar;
 		Ownership ownership;
 		bool isPtr; //< Is internally implemented as pointer. compiledVar then contains a address.
 		bool isSubstituted; //< Is not required to be allocated.

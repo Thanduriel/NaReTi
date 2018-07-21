@@ -20,8 +20,9 @@ namespace codeGen{
 
 
 	Compiler::Compiler():
-		m_assembler(&m_runtime),
-		m_compiler(&m_assembler)
+		m_runtime(),
+		m_codeHolder(),
+		m_compiler((m_codeHolder.init(m_runtime.getCodeInfo()), &m_codeHolder))
 	{
 		m_labelStack.reserve(64); // prevent moving
 		m_retDstStack.reserve(64);
@@ -107,16 +108,18 @@ namespace codeGen{
 	{
 		if (_module.m_text->size() == 0) return;
 		
-		m_compiler.addFunc(FuncBuilder0<void>());
+		m_compiler.addFunc(FuncSignature0<void>());
 		resetRegisters();
 		compileCode(*_module.m_text);
 
 		m_compiler.endFunc();
 		m_compiler.finalize();
-		void* ptr = m_assembler.make();
+		void* ptr;
+		Error err = m_runtime.add(&ptr, &m_codeHolder);
 		((NaReTi::basicFunc*)ptr)();
-		m_assembler.reset(true);
-		m_compiler.attach(&m_assembler);
+		m_codeHolder.reset(true);
+		m_codeHolder.init(m_runtime.getCodeInfo());
+		m_codeHolder.attach(&m_compiler);
 		m_runtime.release(ptr); // this function wont be needed anymore
 	}
 
@@ -124,27 +127,27 @@ namespace codeGen{
 
 	void Compiler::convertSignature(par::Function& _function) const
 	{
-		FuncBuilderX& funcBuilder = _function.funcBuilder;
+		FuncSignatureX& FuncSignature = _function.funcBuilder;
 		for (int i = 0; i < _function.paramCount; ++i)
 		{
 			switch (_function.scope.m_variables[i]->typeInfo.type.basic)
 			{
-			case BasicType::Int: funcBuilder.addArgT<int>(); break;
-			case BasicType::Float: funcBuilder.addArgT<float>(); break;
-			case BasicType::Complex: funcBuilder.addArgT<void*>(); break;
+			case BasicType::Int: FuncSignature.addArgT<int>(); break;
+			case BasicType::Float: FuncSignature.addArgT<float>(); break;
+			case BasicType::Complex: FuncSignature.addArgT<void*>(); break;
 			default:
-				if (_function.scope.m_variables[i]->typeInfo.isReference) funcBuilder.addArgT<void*>();
-				else funcBuilder.addArgT<int>();
+				if (_function.scope.m_variables[i]->typeInfo.isReference) FuncSignature.addArgT<void*>();
+				else FuncSignature.addArgT<int>();
 			}
 		}
 		switch (_function.returnTypeInfo.type.basic)
 		{
-		case BasicType::Int: funcBuilder.setRetT<int>(); break;
-		case BasicType::Float: funcBuilder.setRetT<float>(); break;
-		case BasicType::Complex: funcBuilder.setRetT<void*>(); break;
+		case BasicType::Int: FuncSignature.setRetT<int>(); break;
+		case BasicType::Float: FuncSignature.setRetT<float>(); break;
+		case BasicType::Complex: FuncSignature.setRetT<void*>(); break;
 		default: 
-			if (_function.returnTypeInfo.isReference) funcBuilder.setRetT<void*>();
-			else funcBuilder.setRetT<void>();
+			if (_function.returnTypeInfo.isReference) FuncSignature.setRetT<void*>();
+			else FuncSignature.setRetT<void>();
 		}
 
 	}
@@ -153,7 +156,7 @@ namespace codeGen{
 
 	void Compiler::allocVar(VarSymbol& _sym)
 	{
-		asmjit::Var* varPtr;
+		asmjit::Operand* varPtr;
 
 		if (_sym.typeInfo.isReference)
 		{
@@ -188,9 +191,9 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	X86GpVar* Compiler::allocStackVar(const ComplexType& _type, int _count)
+	X86Gp* Compiler::allocStackVar(const ComplexType& _type, int _count)
 	{
-		X86GpVar& gpVar = getUnusedVar();
+		X86Gp& gpVar = getUnusedVar();
 		X86Mem mem = m_compiler.newStack(_type.size * _count, _type.alignment); // if floats are used  -> operations with xmm(128) register
 
 		m_compiler.lea(gpVar, mem);
@@ -218,7 +221,7 @@ namespace codeGen{
 		//setup registers
 		resetRegisters();
 
-		if (_function.name == "main")
+		if (_function.name == "rand")
 			int brk = 0;
 
 		//code
@@ -227,15 +230,18 @@ namespace codeGen{
 		compileCode(_function.scope);
 		
 		for (int i = 0; i < _function.paramCount; ++i)
-			m_compiler.setArg(i, *_function.scope.m_variables[i]->compiledVar);
+			m_compiler.setArg(i, *static_cast<Reg*>(_function.scope.m_variables[i]->compiledVar));
 
 		// Finalize the current function.
 		m_compiler.endFunc();
 		m_compiler.finalize();
-		_function.binary = m_assembler.make();
-		m_assembler.reset(false); // todo: performance/mem test
-		m_compiler.attach(&m_assembler);
-
+		void* ptr;
+		Error err = m_runtime.add(&ptr, &m_codeHolder);
+		m_codeHolder.reset(true);
+		m_codeHolder.init(m_runtime.getCodeInfo());
+		m_codeHolder.attach(&m_compiler);
+	//	m_compiler._code = &m_codeHolder;
+		_function.binary = ptr;
 	}
 
 	// *************************************************** //
@@ -255,7 +261,7 @@ namespace codeGen{
 		//imported heap vars
 		for (auto& var : _node.m_importedVars)
 		{
-			X86GpVar& gpVar = getUnusedVar(); //is always a ptr
+			X86Gp& gpVar = getUnusedVar(); //is always a ptr
 			var.sym->compiledVar = &gpVar;
 			m_compiler.mov(gpVar, asmjit::imm_ptr(var.sym->ownership.rawPtr));
 
@@ -301,11 +307,11 @@ namespace codeGen{
 		{
 			if (var.refHasChanged)
 			{
-				X86GpVar& gpVar = getUnusedVar();
+				X86Gp& gpVar = getUnusedVar();
 				m_compiler.mov(gpVar, asmjit::imm_ptr(&var.sym->ownership.rawPtr));
 
-				//	m_compiler.mov(*(X86GpVar*)var.sym->compiledVar, imm(2));
-				m_compiler.mov(asmjit::Mem(gpVar, 0), *(X86GpVar*)var.sym->compiledVar);
+				//	m_compiler.mov(*(X86Gp*)var.sym->compiledVar, imm(2));
+				m_compiler.mov(asmjit::X86Mem(gpVar, 0), *(X86Gp*)var.sym->compiledVar);
 			}
 		}
 		for (auto& subNode : _node.epilogue)
@@ -329,13 +335,13 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	Var* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Var* _dest)
+	Operand* Compiler::compileCall(ASTCall& _node, bool _keepRet, asmjit::Operand* _dest)
 	{
 		Function& func = *_node.function;
 		if (func.name == "DisplayValue")
 			int brk = 0;
 
-		std::vector< asmjit::Var* > args; args.reserve(_node.args.size());
+		std::vector< asmjit::Operand* > args; args.reserve(_node.args.size());
 
 		//return values are part of the caller's scope
 		if (func.bHiddenParam)
@@ -347,7 +353,7 @@ namespace codeGen{
 			else
 			{
 				//allocate the stack var and provide a reference as param
-				func.scope.m_variables[0]->compiledVar = (Var*)allocStackVar(func.scope.m_variables[0]->typeInfo.type);
+				func.scope.m_variables[0]->compiledVar = (Operand*)allocStackVar(func.scope.m_variables[0]->typeInfo.type);
 				args.push_back(func.scope.m_variables[0]->compiledVar);
 			}
 			_dest = args.back();
@@ -380,7 +386,7 @@ namespace codeGen{
 				//address constants are always typecasted to the required type
 				//this cast is free and combined with the necessary load
 				ASTLeafAdr* adr = static_cast<ASTLeafAdr*>(arg);
-				X86GpVar& var = getUnusedVar();
+				X86Gp& var = getUnusedVar();
 				m_compiler.mov(var, Imm(adr->value));
 				args.push_back(&var);
 				break;
@@ -390,7 +396,7 @@ namespace codeGen{
 				break;
 			case ASTType::LeafString:
 			{
-				X86GpVar& var = getUnusedVar();
+				X86Gp& var = getUnusedVar();
 				args.push_back(&var);
 				m_compiler.mov(var, imm_ptr(&(static_cast<ASTLeafStr*>(arg)->value))); //->value.buf
 				break;
@@ -398,11 +404,11 @@ namespace codeGen{
 			case ASTType::Member:
 			{
 				ASTMember& member = *(ASTMember*)arg;
-				X86GpVar* baseVar = compileMemberAdr(member);
+				X86Gp* baseVar = compileMemberAdr(member);
 				
 				if (func.intrinsicType == Function::Assignment && i == 0)
 				{
-					X86GpVar* var = &getUnusedVar();
+					X86Gp* var = &getUnusedVar();
 					args.push_back(var);
 					m_compiler.lea(*var, getMemberAdr(*(ASTMember*)arg, *baseVar));
 					indirect += 0x100;
@@ -418,12 +424,12 @@ namespace codeGen{
 				}
 				else
 				{
-					Var* var = getUnusedVarAuto(*member.typeInfo);
+					Reg* var = getUnusedVarAuto(*member.typeInfo);
 					args.push_back(var);
-					if (var->getVarType() == 15) // xmm var
-						compileMemberLdF(*(ASTMember*)arg, *baseVar, *(X86XmmVar*)var);
+					if (var->getKind() == 1) // xmm var
+						compileMemberLdF(*(ASTMember*)arg, *baseVar, *(X86Xmm*)var);
 					else
-						compileMemberLd(*(ASTMember*)arg, *baseVar, *(X86GpVar*)var);
+						compileMemberLd(*(ASTMember*)arg, *baseVar, *(X86Gp*)var);
 				}
 				break;
 			}
@@ -449,13 +455,13 @@ namespace codeGen{
 				case Function::BinOp:
 					//since the first operand of a binop is overwritten with the result copy the values first
 					//todo movOpt
-					if (_dest->getVarType() == 15)
+					if (static_cast<Reg*>(_dest)->getKind() == 1)
 					{
-						m_compiler.movss(*(X86XmmVar*)_dest, *(X86XmmVar*)args[0]);
+						m_compiler.movss(*(X86Xmm*)_dest, *(X86Xmm*)args[0]);
 					}
 					else
 					{
-						m_compiler.mov(*(X86GpVar*)_dest, *(X86GpVar*)args[0]);
+						m_compiler.mov(*(X86Gp*)_dest, *(X86Gp*)args[0]);
 					}
 					args[0] = _dest;
 					break;
@@ -466,8 +472,6 @@ namespace codeGen{
 				default: break;
 				case Function::StaticCast:
 					assert(false && "static casts should be skipped in the parser.");
-				//	args.push_back(args[0]);
-				//	args[0] = _dest;
 					break;
 				}
 
@@ -495,11 +499,11 @@ namespace codeGen{
 		else
 		{
 			// make call
-			X86CallNode* call = m_compiler.call(imm_ptr(func.binary), func.funcBuilder);
+			CCFuncCall* call = m_compiler.call(imm_ptr(func.binary), func.funcBuilder);
 			for (int i = 0; i < func.paramCount; ++i)
 				call->_setArg(i, *args[i]);
 
-			if(_dest) call->setRet(0, *_dest);
+			if(_dest) call->setRet(0, *static_cast<Reg*>(_dest));
 		}
 
 		if (func.name == "breakpoint")
@@ -510,18 +514,18 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::Var* Compiler::compileLeaf(par::ASTLeaf& _node, int* _indirect)
+	asmjit::Operand* Compiler::compileLeaf(par::ASTLeaf& _node, int* _indirect)
 	{
 		//immediate val
 		if (_node.type == ASTType::LeafInt)
 		{
-			X86GpVar& var = getUnusedVar32();
+			X86Gp& var = getUnusedVar32();
 			m_compiler.mov(var, Imm(((ASTLeafInt*)&_node)->value));
 			return &var;
 		}
 		else if (_node.type == ASTType::LeafFloat)
 		{
-			X86XmmVar& var = getUnusedFloat();
+			X86Xmm& var = getUnusedFloat();
 			m_compiler.movss(var, m_compiler.newFloatConst(0, ((ASTLeafFloat*)&_node)->value));
 			return &var;
 		}
@@ -536,7 +540,7 @@ namespace codeGen{
 		}
 		else if (_node.type == ASTType::LeafSizeOf)
 		{
-			X86GpVar& var = getUnusedVar32();
+			X86Gp& var = getUnusedVar32();
 			ASTSizeOf& node = *(ASTSizeOf*)&_node;
 
 			m_compiler.mov(var, Imm(node.value.isReference ? PTRSIZE : node.value.type.size));
@@ -548,97 +552,97 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileOp(par::InstructionType _instr, const std::vector< asmjit::Var* >& _args, int _indirect)
+	void Compiler::compileOp(par::InstructionType _instr, const std::vector< asmjit::Operand* >& _args, int _indirect)
 	{
 		switch (_instr)
 		{
 		case Inc:
-			m_compiler.inc(*(X86GpVar*)_args[0]);
+			m_compiler.inc(*(X86Gp*)_args[0]);
 			break;
 		case Dec:
-			m_compiler.dec(*(X86GpVar*)_args[0]);
+			m_compiler.dec(*(X86Gp*)_args[0]);
 			break;
 		case Neg:
-			m_compiler.mov(*(X86GpVar*)_args[1], *(X86GpVar*)_args[0]); //val is copied to not change the original and to have the result in the right destination
-			m_compiler.neg(*(X86GpVar*)_args[1]);
+			m_compiler.mov(*(X86Gp*)_args[1], *(X86Gp*)_args[0]); //val is copied to not change the original and to have the result in the right destination
+			m_compiler.neg(*(X86Gp*)_args[1]);
 			break;
 		case Add:
-			m_compiler.add(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.add(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Sub:
-			m_compiler.sub(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.sub(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Mul:
-			m_compiler.imul(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.imul(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Mod:
 		{
-			X86GpVar& dummy = getUnusedVar();
+			X86Gp& dummy = getUnusedVar32();
 			m_compiler.xor_(dummy, dummy);
-			m_compiler.idiv(dummy, *(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
-			m_compiler.mov(*(X86GpVar*)_args[0], dummy);
+			m_compiler.idiv(dummy, *(X86Gp*)_args[0], *(X86Gp*)_args[1]);
+			m_compiler.mov(*(X86Gp*)_args[0], dummy);
 			break;
 		}
 		case Div:
 		{
-			X86GpVar& dummy = getUnusedVar();
+			X86Gp& dummy = getUnusedVar();
 			m_compiler.xor_(dummy, dummy);
-			m_compiler.idiv(dummy, *(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.idiv(dummy, *(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		}
 		case ShL:
-			m_compiler.shl(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.shl(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case ShR:
-			m_compiler.shr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.shr(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case And:
-			m_compiler.and_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.and_(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Xor:
-			m_compiler.xor_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.xor_(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Or:
-			m_compiler.or_(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.or_(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Mov:
 			if (_indirect >= 0x100){
-				auto addr = x86::ptr(*(X86GpVar*)_args[0]);
+				auto addr = x86::ptr(*(X86Gp*)_args[0]);
 				addr.setSize(PTRSIZE);
-				m_compiler.mov(addr, *(X86GpVar*)_args[1]);
+				m_compiler.mov(addr, *(X86Gp*)_args[1]);
 			}
-			else m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			else m_compiler.mov(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case Set:
 			if (_indirect) {
-				m_compiler.mov(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86GpVar*)_args[1]);
+				m_compiler.mov(x86::dword_ptr(*(X86Gp*)_args[0]), *(X86Gp*)_args[1]);
 			} else
-				m_compiler.mov(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+				m_compiler.mov(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case fSet:
 			if (_indirect) {
-				m_compiler.movss(x86::dword_ptr(*(X86GpVar*)_args[0]), *(X86XmmVar*)_args[1]);
+				m_compiler.movss(x86::dword_ptr(*(X86Gp*)_args[0]), *(X86Xmm*)_args[1]);
 			}
 			else
-				m_compiler.movss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+				m_compiler.movss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case Ld:
-			m_compiler.mov(*(X86GpVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
+			m_compiler.mov(*(X86Gp*)_args[1], x86::dword_ptr(*(X86Gp*)_args[0]));
 			break;
 		case fLd:
-			m_compiler.movss(*(X86XmmVar*)_args[1], x86::dword_ptr(*(X86GpVar*)_args[0]));
+			m_compiler.movss(*(X86Xmm*)_args[1], x86::dword_ptr(*(X86Gp*)_args[0]));
 			break;
 		case LdO:
-			m_compiler.lea(*(X86GpVar*)_args[2], x86::dword_ptr(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1], 0)); //2
+			m_compiler.lea(*(X86Gp*)_args[2], x86::dword_ptr(*(X86Gp*)_args[0], *(X86Gp*)_args[1], 0)); //2
 			break;
 		case Cmp:
-			m_compiler.cmp(*(X86GpVar*)_args[0], *(X86GpVar*)_args[1]);
+			m_compiler.cmp(*(X86Gp*)_args[0], *(X86Gp*)_args[1]);
 			break;
 		case CmpZ:
-			m_compiler.cmp(*(X86GpVar*)_args[0], imm(0));
+			m_compiler.cmp(*(X86Gp*)_args[0], imm(0));
 			break;
 		case fCmp:
-			m_compiler.comiss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			m_compiler.comiss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case JE:
 			m_compiler.je(m_labelStack.back());
@@ -672,31 +676,31 @@ namespace codeGen{
 			break;
 		//float instructions
 		case fAdd:
-			m_compiler.addss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			m_compiler.addss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case fSub:
-			m_compiler.subss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			m_compiler.subss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case fMul:
-			m_compiler.mulss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			m_compiler.mulss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case fDiv:
-			m_compiler.divss(*(X86XmmVar*)_args[0], *(X86XmmVar*)_args[1]);
+			m_compiler.divss(*(X86Xmm*)_args[0], *(X86Xmm*)_args[1]);
 			break;
 		case fNeg:{
 			auto zeroConst = m_compiler.newFloatConst(0, 0.f); //todo: allocate this cost just once
-			m_compiler.movss(*(X86XmmVar*)_args[1], zeroConst); 
-			m_compiler.subss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
+			m_compiler.movss(*(X86Xmm*)_args[1], zeroConst); 
+			m_compiler.subss(*(X86Xmm*)_args[1], *(X86Xmm*)_args[0]);
 			break; }
 		case Sqrt:
-			m_compiler.sqrtss(*(X86XmmVar*)_args[1], *(X86XmmVar*)_args[0]);
+			m_compiler.sqrtss(*(X86Xmm*)_args[1], *(X86Xmm*)_args[0]);
 			break;
 		//typecasts
 		case iTof:
-			m_compiler.cvtsi2ss(*(X86XmmVar*)_args[1], *(X86GpVar*)_args[0]);
+			m_compiler.cvtsi2ss(*(X86Xmm*)_args[1], *(X86Gp*)_args[0]);
 			break;
 		case fToi:
-			m_compiler.cvtss2si(*(X86GpVar*)_args[1], *(X86XmmVar*)_args[0]);
+			m_compiler.cvtss2si(*(X86Gp*)_args[1], *(X86Xmm*)_args[0]);
 			break;
 		}
 	}
@@ -714,10 +718,10 @@ namespace codeGen{
 			return;
 		}
 
-		asmjit::X86GpVar* var = nullptr;
+		asmjit::X86Gp* var = nullptr;
 		if (_node.body->type == ASTType::Call)
 		{
-			var = (X86GpVar*)compileCall(*(ASTCall*)_node.body);
+			var = (X86Gp*)compileCall(*(ASTCall*)_node.body);
 		}
 		else if (_node.body->type == ASTType::Member)
 		{
@@ -727,12 +731,12 @@ namespace codeGen{
 		}
 		else if ((int)_node.body->type >= (int)ASTType::Leaf)
 		{
-			var = (X86GpVar*)compileLeaf(*(ASTLeaf*)_node.body);
+			var = (X86Gp*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
 
 		if (m_function->bHiddenParam)
 		{
-			X86GpVar& dest = *(X86GpVar*)m_function->scope.m_variables[0]->compiledVar;
+			X86Gp& dest = *(X86Gp*)m_function->scope.m_variables[0]->compiledVar;
 			//due to substitution the value can already be in the destination
 		//	if(&dest != var) compileMemCpy(dest, *var, m_function->returnTypeInfo.type.size);
 
@@ -744,7 +748,7 @@ namespace codeGen{
 		//currently inlining
 		if (m_retDstStack.size())
 		{
-			if (var != m_retDstStack.back().first) m_compiler.mov(*(X86GpVar*)m_retDstStack.back().first, *var);
+			if (var != m_retDstStack.back().first) m_compiler.mov(*(X86Gp*)m_retDstStack.back().first, *var);
 			m_compiler.jmp(m_retDstStack.back().second);
 		}
 		else
@@ -757,10 +761,10 @@ namespace codeGen{
 	{
 		UsageStateLock lock(m_usageState);
 
-		X86XmmVar* var;
+		X86Xmm* var;
 		if (_node.body->type == ASTType::Call)
 		{
-			var = (X86XmmVar*)compileCall(*(ASTCall*)_node.body);
+			var = (X86Xmm*)compileCall(*(ASTCall*)_node.body);
 		}
 		else if (_node.body->type == ASTType::Member)
 		{
@@ -770,14 +774,14 @@ namespace codeGen{
 		}
 		else if ((int)_node.body->type >= (int)ASTType::Leaf)
 		{
-			var = (X86XmmVar*)compileLeaf(*(ASTLeaf*)_node.body);
+			var = (X86Xmm*)compileLeaf(*(ASTLeaf*)_node.body);
 		}
 
 		compileEpilogue(*m_currentCodeNode);
 
 		if (m_retDstStack.size())
 		{
-			if (var != m_retDstStack.back().first) m_compiler.movss(*(X86XmmVar*)m_retDstStack.back().first, *var);
+			if (var != m_retDstStack.back().first) m_compiler.movss(*(X86Xmm*)m_retDstStack.back().first, *var);
 			m_compiler.jmp(m_retDstStack.back().second);
 		}
 		else
@@ -786,9 +790,9 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileMemCpy(const X86GpVar& _dst, const X86GpVar& _src, size_t _size)
+	void Compiler::compileMemCpy(const X86Gp& _dst, const X86Gp& _src, size_t _size)
 	{
-		X86GpVar& tmp = getUnusedVar();
+		X86Gp& tmp = getUnusedVar();
 		size_t chunks = _size / 4;
 		for (size_t i = 0; i < chunks; ++i)
 		{
@@ -799,18 +803,18 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	X86GpVar* Compiler::compileMemberAdr(par::ASTMember& _node)
+	X86Gp* Compiler::compileMemberAdr(par::ASTMember& _node)
 	{
-		X86GpVar* baseVar;
+		X86Gp* baseVar;
 		switch (_node.instance->type)
 		{
 		case ASTType::Call:
-			baseVar = (X86GpVar*)compileCall(*(ASTCall*)_node.instance); // take a var that has a higher lifespan that is still valid in getMemberAdr
+			baseVar = (X86Gp*)compileCall(*(ASTCall*)_node.instance); // take a var that has a higher lifespan that is still valid in getMemberAdr
 			break;
 		case ASTType::LeafSym:
 		{
 			ASTLeafSym& leaf = *(ASTLeafSym*)_node.instance;
-			baseVar = (X86GpVar*)leaf.value->compiledVar;
+			baseVar = (X86Gp*)leaf.value->compiledVar;
 			break;
 		}
 		case ASTType::Member:
@@ -846,7 +850,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	X86Mem Compiler::getMemberAdr(ASTMember& _node, X86GpVar& _var)
+	X86Mem Compiler::getMemberAdr(ASTMember& _node, X86Gp& _var)
 	{
 		ComplexType& type = _node.instance->typeInfo->type;
 		return x86::dword_ptr(_var, type.displacement[_node.index]);
@@ -854,7 +858,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileMemberLd(ASTMember& _node, X86GpVar& _var, X86GpVar& _destination)
+	void Compiler::compileMemberLd(ASTMember& _node, X86Gp& _var, X86Gp& _destination)
 	{
 		auto adr = getMemberAdr(_node, _var);
 
@@ -865,7 +869,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	void Compiler::compileMemberLdF(ASTMember& _node, X86GpVar& _var, X86XmmVar& _destination)
+	void Compiler::compileMemberLdF(ASTMember& _node, X86Gp& _var, X86Xmm& _destination)
 	{
 		auto adr = getMemberAdr(_node, _var);
 		
@@ -936,7 +940,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::X86GpVar& Compiler::getUnusedVar()
+	asmjit::X86Gp& Compiler::getUnusedVar()
 	{
 		if (m_anonymousVars.size() == m_usageState.varsInUse) m_anonymousVars.push_back(m_compiler.newIntPtr());
 
@@ -945,7 +949,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::X86GpVar& Compiler::getUnusedVar32()
+	asmjit::X86Gp& Compiler::getUnusedVar32()
 	{
 		//on x86 just one size of variables has to be managed
 #ifdef	_M_IX86
@@ -959,7 +963,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::X86XmmVar& Compiler::getUnusedFloat()
+	asmjit::X86Xmm& Compiler::getUnusedFloat()
 	{
 		if (m_anonymousFloats.size() == m_usageState.floatsInUse) m_anonymousFloats.push_back(m_compiler.newXmmSs());
 
@@ -968,7 +972,7 @@ namespace codeGen{
 
 	// *************************************************** //
 
-	asmjit::Var* Compiler::getUnusedVarAuto(const TypeInfo& _typeInfo)
+	asmjit::Reg* Compiler::getUnusedVarAuto(const TypeInfo& _typeInfo)
 	{
 		if (_typeInfo.isReference || _typeInfo.type.basic == BasicType::Complex) //complex is always a reference
 			return &getUnusedVar();

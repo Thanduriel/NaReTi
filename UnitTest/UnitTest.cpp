@@ -217,8 +217,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	for (int i = 0; i < 132; ++i) sum += scriptEngine.call<int>(hndlPerf);
 	cout << sum / 132 << " performance" << endl;
 
-	NaReTi::FunctionHandle hndlMain = scriptEngine.getFuncHndl("main");
-	scriptEngine.call(hndlMain);
+//	NaReTi::FunctionHandle hndlMain = scriptEngine.getFuncHndl("main");
+//	scriptEngine.call(hndlMain);
 
 	clock_t beginClock = clock();
 	NaReTi::FunctionHandle hndlWork = scriptEngine.getFuncHndl("much_work");

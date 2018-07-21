@@ -140,7 +140,7 @@ void strSize(string_literal& str)
 
 void main()
 {
-
+	printStr("begin main")
 	initRandom(getTickCount())
 	printStr("random---------------")
 	printI(rand(4, 0))
@@ -149,7 +149,7 @@ void main()
 	Vec2& v2
 	v2 := v1
 	printF(v2.x)
-	/*
+	
 	Vec2[0] array
 
 	Vec2 vec1 = Vec2(124.0, 987.0)
@@ -169,7 +169,7 @@ void main()
 	printF(array[2].y)
 //	vector.data = 1234
 //	printI(vector.data)
-	*/
+	
 //	printF(2.0'13.2)
 	
 	int i = 4

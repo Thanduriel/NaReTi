@@ -4,6 +4,7 @@
 #include <iostream>
 #include "parexception.hpp"
 #include "generics.hpp"
+#include "logger.hpp"
 
 using namespace std;
 
@@ -366,6 +367,23 @@ namespace par
 	void SemanticParser::finishParamList()
 	{
 		m_currentFunction->paramCount = (int)m_currentFunction->scope.m_variables.size();
+	}
+
+	void SemanticParser::finishFunction()
+	{
+		if (!m_currentFunction->bExternal && (!m_currentFunction->scope.size() 
+				|| m_currentFunction->scope.back()->type != ASTType::Ret))
+		{
+			if (m_currentFunction->returnTypeInfo.isVoid())
+			{
+		/*		ASTReturn& retNode = *m_allocator->construct<ASTReturn>();
+				retNode.body = nullptr;
+				m_currentFunction->scope.emplace_back(&retNode);*/
+			}
+		//	else LOG(LogLvl::Warning, "Missing return statement in non void function: " << m_currentFunction->name);
+			
+		}
+		resetScope();
 	}
 
 	// ************************************************** //
